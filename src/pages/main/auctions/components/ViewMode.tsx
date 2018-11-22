@@ -1,4 +1,5 @@
 import { rem } from 'polished';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
 const ViewModeSelector = styled.aside`
@@ -11,8 +12,11 @@ const ViewModeSelector = styled.aside`
   }
 `;
 
-export const ViewModeButton = styled.button`
-  display: inline-grid;
+export const ViewModeButton = styled(NavLink)`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
   width: ${rem('40px')};
   height: ${rem('40px')};
   background: transparent;

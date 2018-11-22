@@ -1,5 +1,11 @@
 interface AppState {
-  auctions: Auction[];
+  auctions: AuctionsState;
+}
+
+interface AuctionsState {
+  running: Auction[];
+  ended: Auction[];
+  scheduled: Auction[];
 }
 
 interface Auction {

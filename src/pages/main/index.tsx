@@ -25,7 +25,7 @@ const Sidebar = styled.aside`
 `;
 
 const Content = styled.main`
-  background: var(--color-content-bg);
+  background-color: var(--color-pale-grey);
 `;
 
 const Branding = styled.header`

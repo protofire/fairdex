@@ -1,25 +1,14 @@
-import React from 'react';
-import styled from 'styled-components';
+import { connect } from 'react-redux';
+import AuctionList from '../components/AuctionList';
 
-import Card from '../../../../components/Card';
-import Grid from '../../../../components/Grid';
+interface Props {
+  auctions: Auction[];
+}
 
-export default () => (
-  <Grid>
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-  </Grid>
-);
+function mapStateToProps(state: AppState): Props {
+  return {
+    auctions: state.auctions.ended
+  };
+}
+
+export default connect(mapStateToProps)(AuctionList);

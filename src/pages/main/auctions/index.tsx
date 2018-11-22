@@ -3,7 +3,6 @@ import Loadable from 'react-loadable';
 import { NavLink, Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
-import Grid from '../../../components/Grid';
 import Menu from './components/Menu';
 import ViewMode from './components/ViewMode';
 
@@ -28,17 +27,13 @@ const NavBar = styled.nav`
   }
 
   ${ViewMode.Selector} {
-    margin-left: var(--spacing-normal);
+    margin-right: var(--spacing-normal);
   }
 `;
 
 const Content = styled.section`
-  height: 100%;
-  padding: var(--spacing-normal);
-  overflow-x: auto;
-
-  ${Grid} {
-  }
+  padding: var(--spacing-wide);
+  overflow: auto;
 `;
 
 const EndedAuctions = Loadable({

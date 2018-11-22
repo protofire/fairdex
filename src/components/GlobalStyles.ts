@@ -9,8 +9,12 @@ const variables = css`
     --color-border: rgba(0, 0, 0, 0.05);
     --color-content-bg: #f4f6f8;
     --color-main-bg: #ffffff;
-    --color-text-primary: #131f3e;
-    --color-text-secondary: #adadad;
+    --color-text-primary: #131f3e; // FIXME
+    --color-text-secondary: #adadad; // FIXME
+    --color-light-grey-blue: #85c3d6; // FIXME
+    --color-greyish: #adadad;
+    --color-grey: #d9dee2;
+    --color-pale-grey: #f4f6f8;
 
     // Layout
     --card-height: ${rem('256px')};
@@ -19,9 +23,10 @@ const variables = css`
     --sidebar-width: ${rem('320px')};
     --spacing-normal: ${rem('32px')};
 
-    // Breakpoints TODO: move to constants
-    phone-max-width: 800px;
-    tablet-min-width: 801px;
+    // Spacing
+    --spacing-narrow: ${rem('8px')};
+    --spacing-normal: ${rem('16px')};
+    --spacing-wide: ${rem('32px')};
 
     @media (min-width: 1025px) {
       --card-width: ${rem('280px')};
@@ -47,6 +52,10 @@ const GlobalStyles = createGlobalStyle`
 
   a {
     text-decoration: none;
+  }
+
+  h1, h2, h3 {
+    margin: 0;
   }
 `;
 

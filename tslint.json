@@ -4,6 +4,7 @@
     "exclude": ["**/__tests__", "**/*.spec.*", "**/*.test.*"]
   },
   "rules": {
-    "interface-name": [true, "never-prefix"]
+    "interface-name": [true, "never-prefix"],
+    "object-literal-sort-keys": false
   }
 }
