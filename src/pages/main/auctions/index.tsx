@@ -3,6 +3,7 @@ import Loadable from 'react-loadable';
 import { NavLink, Redirect, Route, RouteComponentProps, Switch, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
+import Grid from '../../../components/Grid';
 import Menu from './components/Menu';
 import ViewMode from './components/ViewMode';
 
@@ -13,16 +14,16 @@ const Container = styled.section`
 const NavBar = styled.nav`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   height: var(--header-height);
   padding: 0 var(--spacing-normal);
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid var(--color-border);
 
   ${Menu.Container} {
     height: 100%;
 
     a {
-      line-height: var(--header-height);
+      line-height: calc(var(--header-height) - 1px);
     }
   }
 
@@ -35,6 +36,9 @@ const Content = styled.section`
   height: 100%;
   padding: var(--spacing-normal);
   overflow-x: auto;
+
+  ${Grid} {
+  }
 `;
 
 const EndedAuctions = Loadable({
@@ -66,11 +70,6 @@ const AuctionList: FunctionComponent<Props> = ({ match }) => (
           <NavLink to={`${match.path}/ended`}>Ended</NavLink>
         </Menu.Item>
       </Menu.Container>
-      <ViewMode.Selector>
-        <ViewMode.Button>x</ViewMode.Button>
-        <ViewMode.Button>y</ViewMode.Button>
-        <ViewMode.Button>z</ViewMode.Button>
-      </ViewMode.Selector>
     </NavBar>
     <Content>
       <Switch>
