@@ -43,7 +43,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    font-family: 'Lato', Georgia, sans-serif;
+    font-family: 'Open Sans', sans-serif;
   }
 
   *, *:before, *:after {
