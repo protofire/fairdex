@@ -65,7 +65,8 @@ const Button = styled.button`
   margin-top: var(--spacing-normal);
   border-radius: 24px;
   padding: 0.5rem 1rem;
-  border: 2px solid var(--color-pale-grey);
+  background: var(--color-main-bg);
+  border: 2px solid var(--color-content-bg);
   color: var(--color-accent);
   font-weight: bold;
   font-size: 0.8rem;
