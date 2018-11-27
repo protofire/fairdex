@@ -1,7 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 
-module.exports = {
+module.exports = (env, { mode }) => ({
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
   },
@@ -13,9 +13,10 @@ module.exports = {
   module: {
     rules: [
       {
+        enforce: 'pre',
         test: /\.js$/,
         use: 'source-map-loader',
-        enforce: 'pre'
+        exclude: /xhr2-cookies/
       },
       {
         test: /\.tsx?$/,
@@ -50,8 +51,10 @@ module.exports = {
     })
   ],
 
+  devtool: mode === 'production' ? 'hidden-source-map' : 'eval-source-map',
+
   devServer: {
     historyApiFallback: true,
     host: '0.0.0.0'
   }
-};
+});
