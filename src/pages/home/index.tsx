@@ -25,7 +25,7 @@ interface Props {
   wallet?: WalletType;
 }
 
-const HomePage = ({ network, wallet }: Props) => {
+const HomePage = React.memo(({ network, wallet }: Props) => {
   let content = null;
 
   if (!wallet) {
@@ -37,7 +37,7 @@ const HomePage = ({ network, wallet }: Props) => {
   }
 
   return <Container>{content}</Container>;
-};
+});
 
 const Container = styled.section`
   display: flex;
