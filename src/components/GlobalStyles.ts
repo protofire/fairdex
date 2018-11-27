@@ -26,7 +26,7 @@ const variables = css`
     --spacing-normal: ${rem('32px')};
 
     // Animations
-    --animation-duration: 500ms;
+    --animation-duration: 250ms;
   }
 `;
 

@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
 import Icon from '../../../components/icons';
@@ -23,7 +24,7 @@ interface DispatchProps {
   };
 }
 
-const Sidebar = ({ actions, children, ...props }: SidebarProps) => (
+const Sidebar = React.memo(({ actions, children, ...props }: SidebarProps) => (
   <Container>
     <Content {...props}>
       {children}
@@ -31,7 +32,7 @@ const Sidebar = ({ actions, children, ...props }: SidebarProps) => (
     </Content>
     {props.isOpen && <Overlay onClick={actions.hideSidebar} />}
   </Container>
-);
+));
 
 const Container = styled.aside`
   @media (min-width: 801px) {
@@ -91,7 +92,7 @@ function mapStateToProps({ ui }: AppState): StateProps {
   };
 }
 
-function mapDispatchToProps(dispatch: any): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
       hideSidebar: () => dispatch(hideSidebar())

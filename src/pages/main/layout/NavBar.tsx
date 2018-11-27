@@ -1,17 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
+import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
 import Icon from '../../../components/icons';
-import { toggleSidebar } from '../../../store/ui/actions';
+import { toggleFilters, toggleSidebar } from '../../../store/ui/actions';
 import ActionBar from './ActionBar';
 
 type NavBarProps = DispatchProps & RouteComponentProps;
 
 interface DispatchProps {
   actions: {
-    toggleSidebar: () => void;
+    toggleSidebar: typeof toggleSidebar;
+    toggleFilters: typeof toggleFilters;
   };
 }
 
@@ -32,7 +34,7 @@ const NavBar = ({ actions }: NavBarProps) => (
       </Tab>
     </TabBar>
     <ActionBar side='right'>
-      <TogglePreferences />
+      <ToggleFilters onClick={actions.toggleFilters} />
     </ActionBar>
   </Container>
 );
@@ -60,7 +62,7 @@ const ToggleSidebar = styled(Icon.Menu)`
   }
 `;
 
-const TogglePreferences = styled(Icon.Preferences)`
+const ToggleFilters = styled(Icon.Preferences)`
   cursor: pointer;
   user-select: none;
 `;
@@ -117,10 +119,11 @@ export const Tab = styled.li`
   }
 `;
 
-function mapDispatchToProps(dispatch: any): DispatchProps {
+function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
-      toggleSidebar: () => dispatch(toggleSidebar())
+      toggleSidebar: () => dispatch(toggleSidebar()),
+      toggleFilters: () => dispatch(toggleFilters())
     }
   };
 }

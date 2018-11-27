@@ -4,7 +4,7 @@ import { BrowserRouter as Router, NavLink, Redirect, Route, Switch } from 'react
 import styled from 'styled-components';
 
 import Spinner from '../../components/Spinner';
-import { Content, Layout, NavBar, Sidebar } from './layout';
+import { Content, Filters, Layout, NavBar, Sidebar } from './layout';
 
 const EndedAuctions = Loadable({
   loader: () => import('./auctions/containers/EndedAuctions'),
@@ -46,6 +46,7 @@ class MainPage extends React.Component {
             </Branding>
             <Wallet />
           </Sidebar>
+          <Filters />
           <Content>
             <NavBar />
             <Section>

@@ -3,6 +3,7 @@ import { Action, ActionCreator } from 'redux';
 export const HIDE_SIDEBAR = 'sidebar/HIDE';
 export const SHOW_SIDEBAR = 'sidebar/SHOW';
 export const TOGGLE_SIDEBAR = 'sidebar/TOGGLE_VISIBILITY';
+export const TOGGLE_FILTERS = 'filters/TOGGLE_VISIBILITY';
 
 export const hideSidebar: ActionCreator<Action> = () => {
   return {
@@ -19,5 +20,11 @@ export const showSidebar: ActionCreator<Action> = () => {
 export const toggleSidebar: ActionCreator<Action> = () => {
   return {
     type: TOGGLE_SIDEBAR
+  };
+};
+
+export const toggleFilters: ActionCreator<Action> = () => {
+  return {
+    type: TOGGLE_FILTERS
   };
 };

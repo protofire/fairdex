@@ -1,3 +1,4 @@
 interface UiState {
-  sidebarVisible?: boolean;
+  sidebarVisible: boolean;
+  filtersVisible: boolean;
 }

@@ -9,12 +9,21 @@ const Overlay = styled.div`
   bottom: 0;
   z-index: 100;
   background-color: var(--color-content-bg);
-  opacity: 0.75;
 
   touch-action: none;
 
-  transition: opacity var(--animation-duration);
-  transition-delay: var(--animation-duration);
+  animation: fadeIn;
+  animation-duration: var(--animation-duration);
+  animation-fill-mode: forwards;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.75;
+    }
+  }
 `;
 
 export default Overlay;
