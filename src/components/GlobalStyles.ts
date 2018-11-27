@@ -23,7 +23,9 @@ const variables = css`
     --spacing-normal: ${rem('32px')};
 
     // Spacing
+    --spacing-narrow: ${rem('16px')};
     --spacing-normal: ${rem('32px')};
+    --spacing-wide: ${rem('48px')};
 
     // Animations
     --animation-duration: 500ms;

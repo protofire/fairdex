@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import Separator from '../../components/Separator';
+import * as images from '../../images';
 import { connect as connectWallet } from '../../store/wallet/actions';
 
 interface Props {
@@ -30,10 +31,20 @@ class SelectWallet extends React.PureComponent<Props> {
         <Separator />
         <WalletList>
           <Wallet onClick={this.selectStandardWallet}>
+            <Images>
+              <img src={images.wallet.MetaMask} alt='MetaMask' />
+              <img src={images.wallet.Parity} alt='Parity' />
+              <img src={images.wallet.Cipher} alt='Cipher' />
+            </Images>
             <h3>Standard Wallet</h3>
+            <p>MetaMask, Parity, Cipher, Local Node</p>
           </Wallet>
           <Wallet disabled={true} onClick={this.selectLedgerWallet}>
+            <Images>
+              <img src={images.wallet.LedgerNano} alt='Ledger Nano' />
+            </Images>
             <h3>Ledger Nano</h3>
+            <p />
           </Wallet>
         </WalletList>
       </>
@@ -71,17 +82,26 @@ const Wallet = styled.button`
 
   &:hover {
     box-shadow: 0 24px 60px 0 rgba(133, 195, 214, 0.5);
-    transform: translateY(-10%);
+    transform: translateY(-5%);
+  }
+`;
+
+const Images = styled.div`
+  display: grid;
+  grid-gap: var(--spacing-normal);
+  grid-auto-flow: column;
+  place-content: center;
+  margin: var(--spacing-normal) 0;
+
+  img {
+    width: 48px;
+    height: 48px;
   }
 
-  h3 {
-    font-size: 32px;
-    font-weight: 800;
-    font-style: normal;
-    line-height: 0.94;
-    letter-spacing: normal;
-    text-align: center;
-    color: var(--color-light-grey-blue);
+  p {
+    height: var(--spacing-normal);
+    line-height: var(--spacing-normal);
+    margin-bottom: var(--spacing-narrow);
   }
 `;
 

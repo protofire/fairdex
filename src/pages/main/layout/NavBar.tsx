@@ -56,7 +56,7 @@ const ToggleSidebar = styled(Icon.Menu)`
   user-select: none;
 
   @media (min-width: 801px) {
-    display: none;
+    visibility: hidden;
   }
 `;
 
