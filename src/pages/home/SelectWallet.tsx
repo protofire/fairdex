@@ -70,6 +70,8 @@ const Wallet = styled.button`
   box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.05);
   cursor: pointer;
 
+  transition: transform 100ms ease-in-out;
+
   &:disabled {
     pointer-events: none;
     touch-action: none;
@@ -82,7 +84,7 @@ const Wallet = styled.button`
 
   &:hover {
     box-shadow: 0 24px 60px 0 rgba(133, 195, 214, 0.5);
-    transform: translateY(-5%);
+    transform: translateY(-2%);
   }
 `;
 
