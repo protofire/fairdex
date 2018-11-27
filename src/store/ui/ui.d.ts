@@ -1,0 +1,3 @@
+interface UiState {
+  sidebarVisible?: boolean;
+}
