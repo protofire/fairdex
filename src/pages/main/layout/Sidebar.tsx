@@ -29,7 +29,7 @@ const Sidebar = ({ actions, children, ...props }: SidebarProps) => (
       {children}
       <ActionBar>{props.isOpen && <CloseButton onClick={actions.hideSidebar} />}</ActionBar>
     </Content>
-    {props.isOpen && <Overlay />}
+    {props.isOpen && <Overlay onClick={actions.hideSidebar} />}
   </Container>
 );
 
