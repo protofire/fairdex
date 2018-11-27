@@ -14,7 +14,6 @@ const variables = css`
     --color-light-grey-blue: #85c3d6; // FIXME
     --color-greyish: #adadad;
     --color-grey: #d9dee2;
-    --color-pale-grey: #f4f6f8;
 
     // Layout
     --card-height: ${rem('256px')};
@@ -24,9 +23,10 @@ const variables = css`
     --spacing-normal: ${rem('32px')};
 
     // Spacing
-    --spacing-narrow: ${rem('32px')};
     --spacing-normal: ${rem('32px')};
-    --spacing-wide: ${rem('32px')};
+
+    // Animations
+    --animation-duration: 500ms;
   }
 `;
 

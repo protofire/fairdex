@@ -8,7 +8,7 @@ const ViewModeSelector = styled.aside`
   @media (min-width: 801px) {
     display: inline-grid;
     grid-template-columns: repeat(3, auto);
-    column-gap: var(--spacing-narrow);
+    column-gap: var(--spacing-normal);
   }
 `;
 
