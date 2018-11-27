@@ -24,13 +24,9 @@ const variables = css`
     --spacing-normal: ${rem('32px')};
 
     // Spacing
-    --spacing-narrow: ${rem('8px')};
-    --spacing-normal: ${rem('16px')};
+    --spacing-narrow: ${rem('32px')};
+    --spacing-normal: ${rem('32px')};
     --spacing-wide: ${rem('32px')};
-
-    @media (min-width: 1025px) {
-      --card-width: ${rem('280px')};
-    }
   }
 `;
 
@@ -56,6 +52,10 @@ const GlobalStyles = createGlobalStyle`
 
   h1, h2, h3 {
     margin: 0;
+  }
+
+  #root {
+    background-color: var(--color-content-bg);
   }
 `;
 

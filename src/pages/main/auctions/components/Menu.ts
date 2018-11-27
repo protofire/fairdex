@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const Menu = styled.ul`
+export const Menu = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
@@ -11,7 +11,7 @@ const Menu = styled.ul`
   column-gap: var(--spacing-normal);
 `;
 
-const MenuItem = styled.li`
+export const MenuItem = styled.li`
   display: inline-flex;
   align-items: center;
   margin: 0;
@@ -46,8 +46,3 @@ const MenuItem = styled.li`
     }
   }
 `;
-
-export default {
-  Container: Menu,
-  Item: MenuItem
-};

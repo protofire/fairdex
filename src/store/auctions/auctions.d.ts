@@ -1,7 +1,3 @@
-interface AppState {
-  auctions: AuctionsState;
-}
-
 interface AuctionsState {
   running: Auction[];
   ended: Auction[];

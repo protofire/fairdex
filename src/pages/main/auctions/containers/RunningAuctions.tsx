@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+
 import AuctionList from '../components/AuctionList';
 
 interface Props {
