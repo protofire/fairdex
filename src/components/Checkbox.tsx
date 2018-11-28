@@ -1,16 +1,25 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import checkboxChecked from '../images/checkbox_checked.svg';
 import checkboxUnchecked from '../images/checkbox_unchecked.svg';
 
 interface Props {
+  name: string;
   checked: boolean;
   className?: string;
-  onChange: () => void;
+  onChange: (name: string, checked: boolean) => void;
 }
 
-const Checkbox = (props: Props) => <span onClick={props.onChange} className={props.className} />;
+class Checkbox extends React.PureComponent<Props> {
+  render() {
+    return <span onClick={this.toggle} className={this.props.className} />;
+  }
+
+  private toggle = (e: any) => {
+    this.props.onChange(this.props.name, !this.props.checked);
+  };
+}
 
 export default styled(Checkbox)`
   display: inline-block;

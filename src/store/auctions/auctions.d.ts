@@ -1,10 +1,11 @@
 interface AuctionsState {
-  running: Auction[];
-  ended: Auction[];
-  scheduled: Auction[];
+  list: Auction[];
 }
 
+type AuctionState = 'running' | 'ended' | 'scheduled';
+
 interface Auction {
+  state: AuctionState;
   auctionIndex: number;
   sellToken: string;
   buyToken: string;
