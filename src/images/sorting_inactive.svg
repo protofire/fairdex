@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
+  <defs>
+    <style>
+      .cls-1{fill:none}.cls-2{fill:#d9dee2}
+    </style>
+  </defs>
+  <g id="sorting_inactive" transform="rotate(180 263 40)">
+    <path id="Rectangle_155" d="M0 0h14v14H0z" class="cls-1" data-name="Rectangle 155" transform="translate(512 66)"/>
+    <path id="Path_53" d="M-12277-6561h8l-4-4z" class="cls-2" data-name="Path 53" transform="rotate(180 -5877 -3243.5)"/>
+    <path id="Path_52" d="M-12277-6561h8l-4-4z" class="cls-2" data-name="Path 52" transform="translate(12792 6633)"/>
+  </g>
+</svg>

@@ -20,12 +20,13 @@ const variables = css`
     --card-width: ${rem('256px')};
     --header-height: ${rem('72px')};
     --sidebar-width: ${rem('320px')};
-    --spacing-normal: ${rem('32px')};
 
     // Spacing
-    --spacing-narrow: ${rem('16px')};
-    --spacing-normal: ${rem('32px')};
-    --spacing-wide: ${rem('48px')};
+    --spacing-title: 0.75rem;
+    --spacing-text: 0.5rem;
+    --spacing-narrow: 1rem;
+    --spacing-normal: 2rem;
+    --spacing-wide: 3rem;
 
     // Animations
     --animation-duration: 250ms;
@@ -38,10 +39,12 @@ const GlobalStyles = createGlobalStyle`
   html {
     box-sizing: border-box;
     overflow-y: scroll;
+    font-size: 16px;
   }
 
   body {
     font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
   }
 
   *, *:before, *:after {
@@ -54,6 +57,7 @@ const GlobalStyles = createGlobalStyle`
 
   h1, h2, h3 {
     margin: 0;
+    font-size: 1rem;
   }
 
   #root {
