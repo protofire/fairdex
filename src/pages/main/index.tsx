@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import Spinner from '../../components/Spinner';
 import { Content, Filters, Layout, NavBar, Sidebar } from './layout';
 
+import logo from '../../images/protofire.svg';
+
 const EndedAuctions = Loadable({
   loader: () => import('./auctions/containers/EndedAuctions'),
   loading: () => <Spinner size='large' />
@@ -41,7 +43,7 @@ class MainPage extends React.Component {
           <Sidebar>
             <Branding>
               <NavLink to='/'>
-                <img src='https://protofire.io/img/protofire.svg' />
+                <img src={logo} height={40} />
               </NavLink>
             </Branding>
             <Wallet />

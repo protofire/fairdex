@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import Spinner from '../../components/Spinner';
+import * as images from '../../images';
 
 const MainPage = Loadable({
   loader: () => import('../main'),
@@ -36,7 +37,14 @@ const HomePage = React.memo(({ network, wallet }: Props) => {
     return <MainPage />;
   }
 
-  return <Container>{content}</Container>;
+  return (
+    <Container>
+      {content}
+      <Footer>
+        <img src={images.logo} />
+      </Footer>
+    </Container>
+  );
 });
 
 const Container = styled.section`
@@ -48,18 +56,42 @@ const Container = styled.section`
   width: 100%;
   min-height: 100vh;
 
+  @media (min-height: 768px) {
+    padding-bottom: calc(var(--spacing-wide) * 2);
+  }
+
   h2 {
     text-transform: uppercase;
+  }
+
+  h3 {
+    font-size: 32px;
+    font-weight: 800;
+    text-align: center;
+    color: var(--color-light-grey-blue);
   }
 
   p {
     margin: 0;
     font-size: 14px;
     font-weight: normal;
-    line-height: 1.29;
-    letter-spacing: -0.4px;
 
     color: var(--color-greyish);
+  }
+`;
+
+const Footer = styled.footer`
+  margin: var(--spacing-wide) 0;
+  user-select: none;
+
+  @media (min-height: 768px) {
+    position: absolute;
+    bottom: 0;
+  }
+
+  img {
+    width: 144px;
+    height: 40px;
   }
 `;
 
