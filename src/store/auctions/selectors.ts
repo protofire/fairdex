@@ -10,19 +10,26 @@ export const getBuyTokens = createSelector(
   (list: Auction[]) => buildTokens(list, 'buyToken')
 );
 
-export const getRunningAuctions = createSelector(
+export const getFilteredAuctions = createSelector(
   (state: AppState) => state.auctions.list,
-  (list: Auction[]) => filterTokens(list, 'running')
+  (state: AppState) => state.filters,
+  (state: AppState) => state.wallet,
+  filterAuctions
+);
+
+export const getRunningAuctions = createSelector(
+  getFilteredAuctions,
+  list => list.filter(item => item.state === 'running')
 );
 
 export const getEndedAuctions = createSelector(
-  (state: AppState) => state.auctions.list,
-  (list: Auction[]) => filterTokens(list, 'ended')
+  getFilteredAuctions,
+  list => list.filter(item => item.state === 'ended')
 );
 
 export const getScheduledAuctions = createSelector(
-  (state: AppState) => state.auctions.list,
-  (list: Auction[]) => filterTokens(list, 'scheduled')
+  getFilteredAuctions,
+  list => list.filter(item => item.state === 'scheduled')
 );
 
 function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
@@ -46,6 +53,36 @@ function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
   return outputList;
 }
 
-function filterTokens(list: Auction[], state: AuctionState) {
-  return list.filter(item => item.state === state);
+function filterAuctions(list: Auction[], filters: FiltersState, wallet: WalletState) {
+  let out = Array.from(list);
+  const sortMap = {
+    token: 'buyToken',
+    'sell-volume': 'sellVolume',
+    'end-time': 'auctionEnd'
+  };
+  const sortField = sortMap[filters.sortBy] as keyof Auction;
+  if (sortField) {
+    out.sort((a, b) => {
+      if (a[sortField] > b[sortField]) {
+        return filters.sortDir === 'asc' ? 1 : -1;
+      } else if (a[sortField] < b[sortField]) {
+        return filters.sortDir === 'asc' ? -1 : 1;
+      }
+      return 0;
+    });
+  }
+  if (filters.onlyMyAuctions) {
+    out = out.filter(item => item.sellTokenAddress === wallet.accountAddress);
+  }
+  if (filters.onlyMyTokens) {
+    // ?
+  }
+  if (filters.sellTokens.length > 0) {
+    out = out.filter(item => filters.sellTokens.includes(item.sellToken));
+  }
+  if (filters.buyTokens.length > 0) {
+    out = out.filter(item => filters.buyTokens.includes(item.sellToken));
+  }
+
+  return out;
 }
