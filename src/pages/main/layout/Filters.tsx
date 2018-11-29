@@ -3,21 +3,23 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
+import Button from '../../../components/Button';
 import Checkbox from '../../../components/Checkbox';
 import Icon from '../../../components/icons';
 import Overlay from '../../../components/Overlay';
 import sortDownImage from '../../../images/sorting_arrow_down.svg';
 import sortUpImage from '../../../images/sorting_arrow_up.svg';
 import sortNoneImage from '../../../images/sorting_inactive.svg';
-import { applyFilters } from '../../../store/filters/actions';
+import { getBuyTokens, getSellTokens } from '../../../store/auctions/selectors';
+import { applyFilters, clearFilters } from '../../../store/filters/actions';
 import { toggleFilters } from '../../../store/ui/actions';
 
-type SidebarProps = StateProps & DispatchProps;
+type Props = StateProps & DispatchProps;
 
 interface StateProps {
   isOpen?: boolean;
-  sellTokens: Token[];
-  bidTokens: Token[];
+  sellTokens: TokenInfo[];
+  buyTokens: TokenInfo[];
   filters: FiltersState;
 }
 
@@ -25,6 +27,7 @@ interface DispatchProps {
   actions: {
     toggle: typeof toggleFilters;
     applyFilters: typeof applyFilters;
+    clearFilters: typeof clearFilters;
   };
 }
 
@@ -32,15 +35,8 @@ interface SortButtonProps {
   dir: 'up' | 'down' | 'none';
 }
 
-interface Token {
-  id: string;
-  name: string;
-  count: number;
-}
-
-class Filters extends React.PureComponent<SidebarProps> {
+class Filters extends React.PureComponent<Props> {
   toggleOption = (option: string, checked: boolean) => {
-    console.debug(option, checked);
     this.props.actions.applyFilters({
       ...this.props.filters,
       [option]: checked
@@ -51,14 +47,10 @@ class Filters extends React.PureComponent<SidebarProps> {
     this.props.actions.applyFilters(filters);
   };
 
-  applySellTokenFilter = (token: string) => {
-    this.props.actions.applyFilters({ ...this.props.filters });
-  };
-
   render() {
-    const { actions, isOpen, sellTokens, bidTokens } = this.props;
+    const { actions, isOpen, sellTokens, buyTokens } = this.props;
     const sellTokensList = this.buildTokenList(sellTokens, 'sellTokens');
-    const bidTokensList = this.buildTokenList(bidTokens, 'bidTokens');
+    const buyTokensList = this.buildTokenList(buyTokens, 'buyTokens');
     return (
       <>
         <Root {...this.props}>
@@ -66,67 +58,75 @@ class Filters extends React.PureComponent<SidebarProps> {
             <Title>Sort & Filter</Title>
             <CloseButton onClick={actions.toggle} />
           </Header>
-          <Section>
-            <SubTitle>Sort By</SubTitle>
-            <List>
-              <Item>
-                <SortButton dir='up' /> Token
-              </Item>
-              <Item>
-                <SortButton dir='none' /> Sell volume
-              </Item>
-              <Item>
-                <SortButton dir='none' /> Estimated end time
-              </Item>
-            </List>
-          </Section>
-          <Section>
-            <List>
-              <Item>
-                <Checkbox name='onlyMyTokens' checked={this.props.filters.onlyMyTokens} onChange={this.toggleOption} />
-                <ItemText>Only tokens I hold</ItemText>
-                <ItemCount>5</ItemCount>
-              </Item>
-              <Item>
-                <Checkbox
-                  name='onlyMyAuctions'
-                  checked={this.props.filters.onlyMyAuctions}
-                  onChange={this.toggleOption}
-                />
-                <ItemText>Only my auctions</ItemText>
-                <ItemCount>2</ItemCount>
-              </Item>
-            </List>
-          </Section>
-          <Section>
-            <SubTitle>Sell tokens</SubTitle>
-            <List>{sellTokensList}</List>
-          </Section>
-          <Section>
-            <SubTitle>Bid tokens</SubTitle>
-            <List>{bidTokensList}</List>
-          </Section>
+          <Content>
+            <Section>
+              <SubTitle>Sort By</SubTitle>
+              <List>
+                <Item>
+                  <SortButton dir='up' /> Token
+                </Item>
+                <Item>
+                  <SortButton dir='none' /> Sell volume
+                </Item>
+                <Item>
+                  <SortButton dir='none' /> Estimated end time
+                </Item>
+              </List>
+            </Section>
+            <Section>
+              <List>
+                <Item>
+                  <Checkbox
+                    name='onlyMyTokens'
+                    checked={this.props.filters.onlyMyTokens}
+                    onChange={this.toggleOption}
+                  />
+                  <ItemText>Only tokens I hold</ItemText>
+                  <ItemCount>5</ItemCount>
+                </Item>
+                <Item>
+                  <Checkbox
+                    name='onlyMyAuctions'
+                    checked={this.props.filters.onlyMyAuctions}
+                    onChange={this.toggleOption}
+                  />
+                  <ItemText>Only my auctions</ItemText>
+                  <ItemCount>2</ItemCount>
+                </Item>
+              </List>
+            </Section>
+            <Section>
+              <SubTitle>Sell tokens</SubTitle>
+              <List>{sellTokensList}</List>
+            </Section>
+            <Section>
+              <SubTitle>Bid tokens</SubTitle>
+              <List>{buyTokensList}</List>
+            </Section>
+          </Content>
+          <Footer>
+            <Button onClick={actions.clearFilters}>Clear settings</Button>
+          </Footer>
         </Root>
         {isOpen && <Overlay onClick={actions.toggle} />}
       </>
     );
   }
 
-  private buildTokenList(list: Token[], tokenType: 'sellTokens' | 'bidTokens') {
+  private buildTokenList(list: TokenInfo[], tokenType: 'sellTokens' | 'buyTokens') {
     const { filters } = this.props;
     const applyTokenFilter = (id: string, checked: boolean) => {
       const newFilters = Array.from(filters[tokenType]);
       if (checked && !filters[tokenType].includes(id)) {
         newFilters.push(id);
-      } else {
+      } else if (!checked) {
         const indexOfToken = newFilters.indexOf(id);
         if (indexOfToken > -1) {
-          delete newFilters[indexOfToken];
+          newFilters.splice(indexOfToken, 1);
         }
       }
       this.props.actions.applyFilters({
-        ...filters,
-        [tokenType]: filters[tokenType]
+        [tokenType]: newFilters
       });
     };
     return list.map(token => {
@@ -155,6 +155,28 @@ const Root = styled.div`
   background: var(--color-main-bg);
   transform: translateX(${(props: StateProps) => (props.isOpen ? '0' : '100%')});
   color: var(--color-text-primary);
+`;
+
+const Content = styled.div`
+  overflow: auto;
+  flex: 1 1 auto;
+`;
+
+const Footer = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 32%, #fff);
+  padding: var(--spacing-normal);
+  padding-top: calc(var(--spacing-normal) * 2);
+  pointer-events: none;
+
+  ${Button} {
+    pointer-events: auto;
+  }
 `;
 
 const CloseButton = styled(Icon.Close)`
@@ -233,12 +255,12 @@ const SortButton = styled.span`
   }}
 `;
 
-function mapStateToProps({ ui, filters }: AppState): StateProps {
+function mapStateToProps(state: AppState): StateProps {
   return {
-    isOpen: ui.filtersVisible,
-    sellTokens: [],
-    bidTokens: [],
-    filters
+    isOpen: state.ui.filtersVisible,
+    sellTokens: getSellTokens(state),
+    buyTokens: getBuyTokens(state),
+    filters: state.filters
   };
 }
 
@@ -246,7 +268,8 @@ function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
       toggle: () => dispatch(toggleFilters()),
-      applyFilters: (filters: FiltersState) => dispatch(applyFilters(filters))
+      applyFilters: (filters: FiltersState) => dispatch(applyFilters(filters)),
+      clearFilters: () => dispatch(clearFilters())
     }
   };
 }

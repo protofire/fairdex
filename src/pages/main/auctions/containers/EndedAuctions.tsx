@@ -1,5 +1,6 @@
 import { connect } from 'react-redux';
 
+import { getEndedAuctions } from '../../../../store/auctions/selectors';
 import AuctionList from '../components/AuctionList';
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 
 function mapStateToProps(state: AppState): Props {
   return {
-    auctions: state.auctions.ended
+    auctions: getEndedAuctions(state)
   };
 }
 

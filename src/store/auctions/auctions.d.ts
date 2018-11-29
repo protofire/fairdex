@@ -7,8 +7,8 @@ type AuctionState = 'running' | 'ended' | 'scheduled';
 interface Auction {
   state: AuctionState;
   auctionIndex: number;
-  sellToken: string;
-  buyToken: string;
+  sellToken: TokenId;
+  buyToken: TokenId;
   sellTokenAddress: Address;
   buyTokenAddress: Address;
   auctionStart: string;
@@ -17,4 +17,10 @@ interface Auction {
   buyVolume: number;
   closingPrice: number;
   priceIncrement: number;
+}
+
+interface TokenInfo {
+  id: TokenId;
+  name: string;
+  count: number;
 }
