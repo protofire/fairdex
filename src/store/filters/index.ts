@@ -1,6 +1,6 @@
 import { Reducer } from 'redux';
 
-import { APPLY_FILTERS, CLEAR_FILTERS, FiltersAction } from './actions';
+import * as actions from './actions';
 
 const initialState: FiltersState = {
   sellTokens: [],
@@ -15,13 +15,13 @@ const reducer: Reducer<FiltersState, FiltersAction> = (state = initialState, act
   const { type, payload } = action;
 
   switch (type) {
-    case APPLY_FILTERS:
+    case actions.APPLY_FILTERS:
       return {
         ...state,
         ...payload
       };
 
-    case CLEAR_FILTERS:
+    case actions.CLEAR_FILTERS:
       return initialState;
 
     default:

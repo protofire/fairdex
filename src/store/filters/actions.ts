@@ -1,8 +1,4 @@
-import { Action, ActionCreator } from 'redux';
-
-export interface FiltersAction extends Action<string> {
-  payload?: Partial<FiltersState>;
-}
+import { ActionCreator } from 'redux';
 
 export const APPLY_FILTERS = 'filters/apply';
 export const CLEAR_FILTERS = 'filters/clear';
