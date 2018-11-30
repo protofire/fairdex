@@ -82,7 +82,7 @@ class Filters extends React.PureComponent<Props> {
                 </Item>
               </List>
             </Section>
-            <Section>
+            {/* <Section>
               <List>
                 <Item>
                   <Label>
@@ -107,7 +107,7 @@ class Filters extends React.PureComponent<Props> {
                   <ItemCount>2</ItemCount>
                 </Item>
               </List>
-            </Section>
+            </Section> */}
             <Section>
               <SubTitle>Sell tokens ({sellTokensList.length})</SubTitle>
               <CollapsibleList>{sellTokensList}</CollapsibleList>
