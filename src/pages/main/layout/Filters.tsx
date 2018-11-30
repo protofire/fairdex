@@ -109,11 +109,11 @@ class Filters extends React.PureComponent<Props> {
               </List>
             </Section>
             <Section>
-              <SubTitle>Sell tokens</SubTitle>
+              <SubTitle>Sell tokens ({sellTokensList.length})</SubTitle>
               <CollapsibleList>{sellTokensList}</CollapsibleList>
             </Section>
             <Section>
-              <SubTitle>Bid tokens</SubTitle>
+              <SubTitle>Bid tokens ({buyTokensList.length})</SubTitle>
               <CollapsibleList>{buyTokensList}</CollapsibleList>
             </Section>
           </Content>
