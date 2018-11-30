@@ -81,7 +81,7 @@ function filterAuctions(list: Auction[], filters: FiltersState, wallet: WalletSt
     out = out.filter(item => filters.sellTokens.includes(item.sellToken));
   }
   if (filters.buyTokens.length > 0) {
-    out = out.filter(item => filters.buyTokens.includes(item.sellToken));
+    out = out.filter(item => filters.buyTokens.includes(item.buyToken));
   }
 
   return out;
