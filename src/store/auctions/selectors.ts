@@ -64,9 +64,9 @@ function filterAuctions(list: Auction[], filters: FiltersState, wallet: WalletSt
   if (sortField) {
     out.sort((a, b) => {
       if (a[sortField] > b[sortField]) {
-        return filters.sortDir === 'asc' ? 1 : -1;
-      } else if (a[sortField] < b[sortField]) {
         return filters.sortDir === 'asc' ? -1 : 1;
+      } else if (a[sortField] < b[sortField]) {
+        return filters.sortDir === 'asc' ? 1 : -1;
       }
       return 0;
     });
@@ -75,7 +75,7 @@ function filterAuctions(list: Auction[], filters: FiltersState, wallet: WalletSt
     out = out.filter(item => item.sellTokenAddress === wallet.accountAddress);
   }
   if (filters.onlyMyTokens) {
-    // ?
+    // TODO
   }
   if (filters.sellTokens.length > 0) {
     out = out.filter(item => filters.sellTokens.includes(item.sellToken));

@@ -32,7 +32,7 @@ interface DispatchProps {
 }
 
 interface SortButtonProps {
-  dir: 'up' | 'down' | 'none';
+  dir: SortDir;
 }
 
 class Filters extends React.PureComponent<Props> {
@@ -47,10 +47,15 @@ class Filters extends React.PureComponent<Props> {
     this.props.actions.applyFilters(filters);
   };
 
+  createSorter = (sortBy: SortField, sortDir: SortDir) => {
+    return () => this.props.actions.applyFilters({ sortBy, sortDir });
+  };
+
   render() {
-    const { actions, isOpen, sellTokens, buyTokens } = this.props;
+    const { actions, isOpen, sellTokens, buyTokens, filters } = this.props;
     const sellTokensList = this.buildTokenList(sellTokens, 'sellTokens');
     const buyTokensList = this.buildTokenList(buyTokens, 'buyTokens');
+    const nextSort = filters.sortDir === 'asc' ? 'desc' : 'asc';
     return (
       <>
         <Root {...this.props}>
@@ -62,35 +67,42 @@ class Filters extends React.PureComponent<Props> {
             <Section>
               <SubTitle>Sort By</SubTitle>
               <List>
-                <Item>
-                  <SortButton dir='up' /> Token
+                <Item onClick={this.createSorter('token', nextSort)}>
+                  <SortButton dir={filters.sortBy === 'token' ? filters.sortDir : 'none'} />
+                  <Label>Token</Label>
                 </Item>
-                <Item>
-                  <SortButton dir='none' /> Sell volume
+                <Item onClick={this.createSorter('sell-volume', nextSort)}>
+                  <SortButton dir={filters.sortBy === 'sell-volume' ? filters.sortDir : 'none'} />
+                  <Label>Sell volume</Label>
                 </Item>
-                <Item>
-                  <SortButton dir='none' /> Estimated end time
+                <Item onClick={this.createSorter('end-time', nextSort)}>
+                  <SortButton dir={filters.sortBy === 'end-time' ? filters.sortDir : 'none'} />
+                  <Label>Estimated end time</Label>
                 </Item>
               </List>
             </Section>
             <Section>
               <List>
                 <Item>
-                  <Checkbox
-                    name='onlyMyTokens'
-                    checked={this.props.filters.onlyMyTokens}
-                    onChange={this.toggleOption}
-                  />
-                  <ItemText>Only tokens I hold</ItemText>
+                  <Label>
+                    <Checkbox
+                      name='onlyMyTokens'
+                      checked={this.props.filters.onlyMyTokens}
+                      onChange={this.toggleOption}
+                    />
+                    Only tokens I hold
+                  </Label>
                   <ItemCount>5</ItemCount>
                 </Item>
                 <Item>
-                  <Checkbox
-                    name='onlyMyAuctions'
-                    checked={this.props.filters.onlyMyAuctions}
-                    onChange={this.toggleOption}
-                  />
-                  <ItemText>Only my auctions</ItemText>
+                  <Label>
+                    <Checkbox
+                      name='onlyMyAuctions'
+                      checked={this.props.filters.onlyMyAuctions}
+                      onChange={this.toggleOption}
+                    />
+                    Only my auctions
+                  </Label>
                   <ItemCount>2</ItemCount>
                 </Item>
               </List>
@@ -133,8 +145,10 @@ class Filters extends React.PureComponent<Props> {
       const checked = this.props.filters[tokenType].includes(token.id);
       return (
         <Item key={token.id}>
-          <Checkbox checked={checked} name={token.id} onChange={applyTokenFilter} />
-          <ItemText>{token.name}</ItemText>
+          <Label>
+            <Checkbox checked={checked} name={token.id} onChange={applyTokenFilter} />
+            {token.name}
+          </Label>
           <ItemCount>{token.count}</ItemCount>
         </Item>
       );
@@ -225,11 +239,17 @@ const Item = styled.li`
   align-items: center;
   margin: 0.75em 0;
   font-size: 0.9em;
+  cursor: pointer;
 `;
 
-const ItemText = styled.span`
+const Label = styled.label`
   flex: 1 1 auto;
   margin-right: var(--spacing-normal);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const ItemCount = styled.span`
@@ -246,9 +266,9 @@ const SortButton = styled.span`
 
   ${({ dir }: SortButtonProps) => {
     let src = sortNoneImage;
-    if (dir === 'up') {
+    if (dir === 'asc') {
       src = sortUpImage;
-    } else if (dir === 'down') {
+    } else if (dir === 'desc') {
       src = sortDownImage;
     }
     return `background-image: url(${src})`;

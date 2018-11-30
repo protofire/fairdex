@@ -1,8 +1,11 @@
+type SortDir = 'asc' | 'desc' | 'none';
+type SortField = 'token' | 'sell-volume' | 'end-time';
+
 interface FiltersState {
   sellTokens: TokenId[];
   buyTokens: TokenId[];
-  sortBy: 'token' | 'sell-volume' | 'end-time';
-  sortDir: 'asc' | 'desc';
+  sortBy: SortField;
+  sortDir: SortDir;
   onlyMyTokens: boolean;
   onlyMyAuctions: boolean;
 }
