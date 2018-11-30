@@ -11,6 +11,7 @@ const variables = css`
     --color-main-bg: #ffffff;
     --color-text-primary: #131f3e; // FIXME
     --color-text-secondary: #adadad; // FIXME
+    --color-text-orange: #f77902;
     --color-light-grey-blue: #85c3d6; // FIXME
     --color-greyish: #adadad;
     --color-grey: #d9dee2;

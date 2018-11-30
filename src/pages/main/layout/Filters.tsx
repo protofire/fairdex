@@ -13,6 +13,7 @@ import sortNoneImage from '../../../images/sorting_inactive.svg';
 import { getBuyTokens, getSellTokens } from '../../../store/auctions/selectors';
 import { applyFilters, clearFilters } from '../../../store/filters/actions';
 import { toggleFilters } from '../../../store/ui/actions';
+import CollapsibleList from './CollapsibleList';
 
 type Props = StateProps & DispatchProps;
 
@@ -109,11 +110,11 @@ class Filters extends React.PureComponent<Props> {
             </Section>
             <Section>
               <SubTitle>Sell tokens</SubTitle>
-              <List>{sellTokensList}</List>
+              <CollapsibleList>{sellTokensList}</CollapsibleList>
             </Section>
             <Section>
               <SubTitle>Bid tokens</SubTitle>
-              <List>{buyTokensList}</List>
+              <CollapsibleList>{buyTokensList}</CollapsibleList>
             </Section>
           </Content>
           <Footer>
@@ -174,6 +175,7 @@ const Root = styled.div`
 const Content = styled.div`
   overflow: auto;
   flex: 1 1 auto;
+  padding-bottom: calc(var(--spacing-normal) * 4);
 `;
 
 const Footer = styled.div`
@@ -225,6 +227,10 @@ const Section = styled.div`
   padding: var(--spacing-normal) 0;
   margin: 0 var(--spacing-normal);
   border-bottom: 1px solid var(--color-border);
+
+  &:last-child {
+    border-bottom: 0;
+  }
 `;
 
 const List = styled.ul`
