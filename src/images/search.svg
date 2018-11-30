@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <defs>
+        <style>
+            .cls-1,.cls-3{fill:none}.cls-2{fill:#131f3e}.cls-3{stroke:#131f3e;stroke-width:2px}.cls-4{stroke:none}
+        </style>
+    </defs>
+    <g id="ic_search" transform="translate(-552 -24)">
+        <path id="Rectangle_133" d="M0 0h24v24H0z" class="cls-1" data-name="Rectangle 133" transform="translate(552 24)"/>
+        <path id="Path_46" d="M0 0l4.822.144.005 1.982-4.822-.144z" class="cls-2" data-name="Path 46" transform="rotate(45 238.178 703.082)"/>
+        <g id="Ellipse_20" class="cls-3" data-name="Ellipse 20" transform="translate(556 28)">
+            <circle cx="6.5" cy="6.5" r="6.5" class="cls-4"/>
+            <circle cx="6.5" cy="6.5" r="5.5" class="cls-1"/>
+        </g>
+    </g>
+</svg>

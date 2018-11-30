@@ -9,10 +9,10 @@ const variables = css`
     --color-border: rgba(0, 0, 0, 0.05);
     --color-content-bg: #f4f6f8;
     --color-main-bg: #ffffff;
-    --color-text-primary: #131f3e; // FIXME
-    --color-text-secondary: #adadad; // FIXME
+    --color-text-primary: #131f3e;
+    --color-text-secondary: #adadad;
     --color-text-orange: #f77902;
-    --color-light-grey-blue: #85c3d6; // FIXME
+    --color-light-grey-blue: #85c3d6;
     --color-greyish: #adadad;
     --color-grey: #d9dee2;
 

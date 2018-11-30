@@ -13,9 +13,15 @@ import sortNoneImage from '../../../images/sorting_inactive.svg';
 import { getBuyTokens, getSellTokens } from '../../../store/auctions/selectors';
 import { applyFilters, clearFilters } from '../../../store/filters/actions';
 import { toggleFilters } from '../../../store/ui/actions';
-import CollapsibleList from './CollapsibleList';
+import DynamicList from './DynamicList';
 
 type Props = StateProps & DispatchProps;
+
+interface State {
+  sellTokenSearchQuery: string;
+  buyTokenSearchQuery: string;
+  resetCounter: number;
+}
 
 interface StateProps {
   isOpen?: boolean;
@@ -36,7 +42,13 @@ interface SortButtonProps {
   dir: SortDir;
 }
 
-class Filters extends React.PureComponent<Props> {
+class Filters extends React.PureComponent<Props, State> {
+  state = {
+    sellTokenSearchQuery: '',
+    buyTokenSearchQuery: '',
+    resetCounter: 1
+  };
+
   toggleOption = (option: string, checked: boolean) => {
     this.props.actions.applyFilters({
       ...this.props.filters,
@@ -48,15 +60,35 @@ class Filters extends React.PureComponent<Props> {
     this.props.actions.applyFilters(filters);
   };
 
-  createSorter = (sortBy: SortField, sortDir: SortDir) => {
-    return () => this.props.actions.applyFilters({ sortBy, sortDir });
+  clearFilters = () => {
+    this.setState({
+      sellTokenSearchQuery: '',
+      buyTokenSearchQuery: '',
+      resetCounter: this.state.resetCounter + 1
+    });
+    this.props.actions.clearFilters();
+  };
+
+  searchSellToken = (value: string) => {
+    this.setState({ sellTokenSearchQuery: value });
+  };
+
+  searchBuyToken = (value: string) => {
+    this.setState({ buyTokenSearchQuery: value });
   };
 
   render() {
     const { actions, isOpen, sellTokens, buyTokens, filters } = this.props;
-    const sellTokensList = this.buildTokenList(sellTokens, 'sellTokens');
-    const buyTokensList = this.buildTokenList(buyTokens, 'buyTokens');
+    const sellTokensList = this.buildTokenList(
+      this.filterTokens(sellTokens, this.state.sellTokenSearchQuery),
+      'sellTokens'
+    );
+    const buyTokensList = this.buildTokenList(
+      this.filterTokens(buyTokens, this.state.buyTokenSearchQuery),
+      'buyTokens'
+    );
     const nextSort = filters.sortDir === 'asc' ? 'desc' : 'asc';
+
     return (
       <>
         <Root {...this.props}>
@@ -109,21 +141,37 @@ class Filters extends React.PureComponent<Props> {
               </List>
             </Section> */}
             <Section>
-              <SubTitle>Sell tokens ({sellTokensList.length})</SubTitle>
-              <CollapsibleList>{sellTokensList}</CollapsibleList>
+              <DynamicList
+                key={this.state.resetCounter}
+                title={`Sell tokens (${sellTokensList.length})`}
+                searchText={this.state.sellTokenSearchQuery}
+                onSearch={this.searchSellToken}
+              >
+                {sellTokensList}
+              </DynamicList>
             </Section>
             <Section>
-              <SubTitle>Bid tokens ({buyTokensList.length})</SubTitle>
-              <CollapsibleList>{buyTokensList}</CollapsibleList>
+              <DynamicList
+                key={this.state.resetCounter}
+                title={`Bid tokens (${buyTokensList.length})`}
+                searchText={this.state.buyTokenSearchQuery}
+                onSearch={this.searchBuyToken}
+              >
+                {buyTokensList}
+              </DynamicList>
             </Section>
           </Content>
           <Footer>
-            <Button onClick={actions.clearFilters}>Clear settings</Button>
+            <Button onClick={this.clearFilters}>Clear settings</Button>
           </Footer>
         </Root>
         {isOpen && <Overlay onClick={actions.toggle} />}
       </>
     );
+  }
+
+  private createSorter(sortBy: SortField, sortDir: SortDir) {
+    return () => this.props.actions.applyFilters({ sortBy, sortDir });
   }
 
   private buildTokenList(list: TokenInfo[], tokenType: 'sellTokens' | 'buyTokens') {
@@ -148,12 +196,19 @@ class Filters extends React.PureComponent<Props> {
         <Item key={token.id}>
           <Label>
             <Checkbox checked={checked} name={token.id} onChange={applyTokenFilter} />
-            {token.name}
+            <span className='text'>{token.name}</span>
           </Label>
           <ItemCount>{token.count}</ItemCount>
         </Item>
       );
     });
+  }
+
+  private filterTokens(list: TokenInfo[], filterText: string) {
+    if (!filterText) {
+      return list;
+    }
+    return list.filter(token => token.id.toLowerCase().startsWith(filterText.toLowerCase()));
   }
 }
 
@@ -255,6 +310,10 @@ const Label = styled.label`
 
   &:hover {
     text-decoration: underline;
+  }
+
+  .text {
+    vertical-align: middle;
   }
 `;
 
