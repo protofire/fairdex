@@ -176,6 +176,7 @@ class Filters extends React.PureComponent<Props, State> {
 
   private buildTokenList(list: TokenInfo[], tokenType: 'sellTokens' | 'buyTokens') {
     const { filters } = this.props;
+
     const applyTokenFilter = (id: string, checked: boolean) => {
       const newFilters = Array.from(filters[tokenType]);
       if (checked && !filters[tokenType].includes(id)) {
@@ -190,8 +191,10 @@ class Filters extends React.PureComponent<Props, State> {
         [tokenType]: newFilters
       });
     };
+
     return list.map(token => {
       const checked = this.props.filters[tokenType].includes(token.id);
+
       return (
         <Item key={token.id}>
           <Label>
