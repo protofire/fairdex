@@ -4,7 +4,7 @@ import { BrowserRouter as Router, NavLink, Redirect, Route, Switch } from 'react
 import styled from 'styled-components';
 
 import Spinner from '../../components/Spinner';
-import { Content, Filters, Layout, NavBar, Sidebar } from './layout';
+import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 
 import logo from '../../images/protofire.svg';
 
@@ -48,6 +48,7 @@ class MainPage extends React.Component {
             </Branding>
             <Wallet />
           </Sidebar>
+          <MessageHandler />
           <Filters />
           <Content>
             <NavBar />

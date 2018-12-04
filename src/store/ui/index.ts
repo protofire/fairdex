@@ -7,7 +7,7 @@ const initialState: UiState = {
   filtersVisible: false
 };
 
-const uiReducer: Reducer<UiState> = (state = initialState, action) => {
+const uiReducer: Reducer<UiState, UiAction> = (state = initialState, action) => {
   switch (action.type) {
     case actions.SHOW_SIDEBAR:
       return {
@@ -31,6 +31,18 @@ const uiReducer: Reducer<UiState> = (state = initialState, action) => {
       return {
         ...state,
         filtersVisible: !state.filtersVisible
+      };
+
+    case actions.SHOW_INFO_MESSAGE:
+      return {
+        ...state,
+        infoMessage: action.payload && action.payload.infoMessage
+      };
+
+    case actions.HIDE_INFO_MESSAGE:
+      return {
+        ...state,
+        infoMessage: undefined
       };
 
     default:
