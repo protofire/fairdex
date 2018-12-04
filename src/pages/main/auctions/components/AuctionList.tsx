@@ -6,13 +6,14 @@ import AuctionCard from './AuctionCard';
 
 interface Props {
   auctions: Auction[];
+  onBid: () => void;
 }
 
-const AuctionList = ({ auctions }: Props) =>
+const AuctionList = ({ auctions, onBid }: Props) =>
   auctions.length > 0 ? (
     <Container>
       {auctions.map(auction => (
-        <AuctionCard key={auction.auctionIndex} data={auction} />
+        <AuctionCard key={auction.auctionIndex} data={auction} onBid={onBid} />
       ))}
     </Container>
   ) : (
