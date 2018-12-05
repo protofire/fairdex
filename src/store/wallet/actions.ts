@@ -1,6 +1,8 @@
 import { Action, ActionCreator } from 'redux';
 import Web3 from 'web3';
 
+import { fetchAvailableTokens } from '../tokens';
+
 export const INIT_WALLET = 'wallet/INIT';
 export const CHANGE_ACCOUNT = 'wallet/ACCOUNT_CHANGED';
 export const CHANGE_NETWORK = 'wallet/NETWORK_CHANGED';
@@ -24,12 +26,15 @@ export function connect(wallet: WalletType) {
           provider.publicConfigStore.on('update', ({ selectedAddress, networkVersion }) => {
             const { wallet: state } = getState();
 
-            if (state.network !== getNetworkType(networkVersion)) {
-              dispatch(changeNetwork(networkVersion));
-            }
-
             if (state.accountAddress !== selectedAddress) {
               dispatch(changeAccount(selectedAddress));
+            }
+
+            if (state.network !== getNetworkType(networkVersion)) {
+              dispatch(changeNetwork(networkVersion));
+
+              // Reload available tokens
+              dispatch(fetchAvailableTokens());
             }
           });
 

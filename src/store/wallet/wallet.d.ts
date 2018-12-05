@@ -1,5 +1,6 @@
 interface WalletState {
-  type?: WalletType;
-  network?: NetworkType;
   accountAddress?: Address;
+  network?: NetworkType;
+  tokens: TokensState;
+  type?: WalletType;
 }

@@ -1,6 +1,8 @@
 interface AppState {
   auctions: AuctionsState;
-  ui: UiState;
+  tokens: TokensState;
   wallet: WalletState;
+
   filters: FiltersState;
+  ui: UiState;
 }
