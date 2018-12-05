@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+    <defs>
+        <style>
+            .cls-1{fill:none}.cls-2{fill:#d9dee2}
+        </style>
+    </defs>
+    <g id="ic_auctions___empty_page" transform="translate(-48 -120)">
+        <path id="Rectangle_135" d="M0 0h48v48H0z" class="cls-1" transform="translate(48 120)"/>
+        <path id="ic_auctions" d="M8.67 2L1 2.036l.022 4.494 4.652-.022 7.4 17.759-2.69 4.3a4.74 4.74 0 0 0 3.954 7.14h27.099v-4.494H14.344c-.25 0-.279-.049-.145-.263l2.642-4.23h16.781a4.492 4.492 0 0 0 3.927-2.313l8.092-14.574A2.244 2.244 0 0 0 43.679 6.5H10.544zm5.806 35.957a4.494 4.494 0 1 0 4.494 4.494 4.494 4.494 0 0 0-4.494-4.498zm22.468 0a4.494 4.494 0 1 0 4.494 4.494 4.494 4.494 0 0 0-4.494-4.498z" class="cls-2" transform="translate(48.496 119.504)"/>
+    </g>
+</svg>
