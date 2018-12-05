@@ -24,7 +24,7 @@ const Message: FunctionComponent<Props> = props => (
 
 const Root = styled.section`
   position: fixed;
-  z-index: 100;
+  z-index: 1000;
   top: 2rem;
   left: 50%;
   width: 384px;
