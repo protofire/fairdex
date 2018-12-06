@@ -1,19 +1,25 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import Spinner from '../../../../components/Spinner';
 import * as images from '../../../../images';
 import AuctionCard from './AuctionCard';
 
-interface Props {
+interface AuctionListProps {
   auctions: Auction[];
+  isLoading?: boolean;
   onBid: () => void;
 }
 
-const AuctionList = ({ auctions, onBid }: Props) =>
-  auctions.length > 0 ? (
+const AuctionList = ({ auctions, isLoading, onBid }: AuctionListProps) =>
+  isLoading ? (
+    <EmptyList>
+      <Spinner size='large' />
+    </EmptyList>
+  ) : auctions.length > 0 ? (
     <Container>
       {auctions.map(auction => (
-        <AuctionCard key={auction.auctionIndex} data={auction} onBid={onBid} />
+        <AuctionCard key={`${auction.buyToken}-${auction.sellToken}-${auction.auctionIndex}`} data={auction} onBid={onBid} />
       ))}
     </Container>
   ) : (
@@ -24,7 +30,8 @@ const AuctionList = ({ auctions, onBid }: Props) =>
   );
 
 AuctionList.defaultProps = {
-  auctions: []
+  auctions: [],
+  loading: false
 };
 
 const Container = styled.div`
@@ -34,6 +41,7 @@ const Container = styled.div`
 `;
 
 const EmptyList = styled.div`
+  position: relative;
   width: 100%;
   height: calc(100vh - var(--header-height) - var(--spacing-normal) * 2);
   display: flex;

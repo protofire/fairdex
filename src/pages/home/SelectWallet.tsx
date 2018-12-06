@@ -4,16 +4,16 @@ import styled from 'styled-components';
 
 import Separator from '../../components/Separator';
 import * as images from '../../images';
-import { connect as connectWallet } from '../../store/wallet/actions';
+import { initWallet } from '../../store/blockchain';
 
-interface Props {
+interface DispatchProps {
   actions: {
-    onSelectWallet: (wallet: WalletType) => void;
+    onSelectWallet: (wallet: Wallet) => void;
   };
 }
 
-class SelectWallet extends React.PureComponent<Props> {
-  handleWalletSelection = (wallet: WalletType) => {
+class SelectWallet extends React.PureComponent<DispatchProps> {
+  handleWalletSelection = (wallet: Wallet) => {
     const { actions } = this.props;
 
     if (actions.onSelectWallet) {
@@ -31,18 +31,18 @@ class SelectWallet extends React.PureComponent<Props> {
         <Separator />
         <WalletList>
           <Wallet onClick={this.selectStandardWallet}>
-            <Images>
+            <Logos>
               <img src={images.wallet.MetaMask} alt='MetaMask' />
               <img src={images.wallet.Parity} alt='Parity' />
               <img src={images.wallet.Cipher} alt='Cipher' />
-            </Images>
+            </Logos>
             <h3>Standard Wallet</h3>
             <p>MetaMask, Parity, Cipher, Local Node</p>
           </Wallet>
           <Wallet disabled={true} onClick={this.selectLedgerWallet}>
-            <Images>
+            <Logos>
               <img src={images.wallet.LedgerNano} alt='Ledger Nano' />
-            </Images>
+            </Logos>
             <h3>Ledger Nano</h3>
             <p />
           </Wallet>
@@ -88,7 +88,7 @@ const Wallet = styled.button`
   }
 `;
 
-const Images = styled.div`
+const Logos = styled.div`
   display: grid;
   grid-gap: var(--spacing-normal);
   grid-auto-flow: column;
@@ -107,15 +107,11 @@ const Images = styled.div`
   }
 `;
 
-function mapDispatchToProps(dispatch: any): Props {
-  return {
-    actions: {
-      onSelectWallet: wallet => dispatch(connectWallet(wallet))
-    }
-  };
-}
-
 export default connect(
   null,
-  mapDispatchToProps
+  (dispatch: any): DispatchProps => ({
+    actions: {
+      onSelectWallet: wallet => dispatch(initWallet(wallet))
+    }
+  })
 )(SelectWallet);

@@ -5,25 +5,28 @@ import styled from 'styled-components';
 
 import Spinner from '../../components/Spinner';
 import * as images from '../../images';
+import { getNetworkType } from '../../store/blockchain';
+
+const spinner = <Spinner size='large' />;
 
 const MainPage = Loadable({
   loader: () => import('../main'),
-  loading: () => <Spinner size='large' />
+  loading: () => spinner
 });
 
 const NetworkNotAvailable = Loadable({
   loader: () => import('./NetworkNotAvailable'),
-  loading: () => <Spinner size='large' />
+  loading: () => spinner
 });
 
 const SelectWallet = Loadable({
   loader: () => import('./SelectWallet'),
-  loading: () => <Spinner size='large' />
+  loading: () => spinner
 });
 
 interface Props {
-  network?: NetworkType;
-  wallet?: WalletType;
+  network?: Network;
+  wallet?: Wallet;
 }
 
 const HomePage = React.memo(({ network, wallet }: Props) => {
@@ -31,6 +34,8 @@ const HomePage = React.memo(({ network, wallet }: Props) => {
 
   if (!wallet) {
     content = <SelectWallet />;
+  } else if (!network) {
+    return spinner;
   } else if (network !== 'rinkeby') {
     content = <NetworkNotAvailable />;
   } else {
@@ -95,11 +100,9 @@ const Footer = styled.footer`
   }
 `;
 
-function mapStateToProps({ wallet }: AppState): Props {
-  return {
-    wallet: wallet.type,
-    network: wallet.network
-  };
-}
-
-export default connect(mapStateToProps)(HomePage);
+export default connect(
+  (state: AppState): Props => ({
+    network: getNetworkType(state),
+    wallet: state.blockchain.wallet
+  })
+)(HomePage);

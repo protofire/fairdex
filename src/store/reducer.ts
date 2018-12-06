@@ -1,17 +1,13 @@
 import { combineReducers } from 'redux';
 
-import auctions from './auctions';
+import blockchain from './blockchain';
 import filters from './filters';
-import tokens from './tokens';
 import ui from './ui';
-import wallet from './wallet';
 
 const rootReducer = combineReducers<AppState>({
-  auctions,
-  ui,
-  tokens,
-  wallet,
-  filters
+  blockchain,
+  filters,
+  ui
 });
 
 export default rootReducer;

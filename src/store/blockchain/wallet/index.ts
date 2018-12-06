@@ -1,11 +1,57 @@
-import { Action, ActionCreator } from 'redux';
+import { Action, ActionCreator, Reducer } from 'redux';
 import Web3 from 'web3';
 
 import { fetchAvailableTokens } from '../tokens';
 
-export const INIT_WALLET = 'wallet/INIT';
-export const CHANGE_ACCOUNT = 'wallet/ACCOUNT_CHANGED';
-export const CHANGE_NETWORK = 'wallet/NETWORK_CHANGED';
+export * from './selectors';
+
+// Actions
+const INIT_WALLET = 'INIT_WALLET';
+const CHANGE_ACCOUNT = 'CHANGE_ACCOUNT';
+const CHANGE_NETWORK = 'CHANGE_NETWORK';
+
+const reducer: Reducer<WalletState> = (state = {}, action) => {
+  switch (action.type) {
+    case INIT_WALLET:
+      return {
+        wallet: action.payload
+      };
+
+    case CHANGE_ACCOUNT:
+      return {
+        ...state,
+        currentAccount: action.payload
+      };
+
+    case CHANGE_NETWORK:
+      return {
+        ...state,
+        networkId: action.payload
+      };
+
+    default:
+      return state;
+  }
+};
+
+export function initWallet(wallet: Wallet) {
+  return async (dispatch: any, getState: () => AppState) => {
+    const web3 = await createEthereumClient();
+
+    if (web3) {
+      // Save Web3 instance
+      window.web3 = web3;
+
+      // Handle account/network switch
+      const provider: any = web3.currentProvider;
+
+      // @ts-ignore
+      provider.publicConfigStore.on('update', ({ selectedAddress, networkVersion }) => {
+        const { blockchain } = getState();
+
+        if (blockchain.currentAccount !== selectedAddress) {
+          dispatch(changeAccount(selectedAddress));
+        }
 
 export function connect(wallet: WalletType) {
   return async (dispatch: any, getState: any) => {
@@ -47,49 +93,25 @@ export function connect(wallet: WalletType) {
   };
 }
 
-const selectWallet: ActionCreator<Action> = (wallet: WalletType) => {
+const selectWallet: ActionCreator<Action> = (wallet: Wallet) => {
   return {
     type: INIT_WALLET,
-    payload: {
-      wallet
-    }
+    payload: wallet
   };
 };
 
 const changeAccount: ActionCreator<Action> = (accountAddress: Address) => {
   return {
     type: CHANGE_ACCOUNT,
-    payload: {
-      accountAddress
-    }
+    payload: accountAddress
   };
 };
 
 const changeNetwork: ActionCreator<Action> = (networkId: string | number) => {
   return {
     type: CHANGE_NETWORK,
-    payload: {
-      networkId,
-      networkType: getNetworkType(networkId)
-    }
+    payload: networkId
   };
 };
 
-function getNetworkType(id: string | number) {
-  const networkId = Number(id);
-
-  switch (networkId) {
-    case 1:
-      return 'main';
-    case 2:
-      return 'morden';
-    case 3:
-      return 'ropsten';
-    case 4:
-      return 'rinkeby';
-    case 42:
-      return 'kovan';
-    default:
-      return 'private';
-  }
-}
+export default reducer;

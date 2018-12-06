@@ -10,7 +10,7 @@ import Overlay from '../../../components/Overlay';
 import sortDownImage from '../../../images/sorting_arrow_down.svg';
 import sortUpImage from '../../../images/sorting_arrow_up.svg';
 import sortNoneImage from '../../../images/sorting_inactive.svg';
-import { getBuyTokens, getSellTokens } from '../../../store/auctions/selectors';
+import { getBuyTokens, getSellTokens } from '../../../store/blockchain';
 import { applyFilters, clearFilters } from '../../../store/filters/actions';
 import { toggleFilters } from '../../../store/ui/actions';
 import DynamicList from './DynamicList';

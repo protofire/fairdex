@@ -1,11 +1,21 @@
-interface AuctionsState {
-  list: Auction[];
+type Address = string;
+type TransactionHash = string;
+
+type Network = 'main' | 'morden' | 'ropsten' | 'rinkeby' | 'kovan' | 'private';
+type Wallet = 'standard' | 'ledger';
+
+type TokenSymbol = string;
+
+interface Token {
+  symbol: TokenSymbol;
+  address: Address;
+  name: string;
+  decimals: number;
 }
 
 type AuctionState = 'running' | 'ended' | 'scheduled';
 
 interface Auction {
-  state: AuctionState;
   auctionIndex: number;
   sellToken: TokenSymbol;
   buyToken: TokenSymbol;
@@ -17,6 +27,7 @@ interface Auction {
   buyVolume: number;
   closingPrice: number;
   priceIncrement: number;
+  state: AuctionState;
 }
 
 interface TokenInfo {

@@ -3,13 +3,11 @@ import styled from 'styled-components';
 
 interface AuctionCardProps {
   data: Auction;
-  mode?: 'compact';
   onBid: () => void;
 }
 
-const AuctionCard = (props: AuctionCardProps) => {
-  const { data } = props;
-  const title = `${data.buyToken}/${data.sellToken}`;
+const AuctionCard = ({ data: auction, onBid }: AuctionCardProps) => {
+  const title = `${auction.buyToken}/${auction.sellToken}`;
 
   return (
     <Wrapper>
@@ -25,16 +23,12 @@ const AuctionCard = (props: AuctionCardProps) => {
         </Row>
         <Row>
           <Label>Started time</Label>
-          <Value>{data.auctionStart}</Value>
+          <Value>{auction.auctionStart}</Value>
         </Row>
       </Table>
-      <Button onClick={props.onBid}>BID</Button>
+      <Button onClick={onBid}>BID</Button>
     </Wrapper>
   );
-};
-
-AuctionCard.defaultProps = {
-  mode: 'compact'
 };
 
 const Wrapper = styled.div`

@@ -1,12 +1,13 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { getRunningAuctions } from '../../../../store/auctions/selectors';
+import { getRunningAuctions } from '../../../../store/blockchain';
 import { showInfoMessage } from '../../../../store/ui/actions';
 import AuctionList from '../components/AuctionList';
 
 interface Props {
   auctions: Auction[];
+  isLoading?: boolean;
 }
 
 interface DispatchProps {
@@ -15,7 +16,8 @@ interface DispatchProps {
 
 function mapStateToProps(state: AppState): Props {
   return {
-    auctions: getRunningAuctions(state)
+    auctions: getRunningAuctions(state),
+    isLoading: state.blockchain.auctions == null
   };
 }
 
