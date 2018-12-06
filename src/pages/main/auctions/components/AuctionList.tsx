@@ -18,8 +18,8 @@ const AuctionList = ({ auctions, isLoading, onBid }: AuctionListProps) =>
     </EmptyList>
   ) : auctions.length > 0 ? (
     <Container>
-      {auctions.map(auction => (
-        <AuctionCard key={`${auction.buyToken}-${auction.sellToken}-${auction.auctionIndex}`} data={auction} onBid={onBid} />
+      {auctions.map((auction, i) => (
+        <AuctionCard key={`${auction.buyToken}-${auction.sellToken}-${auction.auctionIndex}-${i}`} data={auction} onBid={onBid} />
       ))}
     </Container>
   ) : (

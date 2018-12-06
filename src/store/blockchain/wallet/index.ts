@@ -1,6 +1,7 @@
 import { Action, ActionCreator, Reducer } from 'redux';
 import Web3 from 'web3';
 
+import DutchExchange from '../../../contracts/DutchExchange';
 import { fetchAvailableTokens } from '../tokens';
 
 export * from './selectors';
@@ -53,42 +54,18 @@ export function initWallet(wallet: Wallet) {
           dispatch(changeAccount(selectedAddress));
         }
 
-export function connect(wallet: WalletType) {
-  return async (dispatch: any, getState: any) => {
-    if (wallet === 'ledger') {
-      // TODO: Ledger Nano
-    } else {
-      const provider = window.ethereum || window.web3.currentProvider;
+        if (blockchain.networkId !== networkVersion) {
+          dispatch(changeNetwork(networkVersion));
 
-      window.web3 = new Web3(provider);
+          // Instantiate DutchX contract
+          window.dx = new DutchExchange(networkVersion);
 
-      if (typeof provider.enable === 'function') {
-        try {
-          // Request account access if needed
-          await provider.enable();
-
-          // Handle account switch
-          // @ts-ignore
-          provider.publicConfigStore.on('update', ({ selectedAddress, networkVersion }) => {
-            const { wallet: state } = getState();
-
-            if (state.accountAddress !== selectedAddress) {
-              dispatch(changeAccount(selectedAddress));
-            }
-
-            if (state.network !== getNetworkType(networkVersion)) {
-              dispatch(changeNetwork(networkVersion));
-
-              // Reload available tokens
-              dispatch(fetchAvailableTokens());
-            }
-          });
-
-          dispatch(selectWallet(wallet));
-        } catch (error) {
-          // TODO: User denied account access
+          // Load available tokens
+          dispatch(fetchAvailableTokens());
         }
-      }
+      });
+
+      dispatch(selectWallet(wallet));
     }
   };
 }
@@ -112,6 +89,26 @@ const changeNetwork: ActionCreator<Action> = (networkId: string | number) => {
     type: CHANGE_NETWORK,
     payload: networkId
   };
+};
+
+const createEthereumClient = async () => {
+  const provider: any = window.ethereum || window.web3.currentProvider;
+
+  if (window.ethereum) {
+    const web3 = new Web3(window.ethereum);
+
+    try {
+      // Request account access if needed
+      await provider.enable();
+
+      return web3;
+    } catch (error) {
+      // TODO: User denied account access
+      return undefined;
+    }
+  } else if (window.web3) {
+    return new Web3(window.web3.currentProvider);
+  }
 };
 
 export default reducer;

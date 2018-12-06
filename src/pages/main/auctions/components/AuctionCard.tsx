@@ -15,11 +15,15 @@ const AuctionCard = ({ data: auction, onBid }: AuctionCardProps) => {
       <Table>
         <Row>
           <Label>Current price</Label>
-          <Value>2.452156</Value>
+          <Value>{auction.closingPrice || '—'}</Value>
         </Row>
         <Row>
-          <Label>To end volume</Label>
-          <Value>628</Value>
+          <Label>Sell volume</Label>
+          <Value>{auction.sellVolume}</Value>
+        </Row>
+        <Row>
+          <Label>Buy volume</Label>
+          <Value>{auction.buyVolume}</Value>
         </Row>
         <Row>
           <Label>Started time</Label>
