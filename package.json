@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@gnosis.pm/dx-contracts": "^2.0.0-RC3",
+    "date-fns": "^2.0.0-alpha.25",
     "polished": "^2.3.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",

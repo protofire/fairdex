@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { ElapsedTime } from '../../../../components/formatters';
+
 interface AuctionCardProps {
   data: Auction;
   onBid: () => void;
@@ -27,7 +29,9 @@ const AuctionCard = ({ data: auction, onBid }: AuctionCardProps) => {
         </Row>
         <Row>
           <Label>Started time</Label>
-          <Value>{auction.auctionStart}</Value>
+          <Value>
+            <ElapsedTime from={auction.auctionStart} />
+          </Value>
         </Row>
       </Table>
       <Button onClick={onBid}>BID</Button>
