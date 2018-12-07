@@ -26,7 +26,7 @@ function buildDummyAuctions() {
       buyVolume: 200,
       closingPrice: 150,
       priceIncrement: 1,
-      state: states[Math.round(Math.random() * (states.length - 2)) + 1] as AuctionState
+      state: states[Math.round(Math.random() * (states.length - 2))] as AuctionState
     });
   }
 

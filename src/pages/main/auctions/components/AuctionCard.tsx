@@ -4,6 +4,7 @@ import styled from 'styled-components';
 interface AuctionCardProps {
   data: Auction;
   mode?: 'compact';
+  onBid: () => void;
 }
 
 const AuctionCard = (props: AuctionCardProps) => {
@@ -27,7 +28,7 @@ const AuctionCard = (props: AuctionCardProps) => {
           <Value>{data.auctionStart}</Value>
         </Row>
       </Table>
-      <Button>BID</Button>
+      <Button onClick={props.onBid}>BID</Button>
     </Wrapper>
   );
 };
