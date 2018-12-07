@@ -18,7 +18,7 @@ const variables = css`
 
     // Layout
     --card-height: ${rem('256px')};
-    --card-width: ${rem('256px')};
+    --card-width: ${rem('300px')};
     --header-height: ${rem('72px')};
     --sidebar-width: ${rem('320px')};
 
