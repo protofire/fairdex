@@ -64,21 +64,22 @@ function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
 function filterAuctions(list: Auction[], filters: FiltersState, wallet: WalletState) {
   let out = Array.from(list);
 
-  const sortMap = {
-    token: 'buyToken',
+  const sortMap: { [filter in SortField]: keyof Auction } = {
+    'buy-token': 'buyToken',
     'sell-volume': 'sellVolume',
-    'end-time': 'auctionEnd'
+    'start-time': 'auctionStart'
   };
 
   const sortField = sortMap[filters.sortBy] as keyof Auction;
 
   if (sortField) {
-    out.sort((a, b) => {
+    out.sort((a: Auction, b: Auction) => {
       if (a[sortField] > b[sortField]) {
         return filters.sortDir === 'asc' ? -1 : 1;
       } else if (a[sortField] < b[sortField]) {
         return filters.sortDir === 'asc' ? 1 : -1;
       }
+
       return 0;
     });
   }

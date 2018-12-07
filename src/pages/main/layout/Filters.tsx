@@ -100,16 +100,16 @@ class Filters extends React.PureComponent<Props, State> {
             <Section>
               <SubTitle>Sort By</SubTitle>
               <List>
-                <Item onClick={this.createSorter('token', nextSort)}>
-                  <SortButton dir={filters.sortBy === 'token' ? filters.sortDir : 'none'} />
+                <Item onClick={this.createSorter('buy-token', nextSort)}>
+                  <SortButton dir={filters.sortBy === 'buy-token' ? filters.sortDir : 'none'} />
                   <Label>Token</Label>
                 </Item>
                 <Item onClick={this.createSorter('sell-volume', nextSort)}>
                   <SortButton dir={filters.sortBy === 'sell-volume' ? filters.sortDir : 'none'} />
                   <Label>Sell volume</Label>
                 </Item>
-                <Item onClick={this.createSorter('end-time', nextSort)}>
-                  <SortButton dir={filters.sortBy === 'end-time' ? filters.sortDir : 'none'} />
+                <Item onClick={this.createSorter('start-time', nextSort)}>
+                  <SortButton dir={filters.sortBy === 'start-time' ? filters.sortDir : 'none'} />
                   <Label>Estimated end time</Label>
                 </Item>
               </List>

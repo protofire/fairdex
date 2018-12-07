@@ -1,5 +1,5 @@
 type SortDir = 'asc' | 'desc' | 'none';
-type SortField = 'token' | 'sell-volume' | 'end-time';
+type SortField = 'buy-token' | 'sell-volume' | 'start-time';
 
 interface FiltersState {
   sellTokens: TokenSymbol[];

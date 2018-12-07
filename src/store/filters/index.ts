@@ -5,7 +5,7 @@ import * as actions from './actions';
 const initialState: FiltersState = {
   sellTokens: [],
   buyTokens: [],
-  sortBy: 'token',
+  sortBy: 'start-time',
   sortDir: 'asc',
   onlyMyTokens: false,
   onlyMyAuctions: false
