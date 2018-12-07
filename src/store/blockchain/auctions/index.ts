@@ -1,6 +1,6 @@
 import { ActionCreator, AnyAction, Dispatch, Reducer } from 'redux';
 
-import { getTokens } from '../tokens';
+import { getAvailableTokens } from '../tokens';
 
 export * from './selectors';
 
@@ -25,11 +25,11 @@ export function fetchRunningAuctions() {
 
   return async (dispatch: Dispatch, getState: () => AppState) => {
     const state = getState();
+    const tokens = getAvailableTokens(state);
+    const tokenAddresses = Object.keys(tokens);
 
-    if (state.blockchain.tokens) {
-      const tokens = getTokens(state);
-
-      const tokenPairs = await dx.getRunningTokenPairs(Array.from(tokens.keys()));
+    if (tokenAddresses.length) {
+      const tokenPairs = await dx.getRunningTokenPairs(tokenAddresses);
 
       const runningAuctions = await Promise.all(
         tokenPairs.map(
@@ -44,9 +44,9 @@ export function fetchRunningAuctions() {
             const currentPrice = await dx.getCurrentPrice(t1, t2, auctionIndex);
 
             const sellTokenAddress = t1.toLowerCase();
-            const sellToken = tokens.get(sellTokenAddress);
+            const sellToken = tokens[sellTokenAddress];
             const buyTokenAddress = t2.toLowerCase();
-            const buyToken = tokens.get(buyTokenAddress);
+            const buyToken = tokens[buyTokenAddress];
 
             return {
               auctionIndex,

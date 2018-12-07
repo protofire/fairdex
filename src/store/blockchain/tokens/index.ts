@@ -8,7 +8,7 @@ export * from './selectors';
 // Actions
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
 
-const reducer: Reducer<TokensState> = (state = { tokens: new Map() }, action) => {
+const reducer: Reducer<TokensState> = (state = {}, action) => {
   switch (action.type) {
     case SET_AVAILABLE_TOKENS:
       return {
@@ -41,7 +41,7 @@ export function fetchAvailableTokens() {
 const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
   return {
     type: SET_AVAILABLE_TOKENS,
-    payload: new Map(tokens.map((t): [Address, Token] => [t.address, t]))
+    payload: tokens.reduce((all: object, t: Token) => ({ ...all, [t.address]: t }), {})
   };
 };
 

@@ -1,1 +1,1 @@
-export const getTokens = (state: AppState) => state.blockchain.tokens || new Map();
+export const getAvailableTokens = (state: AppState) => state.blockchain.tokens || {};

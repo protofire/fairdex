@@ -5,7 +5,7 @@ interface AuctionsState {
 }
 
 interface TokensState {
-  tokens?: Map<Address, Token>;
+  tokens?: { [address: string]: Token };
 }
 
 interface WalletState {
