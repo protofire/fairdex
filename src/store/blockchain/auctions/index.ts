@@ -28,6 +28,7 @@ export function fetchRunningAuctions() {
 
     if (state.blockchain.tokens) {
       const tokens = getTokens(state);
+
       const tokenPairs = await dx.getRunningTokenPairs(Array.from(tokens.keys()));
 
       const runningAuctions = await Promise.all(
@@ -40,7 +41,7 @@ export function fetchRunningAuctions() {
               dx.getBuyVolume(t1, t2)
             ]);
 
-            const price = await dx.getCurrentPrice(t1, t2, auctionIndex);
+            const currentPrice = await dx.getCurrentPrice(t1, t2, auctionIndex);
 
             const sellTokenAddress = t1.toLowerCase();
             const sellToken = tokens.get(sellTokenAddress);
@@ -57,8 +58,7 @@ export function fetchRunningAuctions() {
               buyVolume,
               auctionStart,
               auctionEnd: '',
-              closingPrice: price,
-              priceIncrement: 1,
+              currentPrice,
               state: 'running'
             };
           }

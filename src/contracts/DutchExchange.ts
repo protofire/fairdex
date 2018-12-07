@@ -3,6 +3,7 @@ import { DutchExchangeProxy } from '@gnosis.pm/dx-contracts/networks.json';
 import { BlockType } from 'web3/eth/types';
 
 import BaseContract from './BaseContract';
+import { getPrice } from './utils';
 
 class DutchExchange extends BaseContract {
   constructor(networkId: string) {
@@ -27,41 +28,41 @@ class DutchExchange extends BaseContract {
     });
   }
 
-  async getAuctionStart(t1: Address, t2: Address): Promise<any> {
-    const auctionStart = await this.methods.getAuctionStart(t1, t2).call();
-
-    return auctionStart;
+  getAuctionStart(t1: Address, t2: Address): Promise<number | null> {
+    return this.methods
+      .getAuctionStart(t1, t2)
+      .call()
+      .then(auctionStart => parseInt(auctionStart, 10))
+      .then(auctionStart => (isNaN(auctionStart) ? null : auctionStart * 1000));
   }
 
-  async getCurrentPrice(t1: Address, t2: Address, index: number): Promise<any> {
-    const { num, den } = await this.methods.getCurrentAuctionPrice(t1, t2, index).call();
-
-    return num / den;
+  getCurrentPrice(t1: Address, t2: Address, auctionIndex: number): Promise<string> {
+    return this.methods
+      .getCurrentAuctionPrice(t1, t2, auctionIndex)
+      .call()
+      .then((price: Fraction) => getPrice(price));
   }
 
-  async getSellVolume(t1: Address, t2: Address): Promise<any> {
-    const sellVolume = await this.methods.sellVolumesCurrent(t1, t2).call();
-
-    return sellVolume;
+  getSellVolume(t1: Address, t2: Address): Promise<string> {
+    return this.methods.sellVolumesCurrent(t1, t2).call();
   }
 
-  async getBuyVolume(t1: Address, t2: Address): Promise<any> {
-    const buyVolume = await this.methods.buyVolumes(t1, t2).call();
-
-    return buyVolume;
+  getBuyVolume(t1: Address, t2: Address): Promise<string> {
+    return this.methods.buyVolumes(t1, t2).call();
   }
 
-  async getLatestAuctionIndex(t1: Address, t2: Address): Promise<any> {
-    const auctionIndex = await this.methods.getAuctionIndex(t1, t2).call();
-
-    return auctionIndex && parseInt(auctionIndex, 10);
+  getLatestAuctionIndex(t1: Address, t2: Address): Promise<number> {
+    return this.methods
+      .getAuctionIndex(t1, t2)
+      .call()
+      .then(auctionIndex => parseInt(auctionIndex, 10));
   }
 
-  async getRunningTokenPairs(tokens: Address[]): Promise<Array<[Address, Address]>> {
-    const { getRunningTokenPairs } = this.methods;
-    const { tokens1, tokens2 } = await getRunningTokenPairs(tokens).call();
-
-    return tokens1.map((_: any, i: number) => [tokens1[i], tokens2[i]]);
+  getRunningTokenPairs(tokens: Address[]): Promise<Array<[Address, Address]>> {
+    return this.methods
+      .getRunningTokenPairs(tokens)
+      .call()
+      .then(({ tokens1, tokens2 }) => tokens1.map((_: any, i: number) => [tokens1[i], tokens2[i]]));
   }
 }
 

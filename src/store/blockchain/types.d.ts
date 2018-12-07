@@ -21,13 +21,17 @@ interface Auction {
   buyToken: TokenSymbol;
   sellTokenAddress: Address;
   buyTokenAddress: Address;
-  auctionStart: string;
+  auctionStart: number | null;
   auctionEnd: string;
-  sellVolume: number;
-  buyVolume: number;
-  closingPrice: number;
-  priceIncrement: number;
+  sellVolume: string;
+  buyVolume: string;
+  currentPrice: string;
   state: AuctionState;
+}
+
+interface Fraction {
+  num: string | number;
+  den: string | number;
 }
 
 interface TokenInfo {

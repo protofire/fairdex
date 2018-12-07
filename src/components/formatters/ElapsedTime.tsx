@@ -2,12 +2,11 @@ import { differenceInHours, differenceInMinutes, differenceInWeeks, isBefore, su
 import React from 'react';
 
 interface Props {
-  from: string;
+  from: number | null;
   defaultValue?: string;
 }
 
-const ElapsedTime = ({ from, defaultValue }: Props) => {
-  const epoch = parseInt(from, 10) * 1000;
+const ElapsedTime = ({ from: epoch, defaultValue }: Props) => {
   const formatted = elapsedTime(epoch);
 
   return <span>{formatted || defaultValue}</span>;
@@ -17,7 +16,7 @@ ElapsedTime.defaultProps = {
   defaultValue: '-'
 };
 
-function elapsedTime(epoch: number) {
+function elapsedTime(epoch: number | null) {
   const now = Date.now();
   const result: string[] = [];
 
@@ -29,6 +28,10 @@ function elapsedTime(epoch: number) {
     const hoursAgo = subHours(weeksAgo, hours);
 
     const minutes = differenceInMinutes(hoursAgo, epoch);
+
+    if (weeks > 0) {
+      result.push(`${weeks}w`);
+    }
 
     if (hours > 0) {
       result.push(`${hours}h`);

@@ -1,43 +1,43 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { ElapsedTime } from '../../../../components/formatters';
+import { ElapsedTime, Numeric } from '../../../../components/formatters';
 
 interface AuctionCardProps {
   data: Auction;
   onBid: () => void;
 }
 
-const AuctionCard = ({ data: auction, onBid }: AuctionCardProps) => {
-  const title = `${auction.buyToken}/${auction.sellToken}`;
-
-  return (
-    <Wrapper>
-      <Title>{title}</Title>
-      <Table>
-        <Row>
-          <Label>Current price</Label>
-          <Value>{auction.closingPrice || '—'}</Value>
-        </Row>
-        <Row>
-          <Label>Sell volume</Label>
-          <Value>{auction.sellVolume}</Value>
-        </Row>
-        <Row>
-          <Label>Buy volume</Label>
-          <Value>{auction.buyVolume}</Value>
-        </Row>
-        <Row>
-          <Label>Started time</Label>
-          <Value>
-            <ElapsedTime from={auction.auctionStart} />
-          </Value>
-        </Row>
-      </Table>
-      <Button onClick={onBid}>BID</Button>
-    </Wrapper>
-  );
-};
+const AuctionCard = ({ data: auction, onBid }: AuctionCardProps) => (
+  <Wrapper>
+    <Title>
+      {auction.buyToken}/{auction.sellToken}
+    </Title>
+    <Table>
+      <Row>
+        <Label>Current price</Label>
+        <Value>
+          <Numeric value={auction.currentPrice} decimals={6} />
+        </Value>
+      </Row>
+      <Row>
+        <Label>Sell volume</Label>
+        <Value>{auction.sellVolume}</Value>
+      </Row>
+      <Row>
+        <Label>Buy volume</Label>
+        <Value>{auction.buyVolume}</Value>
+      </Row>
+      <Row>
+        <Label>Started time</Label>
+        <Value>
+          <ElapsedTime from={auction.auctionStart} />
+        </Value>
+      </Row>
+    </Table>
+    <Button onClick={onBid}>BID</Button>
+  </Wrapper>
+);
 
 const Wrapper = styled.div`
   padding: var(--spacing-normal);
