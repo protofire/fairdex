@@ -41,27 +41,25 @@ export function fetchRunningAuctions() {
         const runningAuctions = await Promise.all(
           tokenPairs.map(
             async ([t1, t2]): Promise<Auction> => {
+              const sellToken = tokens[t1.toLowerCase()];
+              const buyToken = tokens[t2.toLowerCase()];
+
               const [auctionIndex, auctionStart, sellVolume, buyVolume] = await Promise.all([
-                dx.getLatestAuctionIndex(t1, t2),
-                dx.getAuctionStart(t1, t2),
-                dx.getSellVolume(t1, t2),
-                dx.getBuyVolume(t1, t2)
+                dx.getLatestAuctionIndex(sellToken, buyToken),
+                dx.getAuctionStart(sellToken, buyToken),
+                dx.getSellVolume(sellToken, buyToken),
+                dx.getBuyVolume(sellToken, buyToken)
               ]);
 
-              const currentPrice = await dx.getCurrentPrice(t1, t2, auctionIndex);
-
-              const sellTokenAddress = t1.toLowerCase();
-              const sellToken = tokens[sellTokenAddress];
-              const buyTokenAddress = t2.toLowerCase();
-              const buyToken = tokens[buyTokenAddress];
+              const currentPrice = await dx.getCurrentPrice(sellToken, buyToken, auctionIndex);
 
               return {
                 auctionIndex,
                 sellToken: sellToken ? sellToken.symbol : '',
-                sellTokenAddress,
+                sellTokenAddress: sellToken ? sellToken.address : '',
                 sellVolume,
                 buyToken: buyToken ? buyToken.symbol : '',
-                buyTokenAddress,
+                buyTokenAddress: buyToken ? buyToken.address : '',
                 buyVolume,
                 auctionStart,
                 auctionEnd: '',

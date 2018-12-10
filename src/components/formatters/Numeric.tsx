@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js';
 import React from 'react';
 
 interface Props {
@@ -6,15 +7,14 @@ interface Props {
   defaultValue?: string;
 }
 
-const Numeric = ({ value, defaultValue, decimals }: Props) => {
-  const n = Number(value);
+const Numeric = ({ value, defaultValue, decimals = 18 }: Props) => {
+  const n = new BigNumber(value);
 
-  return <span>{Number.isFinite(n) ? parseFloat(n.toFixed(decimals)) : defaultValue}</span>;
+  return <span>{n.isFinite() ? parseFloat(n.toFixed(decimals)) : defaultValue}</span>;
 };
 
 Numeric.defaultProps = {
-  defaultValue: '-',
-  decimals: 18
+  defaultValue: '-'
 };
 
 export default Numeric;

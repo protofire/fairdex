@@ -28,16 +28,20 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
           <Row>
             <Label>Current price</Label>
             <Value>
-              <Numeric value={auction.currentPrice} decimals={6} />
+              <Numeric value={auction.currentPrice} decimals={7} />
             </Value>
           </Row>
           <Row>
             <Label>Sell volume</Label>
-            <Value>{auction.sellVolume}</Value>
+            <Value>
+              <Numeric value={auction.sellVolume} decimals={7} />
+            </Value>
           </Row>
           <Row>
             <Label>Buy volume</Label>
-            <Value>{auction.buyVolume}</Value>
+            <Value>
+              <Numeric value={auction.buyVolume} decimals={7} />
+            </Value>
           </Row>
           <Row>
             <Label>Started time</Label>
