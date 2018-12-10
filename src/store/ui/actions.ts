@@ -32,7 +32,11 @@ export const toggleFilters: ActionCreator<UiAction> = () => {
   };
 };
 
-export const showInfoMessage: ActionCreator<UiAction> = (type: InfoMessageType, title: string, content: ReactNode) => {
+export const showInfoMessage: ActionCreator<UiAction> = (
+  type: InfoMessageType,
+  title: string,
+  content: ReactNode,
+) => {
   return {
     type: SHOW_INFO_MESSAGE,
     payload: {

@@ -24,7 +24,9 @@ export const getRunningAuctions = createSelector(
   (auctions: Auction[]) =>
     auctions.filter(
       auction =>
-        auction.state === 'running' && !auction.sellToken.startsWith('test') && !auction.buyToken.startsWith('test'),
+        auction.state === 'running' &&
+        !auction.sellToken.startsWith('test') &&
+        !auction.buyToken.startsWith('test'),
     ),
 );
 
