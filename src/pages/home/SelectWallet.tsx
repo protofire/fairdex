@@ -7,21 +7,18 @@ import * as images from '../../images';
 import { initWallet } from '../../store/blockchain';
 
 interface DispatchProps {
-  actions: {
-    onSelectWallet: (wallet: Wallet) => void;
-  };
+  onSelectWallet: (wallet: Wallet) => void;
 }
 
 class SelectWallet extends React.PureComponent<DispatchProps> {
   handleWalletSelection = (wallet: Wallet) => {
-    const { actions } = this.props;
-
-    if (actions.onSelectWallet) {
-      actions.onSelectWallet(wallet);
+    if (this.props.onSelectWallet) {
+      this.props.onSelectWallet(wallet);
     }
   };
 
   selectStandardWallet = () => this.handleWalletSelection('standard');
+
   selectLedgerWallet = () => this.handleWalletSelection('ledger');
 
   render() {
@@ -107,11 +104,13 @@ const Logos = styled.div`
   }
 `;
 
+function mapDispatchToProps(dispatch: any): DispatchProps {
+  return {
+    onSelectWallet: wallet => dispatch(initWallet(wallet))
+  };
+}
+
 export default connect(
   null,
-  (dispatch: any): DispatchProps => ({
-    actions: {
-      onSelectWallet: wallet => dispatch(initWallet(wallet))
-    }
-  })
+  mapDispatchToProps
 )(SelectWallet);

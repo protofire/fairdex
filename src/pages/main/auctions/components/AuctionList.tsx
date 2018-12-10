@@ -3,23 +3,22 @@ import styled from 'styled-components';
 
 import Spinner from '../../../../components/Spinner';
 import * as images from '../../../../images';
-import AuctionCard from './AuctionCard';
+import AuctionView from './AuctionView';
 
-interface AuctionListProps {
+export interface AuctionListProps {
   auctions: Auction[];
   isLoading?: boolean;
-  onBid: () => void;
 }
 
-const AuctionList = ({ auctions, isLoading, onBid }: AuctionListProps) =>
+const AuctionList = ({ auctions, isLoading }: AuctionListProps) =>
   isLoading ? (
     <EmptyList>
       <Spinner size='large' />
     </EmptyList>
   ) : auctions.length > 0 ? (
     <Container>
-      {auctions.map((auction, i) => (
-        <AuctionCard key={`${auction.buyToken}-${auction.sellToken}-${auction.auctionIndex}-${i}`} data={auction} onBid={onBid} />
+      {auctions.map(auction => (
+        <AuctionView key={`${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`} data={auction} />
       ))}
     </Container>
   ) : (
