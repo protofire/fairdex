@@ -106,11 +106,11 @@ const Logos = styled.div`
 
 function mapDispatchToProps(dispatch: any): DispatchProps {
   return {
-    onSelectWallet: wallet => dispatch(initWallet(wallet))
+    onSelectWallet: wallet => dispatch(initWallet(wallet)),
   };
 }
 
 export default connect(
   null,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(SelectWallet);

@@ -46,13 +46,13 @@ class Filters extends React.PureComponent<Props, State> {
   state = {
     sellTokenSearchQuery: '',
     buyTokenSearchQuery: '',
-    resetCounter: 1
+    resetCounter: 1,
   };
 
   toggleOption = (option: string, checked: boolean) => {
     this.props.actions.applyFilters({
       ...this.props.filters,
-      [option]: checked
+      [option]: checked,
     });
   };
 
@@ -64,7 +64,7 @@ class Filters extends React.PureComponent<Props, State> {
     this.setState({
       sellTokenSearchQuery: '',
       buyTokenSearchQuery: '',
-      resetCounter: this.state.resetCounter + 1
+      resetCounter: this.state.resetCounter + 1,
     });
     this.props.actions.clearFilters();
   };
@@ -81,11 +81,11 @@ class Filters extends React.PureComponent<Props, State> {
     const { actions, isOpen, sellTokens, buyTokens, filters } = this.props;
     const sellTokensList = this.buildTokenList(
       this.filterTokens(sellTokens, this.state.sellTokenSearchQuery),
-      'sellTokens'
+      'sellTokens',
     );
     const buyTokensList = this.buildTokenList(
       this.filterTokens(buyTokens, this.state.buyTokenSearchQuery),
-      'buyTokens'
+      'buyTokens',
     );
     const nextSort = filters.sortDir === 'asc' ? 'desc' : 'asc';
 
@@ -188,7 +188,7 @@ class Filters extends React.PureComponent<Props, State> {
         }
       }
       this.props.actions.applyFilters({
-        [tokenType]: newFilters
+        [tokenType]: newFilters,
       });
     };
 
@@ -348,7 +348,7 @@ function mapStateToProps(state: AppState): StateProps {
     isOpen: state.ui.filtersVisible,
     sellTokens: getSellTokens(state),
     buyTokens: getBuyTokens(state),
-    filters: state.filters
+    filters: state.filters,
   };
 }
 
@@ -357,12 +357,12 @@ function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
     actions: {
       toggle: () => dispatch(toggleFilters()),
       applyFilters: (filters: FiltersState) => dispatch(applyFilters(filters)),
-      clearFilters: () => dispatch(clearFilters())
-    }
+      clearFilters: () => dispatch(clearFilters()),
+    },
   };
 }
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(Filters);

@@ -15,19 +15,19 @@ const reducer: Reducer<WalletState> = (state = {}, action) => {
   switch (action.type) {
     case INIT_WALLET:
       return {
-        wallet: action.payload
+        wallet: action.payload,
       };
 
     case CHANGE_ACCOUNT:
       return {
         ...state,
-        currentAccount: action.payload
+        currentAccount: action.payload,
       };
 
     case CHANGE_NETWORK:
       return {
         ...state,
-        networkId: action.payload
+        networkId: action.payload,
       };
 
     default:
@@ -73,21 +73,21 @@ export function initWallet(wallet: Wallet) {
 const selectWallet: ActionCreator<Action> = (wallet: Wallet) => {
   return {
     type: INIT_WALLET,
-    payload: wallet
+    payload: wallet,
   };
 };
 
 const changeAccount: ActionCreator<Action> = (accountAddress: Address) => {
   return {
     type: CHANGE_ACCOUNT,
-    payload: accountAddress
+    payload: accountAddress,
   };
 };
 
 const changeNetwork: ActionCreator<Action> = (networkId: string | number) => {
   return {
     type: CHANGE_NETWORK,
-    payload: networkId
+    payload: networkId,
   };
 };
 

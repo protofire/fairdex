@@ -14,7 +14,7 @@ const MenuIcon = () => (
 
 export default styled.svg.attrs({
   viewBox: '0 0 24 24',
-  children: MenuIcon
+  children: MenuIcon,
 })`
   width: 24px;
   height: 24px;

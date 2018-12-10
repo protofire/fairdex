@@ -12,7 +12,7 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
     case SET_RUNNING_AUCTIONS:
       return {
         ...state,
-        auctions: action.payload
+        auctions: action.payload,
       };
 
     default:
@@ -48,7 +48,7 @@ export function fetchRunningAuctions() {
                 dx.getLatestAuctionIndex(sellToken, buyToken),
                 dx.getAuctionStart(sellToken, buyToken),
                 dx.getSellVolume(sellToken, buyToken),
-                dx.getBuyVolume(sellToken, buyToken)
+                dx.getBuyVolume(sellToken, buyToken),
               ]);
 
               const currentPrice = await dx.getCurrentPrice(sellToken, buyToken, auctionIndex);
@@ -64,10 +64,10 @@ export function fetchRunningAuctions() {
                 auctionStart,
                 auctionEnd: '',
                 currentPrice,
-                state: 'running'
+                state: 'running',
               };
-            }
-          )
+            },
+          ),
         );
 
         dispatch(setRunningAuctions(runningAuctions));
@@ -82,7 +82,7 @@ export function fetchRunningAuctions() {
 const setRunningAuctions: ActionCreator<AnyAction> = (auctions: Auction[]) => {
   return {
     type: SET_RUNNING_AUCTIONS,
-    payload: auctions
+    payload: auctions,
   };
 };
 

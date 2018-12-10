@@ -43,5 +43,5 @@ export const ViewModeButton = styled(NavLink)`
 
 export default {
   Button: ViewModeButton,
-  Selector: ViewModeSelector
+  Selector: ViewModeSelector,
 };

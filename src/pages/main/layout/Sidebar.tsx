@@ -88,19 +88,19 @@ const CloseButton = styled(Icon.Close)`
 
 function mapStateToProps({ ui }: AppState): StateProps {
   return {
-    isOpen: ui.sidebarVisible
+    isOpen: ui.sidebarVisible,
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
-      hideSidebar: () => dispatch(hideSidebar())
-    }
+      hideSidebar: () => dispatch(hideSidebar()),
+    },
   };
 }
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(Sidebar);

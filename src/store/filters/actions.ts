@@ -6,12 +6,12 @@ export const CLEAR_FILTERS = 'filters/clear';
 export const applyFilters: ActionCreator<FiltersAction> = (filters: Partial<FiltersState>) => {
   return {
     type: APPLY_FILTERS,
-    payload: filters
+    payload: filters,
   };
 };
 
 export const clearFilters: ActionCreator<FiltersAction> = () => {
   return {
-    type: CLEAR_FILTERS
+    type: CLEAR_FILTERS,
   };
 };

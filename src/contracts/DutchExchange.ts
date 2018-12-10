@@ -9,7 +9,7 @@ class DutchExchange extends BaseContract {
   constructor(networkId: string) {
     super({
       jsonInterface: abi,
-      address: DutchExchangeProxy[networkId].address
+      address: DutchExchangeProxy[networkId].address,
     });
   }
 
@@ -23,7 +23,7 @@ class DutchExchange extends BaseContract {
     return events.map(result => {
       return {
         block: result.blockNumber,
-        data: marshallAuction(result.returnValues)
+        data: marshallAuction(result.returnValues),
       };
     });
   }
@@ -80,7 +80,7 @@ function marshallAuction(data: any): Partial<Auction> {
     buyVolume: data.buyVolume,
     sellToken: getTokenSymbol(data.sellToken),
     sellTokenAddress: data.sellToken,
-    sellVolume: data.sellVolume
+    sellVolume: data.sellVolume,
   };
 }
 

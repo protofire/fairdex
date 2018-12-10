@@ -123,14 +123,14 @@ function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
       toggleSidebar: () => dispatch(toggleSidebar()),
-      toggleFilters: () => dispatch(toggleFilters())
-    }
+      toggleFilters: () => dispatch(toggleFilters()),
+    },
   };
 }
 
 export default withRouter(
   connect(
     null,
-    mapDispatchToProps
-  )(NavBar)
+    mapDispatchToProps,
+  )(NavBar),
 );

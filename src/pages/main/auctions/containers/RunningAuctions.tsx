@@ -7,7 +7,7 @@ import AuctionList, { AuctionListProps } from '../components/AuctionList';
 function mapStateToProps(state: AppState): AuctionListProps {
   return {
     auctions: getRunningAuctions(state),
-    isLoading: state.blockchain.auctions == null
+    isLoading: state.blockchain.auctions == null,
   };
 }
 

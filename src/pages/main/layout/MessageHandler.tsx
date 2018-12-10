@@ -39,19 +39,19 @@ class MessageHandler extends React.PureComponent<Props> {
 
 function mapStateToProps(state: AppState): StateProps {
   return {
-    infoMessage: state.ui.infoMessage
+    infoMessage: state.ui.infoMessage,
   };
 }
 
 function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
-      dismiss: () => dispatch(hideInfoMessage())
-    }
+      dismiss: () => dispatch(hideInfoMessage()),
+    },
   };
 }
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(MessageHandler);

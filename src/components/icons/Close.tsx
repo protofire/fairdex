@@ -13,7 +13,7 @@ const CloseIcon = () => (
 
 export default styled.svg.attrs({
   viewBox: '0 0 24 24',
-  children: CloseIcon
+  children: CloseIcon,
 })`
   width: 24px;
   height: 24px;

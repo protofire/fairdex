@@ -10,29 +10,29 @@ import logo from '../../images/protofire.svg';
 
 const EndedAuctions = Loadable({
   loader: () => import('./auctions/containers/EndedAuctions'),
-  loading: () => <Spinner size='large' />
+  loading: () => <Spinner size='large' />,
 });
 
 const RunningAuctions = Loadable({
   loader: () => import('./auctions/containers/RunningAuctions'),
-  loading: () => <Spinner size='large' />
+  loading: () => <Spinner size='large' />,
 });
 
 const ScheduledAuctions = Loadable({
   loader: () => import('./auctions/containers/ScheduledAuctions'),
-  loading: () => <Spinner size='large' />
+  loading: () => <Spinner size='large' />,
 });
 
 const Wallet = Loadable({
   loader: () => import('./wallet'),
-  loading: () => <Spinner size='large' />
+  loading: () => <Spinner size='large' />,
 });
 
 class MainPage extends React.Component {
   componentDidMount() {
     window.scrollTo({
       behavior: 'smooth',
-      top: 0
+      top: 0,
     });
   }
 

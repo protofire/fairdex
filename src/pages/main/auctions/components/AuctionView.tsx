@@ -100,7 +100,7 @@ const Table = styled.dl`
 `;
 
 const Title = styled.h3.attrs({
-  title: (props: any) => props.children
+  title: (props: any) => props.children,
 })`
   margin-bottom: 1rem;
   font-size: 2em;
@@ -129,11 +129,11 @@ const Button = styled.button`
 
 function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
-    onBid: () => dispatch(showInfoMessage('info', 'Cannot bid', 'Bid is not yet implemented'))
+    onBid: () => dispatch(showInfoMessage('info', 'Cannot bid', 'Bid is not yet implemented')),
   };
 }
 
 export default connect(
   null,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(AuctionView);

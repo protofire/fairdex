@@ -4,7 +4,7 @@ import * as actions from './actions';
 
 const initialState: UiState = {
   sidebarVisible: false,
-  filtersVisible: false
+  filtersVisible: false,
 };
 
 const uiReducer: Reducer<UiState, UiAction> = (state = initialState, action) => {
@@ -12,37 +12,37 @@ const uiReducer: Reducer<UiState, UiAction> = (state = initialState, action) => 
     case actions.SHOW_SIDEBAR:
       return {
         ...state,
-        sidebarVisible: true
+        sidebarVisible: true,
       };
 
     case actions.HIDE_SIDEBAR:
       return {
         ...state,
-        sidebarVisible: false
+        sidebarVisible: false,
       };
 
     case actions.TOGGLE_SIDEBAR:
       return {
         ...state,
-        sidebarVisible: !state.sidebarVisible
+        sidebarVisible: !state.sidebarVisible,
       };
 
     case actions.TOGGLE_FILTERS:
       return {
         ...state,
-        filtersVisible: !state.filtersVisible
+        filtersVisible: !state.filtersVisible,
       };
 
     case actions.SHOW_INFO_MESSAGE:
       return {
         ...state,
-        infoMessage: action.payload && action.payload.infoMessage
+        infoMessage: action.payload && action.payload.infoMessage,
       };
 
     case actions.HIDE_INFO_MESSAGE:
       return {
         ...state,
-        infoMessage: undefined
+        infoMessage: undefined,
       };
 
     default:

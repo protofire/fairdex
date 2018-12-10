@@ -13,7 +13,7 @@ const reducer: Reducer<TokensState> = (state = {}, action) => {
     case SET_AVAILABLE_TOKENS:
       return {
         ...state,
-        tokens: action.payload
+        tokens: action.payload,
       };
 
     default:
@@ -41,7 +41,7 @@ export function fetchAvailableTokens() {
 const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
   return {
     type: SET_AVAILABLE_TOKENS,
-    payload: tokens.reduce((all: object, t: Token) => ({ ...all, [t.address]: t }), {})
+    payload: tokens.reduce((all: object, t: Token) => ({ ...all, [t.address]: t }), {}),
   };
 };
 

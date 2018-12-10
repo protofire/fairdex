@@ -10,25 +10,25 @@ export const HIDE_INFO_MESSAGE = 'infoMessage/HIDE';
 
 export const hideSidebar: ActionCreator<UiAction> = () => {
   return {
-    type: HIDE_SIDEBAR
+    type: HIDE_SIDEBAR,
   };
 };
 
 export const showSidebar: ActionCreator<UiAction> = () => {
   return {
-    type: SHOW_SIDEBAR
+    type: SHOW_SIDEBAR,
   };
 };
 
 export const toggleSidebar: ActionCreator<UiAction> = () => {
   return {
-    type: TOGGLE_SIDEBAR
+    type: TOGGLE_SIDEBAR,
   };
 };
 
 export const toggleFilters: ActionCreator<UiAction> = () => {
   return {
-    type: TOGGLE_FILTERS
+    type: TOGGLE_FILTERS,
   };
 };
 
@@ -39,14 +39,14 @@ export const showInfoMessage: ActionCreator<UiAction> = (type: InfoMessageType, 
       infoMessage: {
         type,
         title,
-        content
-      }
-    }
+        content,
+      },
+    },
   };
 };
 
 export const hideInfoMessage: ActionCreator<UiAction> = () => {
   return {
-    type: HIDE_INFO_MESSAGE
+    type: HIDE_INFO_MESSAGE,
   };
 };

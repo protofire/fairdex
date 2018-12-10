@@ -10,9 +10,9 @@ module.exports = function(api) {
       '@babel/plugin-syntax-dynamic-import',
       'react-hot-loader/babel',
       'react-loadable/babel',
-      'styled-components'
+      'styled-components',
     ],
 
-    ignore: ['**/__tests__', '**/*.spec.*', '**/*.test.*']
+    ignore: ['**/__tests__', '**/*.spec.*', '**/*.test.*'],
   };
 };

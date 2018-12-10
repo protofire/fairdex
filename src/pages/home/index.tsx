@@ -11,17 +11,17 @@ const spinner = <Spinner size='large' />;
 
 const MainPage = Loadable({
   loader: () => import('../main'),
-  loading: () => spinner
+  loading: () => spinner,
 });
 
 const NetworkNotAvailable = Loadable({
   loader: () => import('./NetworkNotAvailable'),
-  loading: () => spinner
+  loading: () => spinner,
 });
 
 const SelectWallet = Loadable({
   loader: () => import('./SelectWallet'),
-  loading: () => spinner
+  loading: () => spinner,
 });
 
 interface Props {
@@ -103,6 +103,6 @@ const Footer = styled.footer`
 export default connect(
   (state: AppState): Props => ({
     network: getNetworkType(state),
-    wallet: state.blockchain.wallet
-  })
+    wallet: state.blockchain.wallet,
+  }),
 )(HomePage);

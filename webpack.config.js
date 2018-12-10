@@ -3,11 +3,11 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 
 module.exports = (env, { mode }) => ({
   resolve: {
-    extensions: ['.ts', '.tsx', '.js']
+    extensions: ['.ts', '.tsx', '.js'],
   },
 
   output: {
-    publicPath: '/'
+    publicPath: '/',
   },
 
   module: {
@@ -16,14 +16,14 @@ module.exports = (env, { mode }) => ({
         enforce: 'pre',
         test: /\.js$/,
         use: 'source-map-loader',
-        exclude: /xhr2-cookies/
+        exclude: /xhr2-cookies/,
       },
       {
         test: /\.tsx?$/,
         loader: 'babel-loader',
         options: {
-          cacheDirectory: true
-        }
+          cacheDirectory: true,
+        },
       },
       {
         test: /\.(png|jp(e*)g|svg)$/,
@@ -32,29 +32,29 @@ module.exports = (env, { mode }) => ({
             loader: 'url-loader',
             options: {
               limit: 8000, // Convert images < 8kb to base64 strings
-              name: 'images/[name]-[hash].[ext]'
-            }
-          }
-        ]
-      }
-    ]
+              name: 'images/[name]-[hash].[ext]',
+            },
+          },
+        ],
+      },
+    ],
   },
 
   plugins: [
     new HtmlWebpackPlugin({
       favicon: 'src/images/favicon.png',
-      template: 'src/index.html'
+      template: 'src/index.html',
     }),
 
     new ScriptExtHtmlWebpackPlugin({
-      defaultAttribute: 'async'
-    })
+      defaultAttribute: 'async',
+    }),
   ],
 
   devtool: mode === 'production' ? 'hidden-source-map' : 'eval-source-map',
 
   devServer: {
     historyApiFallback: true,
-    host: '0.0.0.0'
-  }
+    host: '0.0.0.0',
+  },
 });

@@ -8,7 +8,7 @@ const initialState: FiltersState = {
   sortBy: 'start-time',
   sortDir: 'asc',
   onlyMyTokens: false,
-  onlyMyAuctions: false
+  onlyMyAuctions: false,
 };
 
 const reducer: Reducer<FiltersState, FiltersAction> = (state = initialState, action) => {
@@ -18,7 +18,7 @@ const reducer: Reducer<FiltersState, FiltersAction> = (state = initialState, act
     case actions.APPLY_FILTERS:
       return {
         ...state,
-        ...payload
+        ...payload,
       };
 
     case actions.CLEAR_FILTERS:

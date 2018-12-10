@@ -5,5 +5,5 @@ import { default as Preferences } from './Preferences';
 export default {
   Close,
   Menu,
-  Preferences
+  Preferences,
 };

@@ -21,7 +21,7 @@ interface State {
 class DynamicList extends React.Component<Props, State> {
   state = {
     collapsed: true,
-    searchMode: false
+    searchMode: false,
   };
 
   toggle = () => {

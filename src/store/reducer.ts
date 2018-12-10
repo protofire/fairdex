@@ -7,7 +7,7 @@ import ui from './ui';
 const rootReducer = combineReducers<AppState>({
   blockchain,
   filters,
-  ui
+  ui,
 });
 
 export default rootReducer;

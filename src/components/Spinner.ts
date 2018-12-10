@@ -6,7 +6,7 @@ const SPINNER_SIZES = {
   medium: 2,
   mini: 0.875,
   small: 1.5,
-  tiny: 1
+  tiny: 1,
 };
 
 interface SpinnerProps {

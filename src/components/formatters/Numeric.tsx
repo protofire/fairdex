@@ -14,7 +14,7 @@ const Numeric = ({ value, defaultValue, decimals = 18 }: Props) => {
 };
 
 Numeric.defaultProps = {
-  defaultValue: '-'
+  defaultValue: '-',
 };
 
 export default Numeric;

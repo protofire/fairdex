@@ -13,7 +13,7 @@ const ElapsedTime = ({ from: epoch, defaultValue }: Props) => {
 };
 
 ElapsedTime.defaultProps = {
-  defaultValue: '-'
+  defaultValue: '-',
 };
 
 function elapsedTime(epoch: number | null) {

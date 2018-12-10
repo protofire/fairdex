@@ -4,19 +4,19 @@ const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
 
 export const getSellTokens = createSelector(
   getAllAuctions,
-  (auctions: Auction[]) => buildTokens(auctions, 'sellToken')
+  (auctions: Auction[]) => buildTokens(auctions, 'sellToken'),
 );
 
 export const getBuyTokens = createSelector(
   getAllAuctions,
-  (auctions: Auction[]) => buildTokens(auctions, 'buyToken')
+  (auctions: Auction[]) => buildTokens(auctions, 'buyToken'),
 );
 
 export const getFilteredAuctions = createSelector(
   getAllAuctions,
   (state: AppState) => state.filters,
   (state: AppState) => state.blockchain,
-  filterAuctions
+  filterAuctions,
 );
 
 export const getRunningAuctions = createSelector(
@@ -24,18 +24,18 @@ export const getRunningAuctions = createSelector(
   (auctions: Auction[]) =>
     auctions.filter(
       auction =>
-        auction.state === 'running' && !auction.sellToken.startsWith('test') && !auction.buyToken.startsWith('test')
-    )
+        auction.state === 'running' && !auction.sellToken.startsWith('test') && !auction.buyToken.startsWith('test'),
+    ),
 );
 
 export const getEndedAuctions = createSelector(
   getFilteredAuctions,
-  (auctions: Auction[]) => auctions.filter(auction => auction.state === 'ended')
+  (auctions: Auction[]) => auctions.filter(auction => auction.state === 'ended'),
 );
 
 export const getScheduledAuctions = createSelector(
   getFilteredAuctions,
-  (auctions: Auction[]) => auctions.filter(auction => auction.state === 'scheduled')
+  (auctions: Auction[]) => auctions.filter(auction => auction.state === 'scheduled'),
 );
 
 function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
@@ -71,7 +71,7 @@ function filterAuctions(list: Auction[], filters: FiltersState, wallet: WalletSt
   const sortMap: { [filter in SortField]: keyof Auction } = {
     'buy-token': 'buyToken',
     'sell-volume': 'sellVolume',
-    'start-time': 'auctionStart'
+    'start-time': 'auctionStart',
   };
 
   const sortField = sortMap[filters.sortBy] as keyof Auction;

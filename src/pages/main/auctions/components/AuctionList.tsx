@@ -30,7 +30,7 @@ const AuctionList = ({ auctions, isLoading }: AuctionListProps) =>
 
 AuctionList.defaultProps = {
   auctions: [],
-  loading: false
+  loading: false,
 };
 
 const Container = styled.div`
