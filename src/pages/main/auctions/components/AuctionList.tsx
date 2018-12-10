@@ -19,7 +19,7 @@ const AuctionList = ({ auctions, isLoading }: AuctionListProps) =>
     <Container>
       {auctions.map(auction => (
         <AuctionView
-          key={`${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}
+          key={`${auction.sellTokenAddress}-${auction.buyTokenAddress}-${auction.auctionIndex}`}
           data={auction}
         />
       ))}
