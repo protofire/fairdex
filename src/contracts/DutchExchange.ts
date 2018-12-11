@@ -112,7 +112,7 @@ function timeout({ ms, secs }: { ms?: number; secs?: number } = {}) {
         const result = await Promise.race([
           func.apply(this, args),
 
-          new Promise((resolve) => {
+          new Promise(resolve => {
             setTimeout(() => resolve(), delay);
           }),
         ]);

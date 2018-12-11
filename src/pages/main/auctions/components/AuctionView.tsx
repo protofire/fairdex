@@ -58,11 +58,7 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
           <Row>
             <Label>Started time</Label>
             <Value>
-              {auction.auctionStart === undefined ? (
-                <Loading />
-              ) : (
-                <ElapsedTime from={auction.auctionStart} />
-              )}
+              {auction.auctionStart === undefined ? <Loading /> : <ElapsedTime from={auction.auctionStart} />}
             </Value>
           </Row>
         </Table>
