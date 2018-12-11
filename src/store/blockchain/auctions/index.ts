@@ -59,7 +59,10 @@ export function fetchRunningAuctions() {
                 dx.getBuyVolume(sellToken, buyToken),
               ]);
 
-              const currentPrice = await dx.getCurrentPrice(sellToken, buyToken, auctionIndex);
+              const [closingPrice, currentPrice] = await Promise.all([
+                dx.getPreviousClosingPrice(sellToken, buyToken, auctionIndex),
+                dx.getCurrentPrice(sellToken, buyToken, auctionIndex),
+              ]);
 
               return {
                 auctionIndex,
@@ -71,6 +74,7 @@ export function fetchRunningAuctions() {
                 buyVolume,
                 auctionStart,
                 auctionEnd: '',
+                closingPrice,
                 currentPrice,
                 state: 'running',
               };

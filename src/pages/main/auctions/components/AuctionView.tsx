@@ -26,6 +26,16 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
       <>
         <Table>
           <Row>
+            <Label>Previous closing price</Label>
+            <Value>
+              {auction.closingPrice === undefined ? (
+                <Loading />
+              ) : (
+                <Numeric value={auction.closingPrice} decimals={7} />
+              )}
+            </Value>
+          </Row>
+          <Row>
             <Label>Current price</Label>
             <Value>
               {auction.currentPrice === undefined ? (

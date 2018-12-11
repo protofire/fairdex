@@ -27,6 +27,7 @@ interface Auction {
   sellVolume?: string;
   buyVolume?: string;
   currentPrice: string;
+  closingPrice: string;
   state: AuctionState;
 }
 
