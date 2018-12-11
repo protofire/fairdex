@@ -7,7 +7,6 @@ module.exports = function(api) {
     plugins: [
       ['@babel/proposal-decorators', { legacy: true }],
       ['@babel/proposal-class-properties', { loose: true }],
-      '@babel/proposal-object-rest-spread',
       '@babel/proposal-numeric-separator',
       '@babel/syntax-dynamic-import',
       'react-hot-loader/babel',
