@@ -19,7 +19,7 @@ const variables = css`
     // Layout
     --button-height: ${rem('40px')};
     --card-height: ${rem('256px')};
-    --card-width: ${rem('300px')};
+    --card-width: ${rem('280px')};
     --header-height: ${rem('72px')};
     --sidebar-width: ${rem('320px')};
 

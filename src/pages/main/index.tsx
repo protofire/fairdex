@@ -91,7 +91,6 @@ const Section = styled.section`
   display: grid;
   height: 100%;
   padding: var(--spacing-normal);
-  overflow-x: auto;
 `;
 
 export default MainPage;

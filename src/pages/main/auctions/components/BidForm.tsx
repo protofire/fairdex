@@ -93,6 +93,8 @@ const Tooltip = styled.div`
   p {
     margin: 0 0 var(--spacing-normal);
     padding: 0 var(--spacing-narrow);
+    line-height: 1.14;
+    letter-spacing: -0.4px;
   }
 
   &:after {
@@ -114,6 +116,7 @@ const Text = styled.h4`
   line-height: 1.25;
   letter-spacing: -0.6px;
   color: var(--color-text-primary);
+  margin: var(--spacing-wide) 0;
 `;
 
 export default BidForm;
