@@ -5,7 +5,7 @@ import { BlockType } from 'web3/eth/types';
 import BaseContract from './BaseContract';
 import { fromFraction, toDecimal } from './utils';
 
-const DEFAULT_TIMEOUT = 8_000; // 8 seconds
+const DEFAULT_TIMEOUT = 6_000; // 6 seconds
 
 class DutchExchange extends BaseContract {
   constructor(networkId: string) {
@@ -112,8 +112,8 @@ function timeout({ ms, secs }: { ms?: number; secs?: number } = {}) {
         const result = await Promise.race([
           func.apply(this, args),
 
-          new Promise((resolve, reject) => {
-            setTimeout(() => reject('Timed out'), delay);
+          new Promise((resolve) => {
+            setTimeout(() => resolve(), delay);
           }),
         ]);
 
