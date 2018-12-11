@@ -8,6 +8,7 @@ module.exports = function(api) {
       ['@babel/proposal-decorators', { legacy: true }],
       ['@babel/proposal-class-properties', { loose: true }],
       '@babel/proposal-object-rest-spread',
+      '@babel/proposal-numeric-separator',
       '@babel/syntax-dynamic-import',
       'react-hot-loader/babel',
       'react-loadable/babel',
