@@ -28,25 +28,41 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
           <Row>
             <Label>Current price</Label>
             <Value>
-              <Numeric value={auction.currentPrice} decimals={7} />
+              {auction.currentPrice === undefined ? (
+                <Loading />
+              ) : (
+                <Numeric value={auction.currentPrice} decimals={7} />
+              )}
             </Value>
           </Row>
           <Row>
             <Label>Sell volume</Label>
             <Value>
-              <Numeric value={auction.sellVolume} decimals={7} />
+              {auction.sellVolume === undefined ? (
+                <Loading />
+              ) : (
+                <Numeric value={auction.sellVolume} decimals={7} />
+              )}
             </Value>
           </Row>
           <Row>
             <Label>Buy volume</Label>
             <Value>
-              <Numeric value={auction.buyVolume} decimals={7} />
+              {auction.buyVolume === undefined ? (
+                <Loading />
+              ) : (
+                <Numeric value={auction.buyVolume} decimals={7} />
+              )}
             </Value>
           </Row>
           <Row>
             <Label>Started time</Label>
             <Value>
-              <ElapsedTime from={auction.auctionStart} />
+              {auction.auctionStart === undefined ? (
+                <Loading />
+              ) : (
+                <ElapsedTime from={auction.auctionStart} />
+              )}
             </Value>
           </Row>
         </Table>
@@ -75,6 +91,19 @@ const Label = styled.dt`
     content: '${'.'.repeat(200)}';
     color: var(--color-grey);
     margin-left: var(--spacing-text);
+  }
+`;
+
+const Loading = styled.span.attrs({
+  children: '…',
+  title: 'Calculating value',
+})`
+  color: var(--color-greyish);
+  user-select: none;
+  cursor: progress;
+
+  &:hover {
+    color: inherit;
   }
 `;
 
