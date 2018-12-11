@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import Button from '../../../../components/Button';
 import { Numeric } from '../../../../components/formatters';
+import Tooltip from '../../../../components/Tooltip';
 
 interface Props {
   auction: Auction;
@@ -25,10 +26,6 @@ class BidForm extends React.PureComponent<Props, State> {
     this.hideDialog();
   };
 
-  toggleDialog = () => {
-    this.state.showDialog ? this.hideDialog() : this.showDialog();
-  };
-
   showDialog = () => {
     this.setState({ showDialog: true, showWarning: true });
   };
@@ -46,10 +43,10 @@ class BidForm extends React.PureComponent<Props, State> {
     const { showDialog, showWarning } = this.state;
 
     return (
-      <Container>
+      <Tooltip.Container>
         {showDialog &&
           (showWarning && +auction.currentPrice < +auction.closingPrice ? (
-            <Tooltip accent>
+            <Tooltip.Dialog theme='accent'>
               <p>
                 You are bidding above the previous closing price for {auction.sellToken}/{auction.buyToken}
               </p>
@@ -59,26 +56,22 @@ class BidForm extends React.PureComponent<Props, State> {
               </Text>
 
               <Button onClick={this.hideWarning}>Proceed</Button>
-            </Tooltip>
+            </Tooltip.Dialog>
           ) : (
-            <Tooltip>
-              <Button onClick={this.toggleDialog}>Confirm</Button>
-            </Tooltip>
+            <Tooltip.Dialog>
+              <Button onClick={this.hideDialog}>Confirm</Button>
+            </Tooltip.Dialog>
           ))}
 
         {showDialog ? (
-          <CancelButton onClick={this.toggleDialog}>Cancel</CancelButton>
+          <CancelButton onClick={this.hideDialog}>Cancel</CancelButton>
         ) : (
-          <BidButton onClick={this.toggleDialog}>Bid</BidButton>
+          <BidButton onClick={this.showDialog}>Bid</BidButton>
         )}
-      </Container>
+      </Tooltip.Container>
     );
   }
 }
-
-const Container = styled.div`
-  position: relative;
-`;
 
 const BidButton = styled(Button).attrs({ mode: 'secondary' })`
   margin-top: var(--spacing-normal);
@@ -86,38 +79,6 @@ const BidButton = styled(Button).attrs({ mode: 'secondary' })`
 
 const CancelButton = styled(Button).attrs({ mode: 'dark' })`
   margin-top: var(--spacing-normal);
-`;
-
-const Tooltip = styled.div`
-  position: absolute;
-  width: 100%;
-  bottom: calc(100% + 15px);
-  padding: var(--spacing-normal);
-  font-size: 0.875rem;
-  line-height: 1rem;
-  text-align: center;
-  background-color: ${(props: { accent?: boolean }) => (props.accent ? '#fff0e2' : 'var(--color-main-bg)')};
-  border-radius: 8px;
-  box-shadow: 0 20px 40px 0 rgba(48, 59, 62, 0.3);
-
-  p {
-    margin: 0 0 var(--spacing-normal);
-    padding: 0 var(--spacing-narrow);
-    line-height: 1.14;
-    letter-spacing: -0.4px;
-  }
-
-  &:after {
-    position: absolute;
-    display: block;
-    content: '';
-    width: 0;
-    bottom: -7.5px;
-    left: 45%;
-    border-style: solid;
-    border-width: 7.5px 10px 0;
-    border-color: ${(props: any) => (props.accent ? '#fff0e2' : 'var(--color-main-bg)')} transparent;
-  }
 `;
 
 const Text = styled.h4`
