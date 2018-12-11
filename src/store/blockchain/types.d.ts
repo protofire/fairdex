@@ -16,15 +16,15 @@ interface Token {
 type AuctionState = 'running' | 'ended' | 'scheduled';
 
 interface Auction {
-  auctionIndex: number;
+  auctionIndex: string;
   sellToken: TokenSymbol;
   buyToken: TokenSymbol;
   sellTokenAddress: Address;
   buyTokenAddress: Address;
   auctionStart: number | null;
   auctionEnd: string;
-  sellVolume: string;
-  buyVolume: string;
+  sellVolume?: string;
+  buyVolume?: string;
   currentPrice: string;
   state: AuctionState;
 }

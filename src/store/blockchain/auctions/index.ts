@@ -20,7 +20,7 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
   }
 };
 
-const RUNNING_AUCTION_INTERVAL = 1000 * 60; // 1 minute
+const RUNNING_AUCTION_INTERVAL = 1_000 * 60; // 1 minute
 
 export function fetchRunningAuctions() {
   const { dx } = window;
@@ -31,18 +31,26 @@ export function fetchRunningAuctions() {
     await checkForUpdates();
 
     async function checkForUpdates() {
-      const state = getState();
-      const tokens = getAvailableTokens(state);
+      const tokens = getAvailableTokens(getState());
       const tokenAddresses = Object.keys(tokens);
 
       if (tokenAddresses.length) {
-        const tokenPairs = await dx.getRunningTokenPairs(tokenAddresses);
+        const runningTokenPairs = await dx.getRunningTokenPairs(tokenAddresses);
+
+        const tokensCombinations = runningTokenPairs.reduce<Array<[Address, Address]>>(
+          (res, [t1, t2]) => [...res, [t1, t2], [t2, t1]],
+          [],
+        );
 
         const runningAuctions = await Promise.all(
-          tokenPairs.map(
-            async ([t1, t2]): Promise<Auction> => {
-              const sellToken = tokens[t1.toLowerCase()];
-              const buyToken = tokens[t2.toLowerCase()];
+          tokensCombinations.map(
+            async ([sellTokenAddress, buyTokenAddress]): Promise<Auction | null> => {
+              const sellToken = tokens[sellTokenAddress];
+              const buyToken = tokens[buyTokenAddress];
+
+              if (!sellToken || !buyToken) {
+                return null;
+              }
 
               const [auctionIndex, auctionStart, sellVolume, buyVolume] = await Promise.all([
                 dx.getLatestAuctionIndex(sellToken, buyToken),
@@ -55,11 +63,11 @@ export function fetchRunningAuctions() {
 
               return {
                 auctionIndex,
-                sellToken: sellToken ? sellToken.symbol : '',
-                sellTokenAddress: sellToken ? sellToken.address : '',
+                sellToken: sellToken.symbol,
+                sellTokenAddress,
                 sellVolume,
-                buyToken: buyToken ? buyToken.symbol : '',
-                buyTokenAddress: buyToken ? buyToken.address : '',
+                buyToken: buyToken.symbol,
+                buyTokenAddress,
                 buyVolume,
                 auctionStart,
                 auctionEnd: '',
@@ -70,7 +78,11 @@ export function fetchRunningAuctions() {
           ),
         );
 
-        dispatch(setRunningAuctions(runningAuctions));
+        dispatch(
+          setRunningAuctions(
+            runningAuctions.filter(a => a != null), // Filter auctions of test/unknown tokens
+          ),
+        );
       }
 
       clearTimeout(subscription);

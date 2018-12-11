@@ -41,7 +41,10 @@ export function fetchAvailableTokens() {
 const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
   return {
     type: SET_AVAILABLE_TOKENS,
-    payload: tokens.reduce((all: object, t: Token) => ({ ...all, [t.address]: t }), {}),
+    payload: tokens.reduce(
+      (all: object, t: Token) => (t.symbol.startsWith('test') ? all : { ...all, [t.address]: t }),
+      {},
+    ),
   };
 };
 

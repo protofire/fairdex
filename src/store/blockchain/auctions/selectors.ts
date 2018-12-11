@@ -21,13 +21,7 @@ export const getFilteredAuctions = createSelector(
 
 export const getRunningAuctions = createSelector(
   getFilteredAuctions,
-  (auctions: Auction[]) =>
-    auctions.filter(
-      auction =>
-        auction.state === 'running' &&
-        !auction.sellToken.startsWith('test') &&
-        !auction.buyToken.startsWith('test'),
-    ),
+  (auctions: Auction[]) => auctions.filter(auction => auction.state === 'running'),
 );
 
 export const getEndedAuctions = createSelector(

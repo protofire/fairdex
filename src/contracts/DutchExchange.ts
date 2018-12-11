@@ -40,7 +40,7 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: number): Promise<string> {
+  getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: string): Promise<string> {
     return this.methods
       .getCurrentAuctionPrice(sellToken.address, buyToken.address, auctionIndex)
       .call()
@@ -64,11 +64,8 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  getLatestAuctionIndex(sellToken: Token, buyToken: Token): Promise<number> {
-    return this.methods
-      .getAuctionIndex(sellToken.address, buyToken.address)
-      .call()
-      .then(auctionIndex => parseInt(auctionIndex, 10));
+  getLatestAuctionIndex(sellToken: Token, buyToken: Token): Promise<string> {
+    return this.methods.getAuctionIndex(sellToken.address, buyToken.address).call();
   }
 
   @timeout()
@@ -76,7 +73,11 @@ class DutchExchange extends BaseContract {
     return this.methods
       .getRunningTokenPairs(tokens)
       .call()
-      .then(({ tokens1, tokens2 }) => tokens1.map((_: any, i: number) => [tokens1[i], tokens2[i]]));
+      .then(({ tokens1, tokens2 }) =>
+        tokens1.map((_: void, i: number) => {
+          return [tokens1[i].toLowerCase(), tokens2[i].toLowerCase()];
+        }),
+      );
   }
 }
 
