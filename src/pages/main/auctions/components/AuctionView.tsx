@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { ElapsedTime, Numeric } from '../../../../components/formatters';
 import { showInfoMessage } from '../../../../store/ui/actions';
+import BidForm from './BidForm';
 
 type AuctionViewProps = OwnProps & DispatchProps;
 
@@ -25,16 +26,6 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
     {auction.state === 'running' && (
       <>
         <Table>
-          <Row>
-            <Label>Previous closing price</Label>
-            <Value>
-              {auction.closingPrice === undefined ? (
-                <Loading />
-              ) : (
-                <Numeric value={auction.closingPrice} decimals={7} />
-              )}
-            </Value>
-          </Row>
           <Row>
             <Label>Current price</Label>
             <Value>
@@ -72,7 +63,7 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
             </Value>
           </Row>
         </Table>
-        <Button onClick={onBid}>Bid</Button>
+        <BidForm auction={auction} onBid={onBid} />
       </>
     )}
   </Card>
@@ -145,21 +136,6 @@ const Title = styled.h3.attrs({
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-`;
-
-const Button = styled.button`
-  display: block;
-  width: 100%;
-  margin-top: var(--spacing-normal);
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  font-weight: bold;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  background: var(--color-main-bg);
-  border: 2px solid var(--color-content-bg);
-  color: var(--color-text-orange);
-  cursor: pointer;
 `;
 
 function mapDispatchToProps(dispatch: Dispatch): DispatchProps {

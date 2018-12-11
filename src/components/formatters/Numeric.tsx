@@ -5,15 +5,26 @@ interface Props {
   value: number | string;
   decimals?: number;
   defaultValue?: string;
+  prefix?: string;
+  postfix?: string;
   showTitle?: boolean;
 }
 
-const Numeric = ({ value, defaultValue, decimals = 18, showTitle }: Props) => {
+const Numeric = ({ value, defaultValue, decimals = 18, showTitle, ...props }: Props) => {
   const val = new BigNumber(value);
-  const raw = showTitle ? (val.isFinite() ? val.toString() : defaultValue) : '';
+  const rawValue = showTitle ? (val.isFinite() ? val.toString() : defaultValue) : null;
   const formatted = val.isFinite() ? parseFloat(val.toFixed(decimals)) : defaultValue;
 
-  return <span title={raw}>{formatted}</span>;
+  const prefix = props.prefix ? props.prefix + ' ' : '';
+  const postfix = props.postfix ? ' ' + props.postfix : '';
+
+  return (
+    <span title={`${prefix}${rawValue}${postfix}`}>
+      {prefix}
+      {formatted}
+      {postfix}
+    </span>
+  );
 };
 
 Numeric.defaultProps = {
