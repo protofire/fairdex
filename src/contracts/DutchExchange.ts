@@ -31,53 +31,59 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  getAuctionStart(sellToken: Token, buyToken: Token): Promise<number | null> {
-    return this.methods
+  async getAuctionStart(sellToken: Token, buyToken: Token): Promise<number | null> {
+    const auctionStart: string = await this.methods
       .getAuctionStart(sellToken.address, buyToken.address)
-      .call()
-      .then((auctionStart: string) => parseInt(auctionStart, 10))
-      .then((auctionStart: number) => (isNaN(auctionStart) ? null : auctionStart * 1000));
+      .call();
+
+    const epoch = parseInt(auctionStart, 10) * 1_000;
+
+    return isNaN(epoch) ? null : epoch;
   }
 
   @timeout()
-  getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: string): Promise<string> {
-    return this.methods
+  async getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: string): Promise<string> {
+    const currentPrice: Fraction = await this.methods
       .getCurrentAuctionPrice(sellToken.address, buyToken.address, auctionIndex)
-      .call()
-      .then((price: Fraction) => fromFraction(price));
+      .call();
+
+    return fromFraction(currentPrice);
   }
 
   @timeout()
-  getSellVolume(sellToken: Token, buyToken: Token): Promise<string> {
-    return this.methods
+  async getSellVolume(sellToken: Token, buyToken: Token): Promise<string> {
+    const sellVolume: string = await this.methods
       .sellVolumesCurrent(sellToken.address, buyToken.address)
-      .call()
-      .then((sellVolume: string) => toDecimal(sellVolume, sellToken.decimals));
+      .call();
+
+    return toDecimal(sellVolume, sellToken.decimals);
   }
 
   @timeout()
-  getBuyVolume(sellToken: Token, buyToken: Token): Promise<string> {
-    return this.methods
-      .buyVolumes(sellToken.address, buyToken.address)
-      .call()
-      .then((buyVolume: string) => toDecimal(buyVolume, buyToken.decimals));
+  async getBuyVolume(sellToken: Token, buyToken: Token): Promise<string> {
+    const buyVolume: string = await this.methods.buyVolumes(sellToken.address, buyToken.address).call();
+
+    return toDecimal(buyVolume, buyToken.decimals);
   }
 
   @timeout()
-  getLatestAuctionIndex(sellToken: Token, buyToken: Token): Promise<string> {
-    return this.methods.getAuctionIndex(sellToken.address, buyToken.address).call();
+  async getLatestAuctionIndex(sellToken: Token, buyToken: Token): Promise<string> {
+    const auctionIndex: string = await this.methods
+      .getAuctionIndex(sellToken.address, buyToken.address)
+      .call();
+
+    return auctionIndex;
   }
 
   @timeout()
-  getRunningTokenPairs(tokens: Address[]): Promise<Array<[Address, Address]>> {
-    return this.methods
-      .getRunningTokenPairs(tokens)
-      .call()
-      .then(({ tokens1, tokens2 }) =>
-        tokens1.map((_: void, i: number) => {
-          return [tokens1[i].toLowerCase(), tokens2[i].toLowerCase()];
-        }),
-      );
+  async getRunningTokenPairs(tokens: Address[]): Promise<Array<[Address, Address]>> {
+    const { tokens1, tokens2 } = await this.methods.getRunningTokenPairs(tokens).call();
+
+    const pairs = tokens1.map((_: void, i: number) => {
+      return [tokens1[i].toLowerCase(), tokens2[i].toLowerCase()];
+    });
+
+    return pairs;
   }
 }
 
