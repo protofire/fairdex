@@ -1,4 +1,5 @@
 import React from 'react';
+import enhanceWithClickOutside from 'react-click-outside';
 import styled from 'styled-components';
 
 import Button from '../../../../components/Button';
@@ -20,11 +21,20 @@ class BidForm extends React.PureComponent<Props, State> {
     showWarning: true,
   };
 
+  handleClickOutside = () => {
+    this.hideDialog();
+  };
+
   toggleDialog = () => {
-    this.setState({
-      showDialog: !this.state.showDialog,
-      showWarning: !this.state.showDialog,
-    });
+    this.state.showDialog ? this.hideDialog() : this.showDialog();
+  };
+
+  showDialog = () => {
+    this.setState({ showDialog: true, showWarning: true });
+  };
+
+  hideDialog = () => {
+    this.setState({ showDialog: false, showWarning: false });
   };
 
   hideWarning = () => {
@@ -119,4 +129,4 @@ const Text = styled.h4`
   margin: var(--spacing-wide) 0;
 `;
 
-export default BidForm;
+export default enhanceWithClickOutside(BidForm);
