@@ -5,6 +5,8 @@ import { BlockType } from 'web3/eth/types';
 import BaseContract from './BaseContract';
 import { fromFraction, toDecimal } from './utils';
 
+const DEFAULT_TIMEOUT = 8_000; // 8 seconds
+
 class DutchExchange extends BaseContract {
   constructor(networkId: string) {
     super({
@@ -28,6 +30,7 @@ class DutchExchange extends BaseContract {
     });
   }
 
+  @timeout()
   getAuctionStart(sellToken: Token, buyToken: Token): Promise<number | null> {
     return this.methods
       .getAuctionStart(sellToken.address, buyToken.address)
@@ -36,6 +39,7 @@ class DutchExchange extends BaseContract {
       .then((auctionStart: number) => (isNaN(auctionStart) ? null : auctionStart * 1000));
   }
 
+  @timeout()
   getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: number): Promise<string> {
     return this.methods
       .getCurrentAuctionPrice(sellToken.address, buyToken.address, auctionIndex)
@@ -43,6 +47,7 @@ class DutchExchange extends BaseContract {
       .then((price: Fraction) => fromFraction(price));
   }
 
+  @timeout()
   getSellVolume(sellToken: Token, buyToken: Token): Promise<string> {
     return this.methods
       .sellVolumesCurrent(sellToken.address, buyToken.address)
@@ -50,6 +55,7 @@ class DutchExchange extends BaseContract {
       .then((sellVolume: string) => toDecimal(sellVolume, sellToken.decimals));
   }
 
+  @timeout()
   getBuyVolume(sellToken: Token, buyToken: Token): Promise<string> {
     return this.methods
       .buyVolumes(sellToken.address, buyToken.address)
@@ -57,6 +63,7 @@ class DutchExchange extends BaseContract {
       .then((buyVolume: string) => toDecimal(buyVolume, buyToken.decimals));
   }
 
+  @timeout()
   getLatestAuctionIndex(sellToken: Token, buyToken: Token): Promise<number> {
     return this.methods
       .getAuctionIndex(sellToken.address, buyToken.address)
@@ -64,6 +71,7 @@ class DutchExchange extends BaseContract {
       .then(auctionIndex => parseInt(auctionIndex, 10));
   }
 
+  @timeout()
   getRunningTokenPairs(tokens: Address[]): Promise<Array<[Address, Address]>> {
     return this.methods
       .getRunningTokenPairs(tokens)
@@ -86,6 +94,32 @@ function marshallAuction(data: any): Partial<Auction> {
 
 function getTokenSymbol(tokenAddress: Address) {
   return `${tokenAddress}`;
+}
+
+function timeout({ ms, secs }: { ms?: number; secs?: number } = {}) {
+  return (
+    target: any,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<(...params: any[]) => Promise<any>>,
+  ) => {
+    const func = descriptor.value;
+
+    if (typeof func === 'function') {
+      const delay = ms || (secs && secs * 1_000) || DEFAULT_TIMEOUT;
+
+      descriptor.value = async function(...args) {
+        const result = await Promise.race([
+          func.apply(this, args),
+
+          new Promise((resolve, reject) => {
+            setTimeout(() => reject('Timed out'), delay);
+          }),
+        ]);
+
+        return result;
+      };
+    }
+  };
 }
 
 export default DutchExchange;
