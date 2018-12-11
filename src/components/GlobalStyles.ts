@@ -17,6 +17,7 @@ const variables = css`
     --color-grey: #d9dee2;
 
     // Layout
+    --button-height: ${rem('40px')};
     --card-height: ${rem('256px')};
     --card-width: ${rem('300px')};
     --header-height: ${rem('72px')};

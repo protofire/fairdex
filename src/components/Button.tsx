@@ -1,13 +1,18 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+interface ButtonProps {
+  inline?: boolean;
+  mode?: 'primary' | 'secondary' | 'dark';
+}
 
 const Button = styled.button`
-  height: 40px;
+  display: block;
+  height: var(--button-height);
+  width: ${(props: ButtonProps) => (props.inline ? 'auto' : '100%')};
   padding: 0 calc(var(--spacing-normal) * 0.5);
-  background-color: #f77902;
   border: none;
   border-radius: 8px;
-  color: #ffffff;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: bold;
   text-transform: uppercase;
   cursor: pointer;
@@ -16,9 +21,40 @@ const Button = styled.button`
     outline: 0;
   }
 
-  &:hover {
-    box-shadow: 0 8px 24px 0 rgba(247, 121, 2, 0.5);
-  }
+  ${(props: ButtonProps) => {
+    switch (props.mode) {
+      case 'secondary':
+        return css`
+          color: var(--color-text-orange);
+          background-color: var(--color-main-bg);
+          border: 2px solid var(--color-content-bg);
+
+          &:hover {
+            box-shadow: 0 0 12px 0 rgba(217, 222, 226, 0.25);
+          }
+        `;
+
+      case 'dark':
+        return css`
+          color: var(--color-main-bg);
+          background-color: var(--color-text-primary);
+
+          &:hover {
+            box-shadow: 0 0 12px 0 rgba(217, 222, 226, 0.25);
+          }
+        `;
+
+      default:
+        return css`
+          color: var(--color-main-bg);
+          background-color: var(--color-text-orange);
+
+          &:hover {
+            box-shadow: 0 8px 24px 0 rgba(247, 121, 2, 0.5);
+          }
+        `;
+    }
+  }};
 `;
 
 export default Button;
