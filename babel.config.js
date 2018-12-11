@@ -5,9 +5,10 @@ module.exports = function(api) {
     presets: ['@babel/env', '@babel/react', '@babel/typescript'],
 
     plugins: [
-      '@babel/proposal-class-properties',
+      ['@babel/proposal-decorators', { legacy: true }],
+      ['@babel/proposal-class-properties', { loose: true }],
       '@babel/proposal-object-rest-spread',
-      '@babel/plugin-syntax-dynamic-import',
+      '@babel/syntax-dynamic-import',
       'react-hot-loader/babel',
       'react-loadable/babel',
       'styled-components',
