@@ -114,7 +114,7 @@ class Filters extends React.PureComponent<Props, State> {
                 </Item>
               </List>
             </Section>
-            {/* <Section>
+            <Section>
               <List>
                 <Item>
                   <Label>
@@ -139,7 +139,7 @@ class Filters extends React.PureComponent<Props, State> {
                   <ItemCount>2</ItemCount>
                 </Item>
               </List>
-            </Section> */}
+            </Section>
             <Section>
               <DynamicList
                 key={this.state.resetCounter}
