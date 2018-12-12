@@ -1,3 +1,4 @@
+export * from './auction';
 export * from './decimal';
 
 const DEFAULT_TIMEOUT = 6_000; // 6 seconds

@@ -4,6 +4,7 @@ import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
 import { ElapsedTime, Numeric } from '../../../../components/formatters';
+import { getToEndVolume } from '../../../../contracts/utils';
 import { showInfoMessage } from '../../../../store/ui/actions';
 import BidForm from './BidForm';
 
@@ -37,22 +38,12 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
             </Value>
           </Row>
           <Row>
-            <Label>Sell volume</Label>
+            <Label>To end volume</Label>
             <Value>
-              {auction.sellVolume === undefined ? (
+              {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
                 <Loading />
               ) : (
-                <Numeric value={auction.sellVolume} decimals={7} />
-              )}
-            </Value>
-          </Row>
-          <Row>
-            <Label>Buy volume</Label>
-            <Value>
-              {auction.buyVolume === undefined ? (
-                <Loading />
-              ) : (
-                <Numeric value={auction.buyVolume} decimals={7} />
+                <Numeric value={getToEndVolume(auction.sellVolume, auction.buyVolume)} decimals={7} />
               )}
             </Value>
           </Row>
