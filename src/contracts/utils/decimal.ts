@@ -1,9 +1,27 @@
-import { BigNumber } from 'bignumber.js';
+import BigNumber from 'bignumber.js';
 
-const TEN = new BigNumber(10);
+const TEN = toBigNumber(10);
 
-export function toBigNumber(value: string | number | BigNumber): BigNumber {
-  return new BigNumber(value);
+export type Decimal = BigNumber.Value;
+
+export interface DecimalFormat {
+  decimals?: number;
+  prefix?: string;
+  postfix?: string;
+}
+
+export function formatNumber(value: BigNumber.Value, options: DecimalFormat = {}): string {
+  const num = toBigNumber(value);
+
+  if (num.isFinite()) {
+    const prefix = options.prefix ? options.prefix + ' ' : '';
+    const postfix = options.postfix ? ' ' + options.postfix : '';
+    const formatted = toBigNumber(options.decimals != null ? num.toFixed(options.decimals) : num);
+
+    return `${prefix}${formatted.toString(10)}${postfix}`;
+  }
+
+  return '';
 }
 
 export function fromFraction(value?: Fraction): string {
@@ -23,9 +41,13 @@ export function fromFraction(value?: Fraction): string {
   return '';
 }
 
-export function toDecimal(value: string, decimals: number): string {
+export function toBigNumber(value: Decimal): BigNumber {
+  return new BigNumber(value);
+}
+
+export function toDecimal(value: Decimal, decimals: number): string {
   try {
-    const num = new BigNumber(value);
+    const num = toBigNumber(value);
     const base = TEN.pow(decimals);
 
     return num.div(base).toString(10);

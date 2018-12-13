@@ -1,31 +1,18 @@
-import { BigNumber } from 'bignumber.js';
 import React from 'react';
 
-interface Props {
-  value: number | string;
-  decimals?: number;
+import { Decimal, DecimalFormat, formatNumber } from '../../contracts/utils';
+
+interface Props extends DecimalFormat {
+  value: Decimal;
   defaultValue?: string;
-  prefix?: string;
-  postfix?: string;
   showTitle?: boolean;
 }
 
-const Numeric = ({ value, defaultValue, decimals = 18, showTitle, ...props }: Props) => {
-  const val = new BigNumber(value);
-  const rawValue = showTitle ? (val.isFinite() ? val.toString() : defaultValue) : null;
-  const formatted = val.isFinite() ? parseFloat(val.toFixed(decimals)) : defaultValue;
-
-  const prefix = props.prefix ? props.prefix + ' ' : '';
-  const postfix = props.postfix ? ' ' + props.postfix : '';
-
-  return (
-    <span title={`${prefix}${rawValue}${postfix}`}>
-      {prefix}
-      {formatted}
-      {postfix}
-    </span>
-  );
-};
+const Numeric = ({ value, defaultValue, decimals, showTitle, prefix, postfix }: Props) => (
+  <span title={showTitle ? formatNumber(value, { prefix, postfix }) : undefined}>
+    {formatNumber(value, { decimals, prefix, postfix }) || defaultValue}
+  </span>
+);
 
 Numeric.defaultProps = {
   defaultValue: '-',
