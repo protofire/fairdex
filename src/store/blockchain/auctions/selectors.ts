@@ -97,7 +97,7 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
       const myTokenAddresses = Object.keys(tokens).filter(addr => {
         return tokens[addr].balance > 0;
       });
-      return myTokenAddresses.includes(item.sellTokenAddress);
+      return myTokenAddresses.includes(item.buyTokenAddress);
     });
   }
 
