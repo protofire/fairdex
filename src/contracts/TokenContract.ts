@@ -5,18 +5,11 @@ import BaseContract from './BaseContract';
 import { timeout } from './utils';
 
 class TokenContract extends BaseContract {
-  token: Token;
-
   constructor(token: Token) {
     super({
       jsonInterface: abi,
       address: token.address,
     });
-    this.token = token;
-  }
-
-  get methods() {
-    return this.instance.methods;
   }
 
   @timeout()

@@ -16,6 +16,10 @@ abstract class BaseContract {
 
     this.instance = new web3.eth.Contract(jsonInterface, address);
   }
+
+  get methods() {
+    return this.instance.methods;
+  }
 }
 
 export default BaseContract;
