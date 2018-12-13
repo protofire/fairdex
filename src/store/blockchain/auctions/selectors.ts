@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js';
 import { createSelector } from 'reselect';
 
 const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
@@ -95,7 +96,8 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
     out = out.filter(item => {
       const tokens = blockchain.tokens || {};
       const myTokenAddresses = Object.keys(tokens).filter(addr => {
-        return tokens[addr].balance > 0;
+        const balance = new BigNumber(tokens[addr].balance);
+        return balance.gt(0);
       });
       return myTokenAddresses.includes(item.buyTokenAddress);
     });

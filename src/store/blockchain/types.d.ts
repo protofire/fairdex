@@ -7,7 +7,7 @@ type Wallet = 'standard' | 'ledger';
 type TokenSymbol = string;
 
 interface Token {
-  balance: number;
+  balance: string;
   symbol: TokenSymbol;
   address: Address;
   name: string;
