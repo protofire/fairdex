@@ -61,7 +61,7 @@ function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
   return outputList;
 }
 
-function filterAuctions(list: Auction[], filters: FiltersState, wallet: WalletState) {
+function filterAuctions(list: Auction[], filters: FiltersState, blockchain: BlockchainState) {
   let out = Array.from(list);
 
   const sortMap: { [filter in SortField]: keyof Auction } = {
@@ -85,11 +85,17 @@ function filterAuctions(list: Auction[], filters: FiltersState, wallet: WalletSt
   }
 
   if (filters.onlyMyAuctions) {
-    out = out.filter(item => item.sellTokenAddress === wallet.currentAccount);
+    // out = out.filter(item => item.sellTokenAddress === blockchain.wallet.currentAccount);
   }
 
   if (filters.onlyMyTokens) {
-    // TODO
+    out = out.filter(item => {
+      const tokens = blockchain.tokens || {};
+      const myTokenAddresses = Object.keys(tokens).filter(addr => {
+        return tokens[addr].balance > 0;
+      });
+      return myTokenAddresses.includes(item.sellTokenAddress);
+    });
   }
 
   if (filters.sellTokens.length > 0) {
