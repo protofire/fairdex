@@ -3,9 +3,7 @@ import { DutchExchangeProxy } from '@gnosis.pm/dx-contracts/networks.json';
 import { BlockType } from 'web3/eth/types';
 
 import BaseContract from './BaseContract';
-import { fromFraction, toDecimal } from './utils';
-
-const DEFAULT_TIMEOUT = 6_000; // 6 seconds
+import { fromFraction, timeout, toDecimal } from './utils';
 
 class DutchExchange extends BaseContract {
   constructor(networkId: string) {
@@ -101,32 +99,6 @@ function marshallAuction(data: any): Partial<Auction> {
 
 function getTokenSymbol(tokenAddress: Address) {
   return `${tokenAddress}`;
-}
-
-function timeout({ ms, secs }: { ms?: number; secs?: number } = {}) {
-  return (
-    target: any,
-    propertyKey: string,
-    descriptor: TypedPropertyDescriptor<(...params: any[]) => Promise<any>>,
-  ) => {
-    const func = descriptor.value;
-
-    if (typeof func === 'function') {
-      const delay = ms || (secs && secs * 1_000) || DEFAULT_TIMEOUT;
-
-      descriptor.value = async function(...args) {
-        const result = await Promise.race([
-          func.apply(this, args),
-
-          new Promise(resolve => {
-            setTimeout(() => resolve(), delay);
-          }),
-        ]);
-
-        return result;
-      };
-    }
-  };
 }
 
 export default DutchExchange;
