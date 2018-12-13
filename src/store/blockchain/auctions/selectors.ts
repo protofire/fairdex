@@ -74,9 +74,12 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
 
   if (sortField) {
     out.sort((a: Auction, b: Auction) => {
-      if (a[sortField] > b[sortField]) {
+      const field1 = a[sortField] || 0;
+      const field2 = b[sortField] || 0;
+
+      if (field1 > field2) {
         return filters.sortDir === 'asc' ? -1 : 1;
-      } else if (a[sortField] < b[sortField]) {
+      } else if (field1 < field2) {
         return filters.sortDir === 'asc' ? 1 : -1;
       }
 
