@@ -111,10 +111,4 @@ const createEthereumClient = async () => {
   }
 };
 
-function getTokenBalances(wallet: Wallet) {
-  return async (dispatch: any, getState: () => AppState) => {
-    //window.dx.methods
-  };
-}
-
 export default reducer;
