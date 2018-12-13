@@ -1,5 +1,6 @@
 import { ActionCreator, AnyAction, Reducer } from 'redux';
 
+import TokenContract from '../../../contracts/TokenContract';
 import { fetchRunningAuctions } from '../auctions';
 import { getNetworkType } from '../wallet';
 
@@ -32,9 +33,29 @@ export function fetchAvailableTokens() {
 
       // Load running auctions
       dispatch(fetchRunningAuctions());
+
+      // Fetch token balances
+      dispatch(updateTokenBalances());
     } catch (err) {
       // TODO: Handle error
     }
+  };
+}
+
+export function updateTokenBalances() {
+  return async (dispatch: any, getState: () => AppState) => {
+    const ownerAddress = getState().blockchain.currentAccount as string;
+    const tokens = getState().blockchain.tokens || {};
+    const balanceGetters = Object.keys(tokens).map(tokenAddress => {
+      return (async () => {
+        const token = tokens[tokenAddress];
+        const contract = new TokenContract(token);
+        const balance = await contract.getTokenBalance(ownerAddress);
+        return { ...token, balance };
+      })();
+    });
+    const tokensWithBalances = await Promise.all(balanceGetters);
+    dispatch(setAvailableTokens(tokensWithBalances));
   };
 }
 
