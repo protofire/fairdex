@@ -20,9 +20,9 @@ class TokenContract extends BaseContract {
   }
 
   @timeout()
-  async getTokenBalance(owner: Address): Promise<BigNumber> {
+  async getTokenBalance(owner: Address): Promise<number> {
     const balance = await this.instance.methods.balanceOf(owner).call();
-    return new BigNumber(balance);
+    return new BigNumber(balance).toNumber();
   }
 }
 
