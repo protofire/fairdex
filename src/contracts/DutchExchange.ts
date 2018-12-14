@@ -40,7 +40,7 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  async getPreviousClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string): Promise<string> {
+  async getPreviousClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
     const closingPrice: Fraction = await this.methods
       .getPriceInPastAuction(sellToken.address, buyToken.address, auctionIndex)
       .call();
@@ -49,7 +49,7 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  async getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: string): Promise<string> {
+  async getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
     const currentPrice: Fraction = await this.methods
       .getCurrentAuctionPrice(sellToken.address, buyToken.address, auctionIndex)
       .call();
@@ -58,7 +58,7 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  async getSellVolume(sellToken: Token, buyToken: Token): Promise<string> {
+  async getSellVolume(sellToken: Token, buyToken: Token) {
     const sellVolume: string = await this.methods
       .sellVolumesCurrent(sellToken.address, buyToken.address)
       .call();
@@ -67,7 +67,7 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  async getBuyVolume(sellToken: Token, buyToken: Token): Promise<string> {
+  async getBuyVolume(sellToken: Token, buyToken: Token) {
     const buyVolume: string = await this.methods.buyVolumes(sellToken.address, buyToken.address).call();
 
     return toDecimal(buyVolume, buyToken.decimals);

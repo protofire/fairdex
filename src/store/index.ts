@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 
 import rootReducer from './reducer';
 
-const composeEnhancers = composeWithDevTools({});
+const composeEnhancers = composeWithDevTools({ serialize: true });
 const enhancer = composeEnhancers(applyMiddleware(thunk));
 
 export default createStore(

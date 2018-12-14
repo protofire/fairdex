@@ -1,6 +1,8 @@
 import BigNumber from 'bignumber.js';
 
-const TEN = toBigNumber(10);
+export const NAN = new BigNumber(NaN);
+export const TEN = new BigNumber(10);
+export const ZERO = new BigNumber(0);
 
 export type Decimal = BigNumber.Value;
 
@@ -10,13 +12,13 @@ export interface DecimalFormat {
   postfix?: string;
 }
 
-export function formatNumber(value: BigNumber.Value, options: DecimalFormat = {}): string {
+export function formatNumber(value: Decimal, options: DecimalFormat = {}): string {
   const num = toBigNumber(value);
 
-  if (num.isFinite()) {
+  if (num && num.isFinite()) {
     const prefix = options.prefix ? options.prefix + ' ' : '';
     const postfix = options.postfix ? ' ' + options.postfix : '';
-    const formatted = toBigNumber(options.decimals != null ? num.toFixed(options.decimals) : num);
+    const formatted = toBigNumber(options.decimals != null ? num.toFixed(options.decimals) : num) || '';
 
     return `${prefix}${formatted.toString(10)}${postfix}`;
   }
@@ -24,34 +26,38 @@ export function formatNumber(value: BigNumber.Value, options: DecimalFormat = {}
   return '';
 }
 
-export function fromFraction(value?: Fraction): string {
+export function fromFraction(value?: Fraction) {
   if (value) {
-    const num = new BigNumber(value.num || 0);
-    const den = new BigNumber(value.den || 0);
+    const num = toBigNumber(value.num) || ZERO;
+    const den = toBigNumber(value.den) || ZERO;
 
     if (num.isZero()) {
-      return '0';
+      return ZERO;
     }
 
     if (!den.isZero()) {
-      return num.div(den).toString(10);
+      return num.div(den);
     }
   }
 
-  return '';
+  return undefined;
 }
 
-export function toBigNumber(value: Decimal): BigNumber {
-  return new BigNumber(value);
-}
-
-export function toDecimal(value: Decimal, decimals: number): string {
+export function toBigNumber(value: Decimal) {
   try {
-    const num = toBigNumber(value);
+    return new BigNumber(value);
+  } catch {
+    return undefined;
+  }
+}
+
+export function toDecimal(value: Decimal, decimals: number) {
+  try {
+    const val = toBigNumber(value) || NAN;
     const base = TEN.pow(decimals);
 
-    return num.div(base).toString(10);
+    return val.div(base);
   } catch {
-    return '';
+    return undefined;
   }
 }

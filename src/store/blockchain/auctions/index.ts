@@ -73,7 +73,7 @@ export function fetchRunningAuctions() {
                 buyTokenAddress,
                 buyVolume,
                 auctionStart,
-                auctionEnd: '',
+                auctionEnd: null,
                 closingPrice,
                 currentPrice,
                 state: 'running',

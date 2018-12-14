@@ -1,8 +1,7 @@
 import { abi } from '@gnosis.pm/dx-contracts/build/contracts/Token.json';
-import { BigNumber } from 'bignumber.js';
 
 import BaseContract from './BaseContract';
-import { timeout } from './utils';
+import { timeout, toBigNumber, ZERO } from './utils';
 
 class TokenContract extends BaseContract {
   constructor(token: Token) {
@@ -13,9 +12,10 @@ class TokenContract extends BaseContract {
   }
 
   @timeout()
-  async getTokenBalance(owner: Address): Promise<string> {
+  async getTokenBalance(owner: Address) {
     const balance = await this.instance.methods.balanceOf(owner).call();
-    return new BigNumber(balance).toString(10);
+
+    return toBigNumber(balance) || ZERO;
   }
 }
 

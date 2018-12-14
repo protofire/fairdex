@@ -8,6 +8,7 @@ export * from './selectors';
 
 // Actions
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
+// TODO: const SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES';
 
 const reducer: Reducer<TokensState> = (state = {}, action) => {
   switch (action.type) {
@@ -44,18 +45,23 @@ export function fetchAvailableTokens() {
 
 export function updateTokenBalances() {
   return async (dispatch: any, getState: () => AppState) => {
-    const ownerAddress = getState().blockchain.currentAccount as string;
-    const tokens = getState().blockchain.tokens || {};
-    const balanceGetters = Object.keys(tokens).map(tokenAddress => {
-      return (async () => {
-        const token = tokens[tokenAddress];
-        const contract = new TokenContract(token);
-        const balance = await contract.getTokenBalance(ownerAddress);
-        return { ...token, balance };
-      })();
-    });
-    const tokensWithBalances = await Promise.all(balanceGetters);
-    dispatch(setAvailableTokens(tokensWithBalances));
+    const state = getState();
+
+    if (state.blockchain.currentAccount) {
+      const { currentAccount, tokens = {} } = state.blockchain;
+
+      const tokensWithBalances = await Promise.all(
+        Object.values(tokens).map(async token => {
+          // TODO: Cache contract instance
+          const contract = new TokenContract(token);
+          const balance = await contract.getTokenBalance(currentAccount);
+
+          return { ...token, balance };
+        }),
+      );
+
+      dispatch(setAvailableTokens(tokensWithBalances));
+    }
   };
 }
 

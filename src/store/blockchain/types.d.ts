@@ -7,11 +7,11 @@ type Wallet = 'standard' | 'ledger';
 type TokenSymbol = string;
 
 interface Token {
-  balance: string;
-  symbol: TokenSymbol;
   address: Address;
-  name: string;
+  balance: BigNumber;
   decimals: number;
+  name: string;
+  symbol: TokenSymbol;
 }
 
 type AuctionState = 'running' | 'ended' | 'scheduled';
@@ -23,11 +23,11 @@ interface Auction {
   sellTokenAddress: Address;
   buyTokenAddress: Address;
   auctionStart: number | null;
-  auctionEnd: string;
-  sellVolume?: string;
-  buyVolume?: string;
-  currentPrice: string;
-  closingPrice: string;
+  auctionEnd: number | null;
+  sellVolume?: BigNumber;
+  buyVolume?: BigNumber;
+  currentPrice?: BigNumber;
+  closingPrice?: BigNumber;
   state: AuctionState;
 }
 
