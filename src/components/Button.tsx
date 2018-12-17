@@ -17,6 +17,13 @@ const Button = styled.button`
   text-transform: uppercase;
   cursor: pointer;
 
+  &:disabled {
+    opacity: 0.25;
+    pointer-events: none;
+    user-focus: none;
+    user-select: none;
+  }
+
   &:focus {
     outline: 0;
   }
