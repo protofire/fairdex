@@ -50,22 +50,22 @@ export function initWallet(wallet: Wallet) {
       provider.publicConfigStore.on('update', ({ selectedAddress, networkVersion }) => {
         const { blockchain } = getState();
 
-        if (blockchain.currentAccount !== selectedAddress) {
-          dispatch(changeAccount(selectedAddress));
-        }
-
         if (blockchain.networkId !== networkVersion) {
           dispatch(changeNetwork(networkVersion));
 
           // Instantiate DutchX contract
           window.dx = new DutchExchange(networkVersion);
+
+          // Load available tokens
+          dispatch(loadAvailableTokens());
         }
 
-        // Load available tokens
-        dispatch(loadAvailableTokens());
+        if (blockchain.currentAccount !== selectedAddress) {
+          dispatch(changeAccount(selectedAddress));
 
-        // Update fee ratio
-        dispatch(updateFeeRatio());
+          // Update fee ratio
+          dispatch(updateFeeRatio());
+        }
       });
 
       dispatch(selectWallet(wallet));
