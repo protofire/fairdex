@@ -1,6 +1,6 @@
 import { Action, ActionCreator, AnyAction, Reducer } from 'redux';
 
-import TokenContract from '../../../contracts/TokenContract';
+import { getTokenContract } from '../../../contracts';
 import { Decimal } from '../../../contracts/utils';
 import { periodicAction } from '../../utils';
 import { loadRunningAuctions } from '../auctions';
@@ -10,8 +10,6 @@ import { getNetworkType } from '../wallet';
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
 const SET_FEE_RATIO = 'SET_FEE_RATIO';
 const SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES';
-
-const cache = new Map<Address, TokenContract>();
 
 const initialState: TokensState = {
   tokens: new Map<Address, Token>(),
@@ -117,7 +115,7 @@ export function updateTokenBalances() {
 
           const [walletBalance, contractBalance] = await Promise.all([
             dx.getBalance(token, accountAddress),
-            tokenContract && tokenContract.getTokenBalance(accountAddress, token),
+            tokenContract.getBalance(accountAddress),
           ]);
 
           return [token.address, [walletBalance, contractBalance]];
@@ -127,16 +125,6 @@ export function updateTokenBalances() {
       dispatch(setTokenBalances(tokensWithBalances));
     }
   };
-}
-
-function getTokenContract(token: Token) {
-  const contract = cache.get(token.address) || new TokenContract(token);
-
-  if (contract != null && !cache.has(token.address)) {
-    cache.set(token.address, contract);
-  }
-
-  return contract;
 }
 
 const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
