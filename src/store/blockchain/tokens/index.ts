@@ -1,12 +1,10 @@
-import { ActionCreator, AnyAction, Reducer } from 'redux';
+import { Action, ActionCreator, AnyAction, Reducer } from 'redux';
 
 import TokenContract from '../../../contracts/TokenContract';
 import { Decimal } from '../../../contracts/utils';
 import { periodicAction } from '../../utils';
 import { loadRunningAuctions } from '../auctions';
 import { getNetworkType } from '../wallet';
-
-export * from './selectors';
 
 // Actions
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
@@ -15,12 +13,24 @@ const SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES';
 
 const cache = new Map<Address, TokenContract>();
 
-const reducer: Reducer<TokensState> = (state = {}, action) => {
+const initialState: TokensState = {
+  tokens: new Map<Address, Token>(),
+};
+
+const reducer: Reducer<TokensState> = (state = initialState, action) => {
   switch (action.type) {
     case SET_AVAILABLE_TOKENS:
       return {
         ...state,
-        tokens: action.payload,
+        tokens: new Map<Address, Token>(
+          action.payload.reduce((all: Array<[Address, Token]>, token: Token) => {
+            if (!token.symbol.startsWith('test')) {
+              all.push([token.address, token]);
+            }
+
+            return all;
+          }, []),
+        ),
       };
 
     case SET_FEE_RATIO:
@@ -32,11 +42,15 @@ const reducer: Reducer<TokensState> = (state = {}, action) => {
     case SET_TOKEN_BALANCES:
       return {
         ...state,
-        tokens: Object.values(state.tokens || {}).reduce((all, token) => {
-          token.balance = action.payload.get(token.address);
+        tokens: new Map<Address, Token>(
+          Array.from(state.tokens).map(
+            ([_, token]): [Address, Token] => {
+              token.balance = action.payload.get(token.address);
 
-          return { ...all, [token.address]: token };
-        }),
+              return [token.address, token];
+            },
+          ),
+        ),
       };
 
     default:
@@ -91,20 +105,22 @@ export function updateFeeRatio() {
 
 export function updateTokenBalances() {
   return async (dispatch: any, getState: () => AppState) => {
-    const state = getState();
+    const { blockchain } = getState();
 
-    if (state.blockchain.currentAccount) {
-      const { currentAccount, tokens = {} } = state.blockchain;
+    const tokens = blockchain.tokens;
+    const accountAddress = blockchain.currentAccount;
 
+    if (accountAddress && tokens.size > 0) {
       const tokensWithBalances = await Promise.all(
-        Object.values(tokens).map(async token => {
-          const contract = getTokenContract(token);
+        Array.from(tokens).map(async ([_, token]) => {
+          const tokenContract = getTokenContract(token);
 
-          if (contract) {
-            const balance = await contract.getTokenBalance(currentAccount, token);
+          const [walletBalance, contractBalance] = await Promise.all([
+            dx.getBalance(token, accountAddress),
+            tokenContract && tokenContract.getTokenBalance(accountAddress, token),
+          ]);
 
-            return [token.address, balance];
-          }
+          return [token.address, [walletBalance, contractBalance]];
         }),
       );
 
@@ -126,10 +142,7 @@ function getTokenContract(token: Token) {
 const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
   return {
     type: SET_AVAILABLE_TOKENS,
-    payload: tokens.reduce(
-      (all: object, t: Token) => (t.symbol.startsWith('test') ? all : { ...all, [t.address]: t }),
-      {},
-    ),
+    payload: tokens,
   };
 };
 
@@ -140,7 +153,7 @@ const setFeeRatio: ActionCreator<AnyAction> = (ratio: BigNumber) => {
   };
 };
 
-const setTokenBalances: ActionCreator<AnyAction> = (balances: Array<[Address, Decimal]>) => {
+const setTokenBalances: ActionCreator<Action> = (balances: Array<[Address, [Decimal, Decimal]]>) => {
   return {
     type: SET_TOKEN_BALANCES,
     payload: new Map(balances),

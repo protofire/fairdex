@@ -1,7 +1,6 @@
 import { ActionCreator, AnyAction, Reducer } from 'redux';
 
 import { periodicAction } from '../../utils';
-import { getAvailableTokens } from '../tokens';
 
 export * from './selectors';
 
@@ -22,15 +21,15 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
 };
 
 export function loadRunningAuctions() {
-  const { dx } = window;
-
   return periodicAction({
     name: 'loadRunningAuctions',
     interval: 60_000, // check for running auction every 1 minute,
 
     async task(dispatch, getState) {
-      const tokens = getAvailableTokens(getState());
-      const tokenAddresses = Object.keys(tokens);
+      const { blockchain } = getState();
+
+      const tokens = blockchain.tokens;
+      const tokenAddresses = Array.from(tokens.keys());
 
       if (tokenAddresses.length) {
         const runningTokenPairs = await dx.getRunningTokenPairs(tokenAddresses);
@@ -43,8 +42,8 @@ export function loadRunningAuctions() {
         const runningAuctions = await Promise.all(
           tokensCombinations.map(
             async ([sellTokenAddress, buyTokenAddress]): Promise<Auction | null> => {
-              const sellToken = tokens[sellTokenAddress];
-              const buyToken = tokens[buyTokenAddress];
+              const sellToken = tokens.get(sellTokenAddress);
+              const buyToken = tokens.get(buyTokenAddress);
 
               if (!sellToken || !buyToken) {
                 return null;

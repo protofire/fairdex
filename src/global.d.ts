@@ -7,10 +7,12 @@ import DutchExchange from './contracts/DutchExchange';
 declare global {
   type BigNumber = BN;
 
+  let web3: Web3;
+  let dx: DutchExchange;
+
   interface Window {
     ethereum: EthereumProvider;
     web3: Web3;
-
     dx: DutchExchange;
   }
 

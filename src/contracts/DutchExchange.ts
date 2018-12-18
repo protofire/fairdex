@@ -40,12 +40,10 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  async getPreviousClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
-    const closingPrice: Fraction = await this.methods
-      .getPriceInPastAuction(sellToken.address, buyToken.address, auctionIndex)
-      .call();
+  async getBalance(token: Token, accountAddress: Address) {
+    const balance = await this.instance.methods.balances(token.address, accountAddress).call();
 
-    return fromFraction(closingPrice);
+    return toDecimal(balance, token.decimals) || ZERO;
   }
 
   @timeout()
@@ -87,6 +85,15 @@ class DutchExchange extends BaseContract {
       .call();
 
     return auctionIndex;
+  }
+
+  @timeout()
+  async getPreviousClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
+    const closingPrice: Fraction = await this.methods
+      .getPriceInPastAuction(sellToken.address, buyToken.address, auctionIndex)
+      .call();
+
+    return fromFraction(closingPrice);
   }
 
   @timeout()

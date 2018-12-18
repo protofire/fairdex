@@ -12,8 +12,8 @@ class TokenContract extends BaseContract {
   }
 
   @timeout()
-  async getTokenBalance(owner: Address, token: Token) {
-    const balance = await this.instance.methods.balanceOf(owner).call();
+  async getTokenBalance(account: Address, token: Token) {
+    const balance = await this.instance.methods.balanceOf(account).call();
 
     return toDecimal(balance, token.decimals) || ZERO;
   }
