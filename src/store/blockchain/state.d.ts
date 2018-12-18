@@ -5,6 +5,7 @@ interface AuctionsState {
 }
 
 interface TokensState {
+  feeRatio?: BigNumber;
   tokens?: { [address: string]: Token };
 }
 

@@ -2,7 +2,7 @@ import { Action, ActionCreator, Reducer } from 'redux';
 import Web3 from 'web3';
 
 import DutchExchange from '../../../contracts/DutchExchange';
-import { loadAvailableTokens } from '../tokens';
+import { loadAvailableTokens, updateFeeRatio } from '../tokens';
 
 export * from './selectors';
 
@@ -59,10 +59,13 @@ export function initWallet(wallet: Wallet) {
 
           // Instantiate DutchX contract
           window.dx = new DutchExchange(networkVersion);
-
-          // Load available tokens
-          dispatch(loadAvailableTokens());
         }
+
+        // Load available tokens
+        dispatch(loadAvailableTokens());
+
+        // Update fee ratio
+        dispatch(updateFeeRatio());
       });
 
       dispatch(selectWallet(wallet));

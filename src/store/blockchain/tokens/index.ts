@@ -10,6 +10,7 @@ export * from './selectors';
 
 // Actions
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
+const SET_FEE_RATIO = 'SET_FEE_RATIO';
 const SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES';
 
 const cache = new Map<Address, TokenContract>();
@@ -20,6 +21,12 @@ const reducer: Reducer<TokensState> = (state = {}, action) => {
       return {
         ...state,
         tokens: action.payload,
+      };
+
+    case SET_FEE_RATIO:
+      return {
+        ...state,
+        feeRatio: action.payload,
       };
 
     case SET_TOKEN_BALANCES:
@@ -57,6 +64,26 @@ export function loadAvailableTokens() {
         dispatch(updateTokenBalances());
       } catch (err) {
         // TODO: Handle error
+      }
+    },
+  });
+}
+
+export function updateFeeRatio() {
+  return periodicAction({
+    name: 'updateFeeRatio',
+    interval: 60_000 * 5, // update fee ratio every 5 minutes
+
+    async task(dispatch, getState) {
+      const { dx } = window;
+      const { blockchain } = getState();
+
+      if (blockchain.currentAccount) {
+        const ratio = await dx.getFeeRatio(blockchain.currentAccount);
+
+        if (ratio) {
+          dispatch(setFeeRatio(ratio));
+        }
       }
     },
   });
@@ -103,6 +130,13 @@ const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
       (all: object, t: Token) => (t.symbol.startsWith('test') ? all : { ...all, [t.address]: t }),
       {},
     ),
+  };
+};
+
+const setFeeRatio: ActionCreator<AnyAction> = (ratio: BigNumber) => {
+  return {
+    type: SET_FEE_RATIO,
+    payload: ratio,
   };
 };
 

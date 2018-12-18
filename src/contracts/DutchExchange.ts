@@ -74,6 +74,13 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
+  async getFeeRatio(accountAddress: Address) {
+    const currentFeeRatio: Fraction = await this.methods.getFeeRatio(accountAddress).call();
+
+    return fromFraction(currentFeeRatio);
+  }
+
+  @timeout()
   async getLatestAuctionIndex(sellToken: Token, buyToken: Token): Promise<string> {
     const auctionIndex: string = await this.methods
       .getAuctionIndex(sellToken.address, buyToken.address)
