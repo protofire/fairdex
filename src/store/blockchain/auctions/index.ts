@@ -1,5 +1,6 @@
-import { ActionCreator, AnyAction, Dispatch, Reducer } from 'redux';
+import { ActionCreator, AnyAction, Reducer } from 'redux';
 
+import { periodicAction } from '../../utils';
 import { getAvailableTokens } from '../tokens';
 
 export * from './selectors';
@@ -20,17 +21,11 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
   }
 };
 
-const RUNNING_AUCTION_INTERVAL = 1_000 * 60; // 1 minute
-
-export function fetchRunningAuctions() {
+export function loadRunningAuctions() {
   const { dx } = window;
 
-  let subscription: any;
-
-  return async (dispatch: Dispatch, getState: () => AppState) => {
-    await checkForUpdates();
-
-    async function checkForUpdates() {
+  return periodicAction(
+    async (dispatch, getState) => {
       const tokens = getAvailableTokens(getState());
       const tokenAddresses = Object.keys(tokens);
 
@@ -88,11 +83,9 @@ export function fetchRunningAuctions() {
           ),
         );
       }
-
-      clearTimeout(subscription);
-      subscription = setTimeout(checkForUpdates, RUNNING_AUCTION_INTERVAL);
-    }
-  };
+    },
+    60_000, // check for running auction every 1 minute
+  );
 }
 
 const setRunningAuctions: ActionCreator<AnyAction> = (auctions: Auction[]) => {

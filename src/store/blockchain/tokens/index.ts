@@ -1,7 +1,8 @@
 import { ActionCreator, AnyAction, Reducer } from 'redux';
 
 import TokenContract from '../../../contracts/TokenContract';
-import { fetchRunningAuctions } from '../auctions';
+import { periodicAction } from '../../utils';
+import { loadRunningAuctions } from '../auctions';
 import { getNetworkType } from '../wallet';
 
 export * from './selectors';
@@ -23,24 +24,27 @@ const reducer: Reducer<TokensState> = (state = {}, action) => {
   }
 };
 
-export function fetchAvailableTokens() {
-  return async (dispatch: any, getState: () => AppState) => {
-    const network = getNetworkType(getState());
+export function loadAvailableTokens() {
+  return periodicAction(
+    async (dispatch, getState) => {
+      const network = getNetworkType(getState());
 
-    try {
-      const { default: tokens } = await import(`./networks/${network}.json`);
+      try {
+        const { default: tokens } = await import(`./networks/${network}.json`);
 
-      dispatch(setAvailableTokens(tokens));
+        dispatch(setAvailableTokens(tokens));
 
-      // Load running auctions
-      dispatch(fetchRunningAuctions());
+        // Load running auctions
+        dispatch(loadRunningAuctions());
 
-      // Fetch token balances
-      dispatch(updateTokenBalances());
-    } catch (err) {
-      // TODO: Handle error
-    }
-  };
+        // Fetch token balances
+        dispatch(updateTokenBalances());
+      } catch (err) {
+        // TODO: Handle error
+      }
+    },
+    15_000, // check for tokens every 15 seconds
+  );
 }
 
 export function updateTokenBalances() {
