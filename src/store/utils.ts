@@ -4,10 +4,18 @@ import { ThunkDispatch } from 'redux-thunk';
 type Dispatch = ThunkDispatch<AppState, void, AnyAction>;
 type AsyncAction = (dispatch: Dispatch, getState: () => AppState) => Promise<void> | void;
 
+interface PeriodicActionOptions {
+  name: string;
+  task: AsyncAction;
+  interval?: number;
+}
+
 const DEFAULT_INTERVAL = 10_000; // 10 seconds
 
-export function periodicAction(task: AsyncAction, interval = DEFAULT_INTERVAL) {
-  let subscription: NodeJS.Timeout;
+const subscriptions = new Map<string, NodeJS.Timeout>();
+
+export function periodicAction({ name, task, interval = DEFAULT_INTERVAL }: PeriodicActionOptions) {
+  const subscription = subscriptions.get(name);
 
   return async (dispatch: Dispatch, getState: () => AppState) => {
     await checkForUpdates();
@@ -19,8 +27,11 @@ export function periodicAction(task: AsyncAction, interval = DEFAULT_INTERVAL) {
         // TODO: log error
       }
 
-      clearTimeout(subscription);
-      subscription = setTimeout(checkForUpdates, interval);
+      if (subscription) {
+        clearTimeout(subscription);
+      }
+
+      subscriptions.set(name, setTimeout(checkForUpdates, interval));
     }
   };
 }

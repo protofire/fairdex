@@ -38,8 +38,11 @@ const reducer: Reducer<TokensState> = (state = {}, action) => {
 };
 
 export function loadAvailableTokens() {
-  return periodicAction(
-    async (dispatch, getState) => {
+  return periodicAction({
+    name: 'loadAvailableTokens',
+    interval: 15_000, // check for tokens every 15 seconds
+
+    async task(dispatch, getState) {
       const network = getNetworkType(getState());
 
       try {
@@ -50,14 +53,13 @@ export function loadAvailableTokens() {
         // Load running auctions
         dispatch(loadRunningAuctions());
 
-        // Fetch token balances
+        // Load token balances
         dispatch(updateTokenBalances());
       } catch (err) {
         // TODO: Handle error
       }
     },
-    15_000, // check for tokens every 15 seconds
-  );
+  });
 }
 
 export function updateTokenBalances() {

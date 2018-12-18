@@ -24,8 +24,11 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
 export function loadRunningAuctions() {
   const { dx } = window;
 
-  return periodicAction(
-    async (dispatch, getState) => {
+  return periodicAction({
+    name: 'loadRunningAuctions',
+    interval: 60_000, // check for running auction every 1 minute,
+
+    async task(dispatch, getState) {
       const tokens = getAvailableTokens(getState());
       const tokenAddresses = Object.keys(tokens);
 
@@ -84,8 +87,7 @@ export function loadRunningAuctions() {
         );
       }
     },
-    60_000, // check for running auction every 1 minute
-  );
+  });
 }
 
 const setRunningAuctions: ActionCreator<AnyAction> = (auctions: Auction[]) => {
