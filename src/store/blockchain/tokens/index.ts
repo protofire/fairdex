@@ -1,6 +1,7 @@
 import { ActionCreator, AnyAction, Reducer } from 'redux';
 
 import TokenContract from '../../../contracts/TokenContract';
+import { Decimal } from '../../../contracts/utils';
 import { periodicAction } from '../../utils';
 import { loadRunningAuctions } from '../auctions';
 import { getNetworkType } from '../wallet';
@@ -9,7 +10,9 @@ export * from './selectors';
 
 // Actions
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
-// TODO: const SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES';
+const SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES';
+
+const cache = new Map<Address, TokenContract>();
 
 const reducer: Reducer<TokensState> = (state = {}, action) => {
   switch (action.type) {
@@ -17,6 +20,16 @@ const reducer: Reducer<TokensState> = (state = {}, action) => {
       return {
         ...state,
         tokens: action.payload,
+      };
+
+    case SET_TOKEN_BALANCES:
+      return {
+        ...state,
+        tokens: Object.values(state.tokens || {}).reduce((all, token) => {
+          token.balance = action.payload.get(token.address);
+
+          return { ...all, [token.address]: token };
+        }),
       };
 
     default:
@@ -56,17 +69,29 @@ export function updateTokenBalances() {
 
       const tokensWithBalances = await Promise.all(
         Object.values(tokens).map(async token => {
-          // TODO: Cache contract instance
-          const contract = new TokenContract(token);
-          const balance = await contract.getTokenBalance(currentAccount);
+          const contract = getTokenContract(token);
 
-          return { ...token, balance };
+          if (contract) {
+            const balance = await contract.getTokenBalance(currentAccount, token);
+
+            return [token.address, balance];
+          }
         }),
       );
 
-      dispatch(setAvailableTokens(tokensWithBalances));
+      dispatch(setTokenBalances(tokensWithBalances));
     }
   };
+}
+
+function getTokenContract(token: Token) {
+  const contract = cache.get(token.address) || new TokenContract(token);
+
+  if (contract != null && !cache.has(token.address)) {
+    cache.set(token.address, contract);
+  }
+
+  return contract;
 }
 
 const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
@@ -76,6 +101,13 @@ const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
       (all: object, t: Token) => (t.symbol.startsWith('test') ? all : { ...all, [t.address]: t }),
       {},
     ),
+  };
+};
+
+const setTokenBalances: ActionCreator<AnyAction> = (balances: Array<[Address, Decimal]>) => {
+  return {
+    type: SET_TOKEN_BALANCES,
+    payload: new Map(balances),
   };
 };
 
