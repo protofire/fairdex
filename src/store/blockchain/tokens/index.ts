@@ -72,7 +72,7 @@ export function loadAvailableTokens() {
 export function updateFeeRatio() {
   return periodicAction({
     name: 'updateFeeRatio',
-    interval: 60_000 * 5, // update fee ratio every 5 minutes
+    interval: 60_000 * 2, // update fee ratio every 2 minutes
 
     async task(dispatch, getState) {
       const { dx } = window;
