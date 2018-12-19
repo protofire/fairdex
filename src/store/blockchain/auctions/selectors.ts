@@ -1,5 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 import { createSelector } from 'reselect';
+import { ZERO } from '../../../contracts/utils/decimal';
+import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
 
 const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
 
@@ -33,6 +35,12 @@ export const getEndedAuctions = createSelector(
 export const getScheduledAuctions = createSelector(
   getFilteredAuctions,
   (auctions: Auction[]) => auctions.filter(auction => auction.state === 'scheduled'),
+);
+
+export const getFilteredMyTokensAuctions = createSelector(
+  getAllAuctions,
+  (state: AppState) => state.blockchain.tokens || {},
+  filterMyTokensAuctions,
 );
 
 function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
@@ -93,14 +101,8 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
   }
 
   if (filters.onlyMyTokens) {
-    out = out.filter(item => {
-      const tokens = blockchain.tokens || {};
-      const myTokenAddresses = Object.keys(tokens).filter(addr => {
-        const balance = new BigNumber(tokens[addr].balance);
-        return balance.gt(0);
-      });
-      return myTokenAddresses.includes(item.buyTokenAddress);
-    });
+    const tokens = blockchain.tokens || {};
+    out = filterMyTokensAuctions(out, tokens);
   }
 
   if (filters.sellTokens.length > 0) {
@@ -112,4 +114,16 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
   }
 
   return out;
+}
+
+function filterMyTokensAuctions(list: Auction[], tokens: Map<Address, Token>) {
+  return list.filter(item => {
+    const myTokenAddresses = Array.from(tokens.keys()).filter(addr => {
+      const dxBalance = getDxBalance(tokens.get(addr));
+      const walletBalance = getWalletBalance(tokens.get(addr));
+      return dxBalance.gt(ZERO) || walletBalance.gt(ZERO);
+    });
+
+    return myTokenAddresses.includes(item.buyTokenAddress);
+  });
 }
