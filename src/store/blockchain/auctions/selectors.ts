@@ -39,7 +39,7 @@ export const getScheduledAuctions = createSelector(
 
 export const getFilteredMyTokensAuctions = createSelector(
   getAllAuctions,
-  (state: AppState) => state.blockchain.tokens || {},
+  (state: AppState) => state.blockchain.tokens,
   filterMyTokensAuctions,
 );
 
@@ -101,8 +101,7 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
   }
 
   if (filters.onlyMyTokens) {
-    const tokens = blockchain.tokens || {};
-    out = filterMyTokensAuctions(out, tokens);
+    out = filterMyTokensAuctions(out, blockchain.tokens);
   }
 
   if (filters.sellTokens.length > 0) {
@@ -116,11 +115,12 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
   return out;
 }
 
-function filterMyTokensAuctions(list: Auction[], tokens: Map<Address, Token>) {
+function filterMyTokensAuctions(list: Auction[], tokens = new Map<Address, Token>()) {
   return list.filter(item => {
     const myTokenAddresses = Array.from(tokens.keys()).filter(addr => {
       const dxBalance = getDxBalance(tokens.get(addr));
       const walletBalance = getWalletBalance(tokens.get(addr));
+
       return dxBalance.gt(ZERO) || walletBalance.gt(ZERO);
     });
 
