@@ -33,13 +33,13 @@ const uiReducer: Reducer<UiState, UiAction> = (state = initialState, action) => 
         filtersVisible: !state.filtersVisible,
       };
 
-    case actions.SHOW_INFO_MESSAGE:
+    case actions.SHOW_NOTIFICATION:
       return {
         ...state,
         infoMessage: action.payload && action.payload.infoMessage,
       };
 
-    case actions.HIDE_INFO_MESSAGE:
+    case actions.HIDE_NOTIFICATION:
       return {
         ...state,
         infoMessage: undefined,

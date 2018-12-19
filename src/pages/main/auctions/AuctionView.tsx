@@ -1,24 +1,15 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
-import { ElapsedTime, Numeric } from '../../../../components/formatters';
-import { getToEndVolume } from '../../../../contracts/utils';
-import { showInfoMessage } from '../../../../store/ui/actions';
+import { DecimalValue, ElapsedTime } from '../../../components/formatters';
+import * as utils from '../../../contracts/utils';
 import BidForm from './BidForm';
 
-type AuctionViewProps = OwnProps & DispatchProps;
-
-interface OwnProps {
+interface Props {
   data: Auction;
 }
 
-interface DispatchProps {
-  onBid: () => void;
-}
-
-const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
+const AuctionView = React.memo(({ data: auction }: Props) => (
   <Card>
     <Title>
       {auction.sellToken}/{auction.buyToken}
@@ -33,7 +24,17 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
               {auction.currentPrice === undefined ? (
                 <Loading />
               ) : (
-                <Numeric value={auction.currentPrice} decimals={7} />
+                <DecimalValue value={auction.currentPrice} decimals={7} />
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label>Previous closing price</Label>
+            <Value>
+              {auction.closingPrice === undefined ? (
+                <Loading />
+              ) : (
+                <DecimalValue value={auction.closingPrice} decimals={7} />
               )}
             </Value>
           </Row>
@@ -43,7 +44,7 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
               {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
                 <Loading />
               ) : (
-                <Numeric value={getToEndVolume(auction.sellVolume, auction.buyVolume)} decimals={7} />
+                <DecimalValue value={utils.auction.getToEndVolume(auction)} decimals={7} />
               )}
             </Value>
           </Row>
@@ -54,7 +55,7 @@ const AuctionView = React.memo(({ data: auction, onBid }: AuctionViewProps) => (
             </Value>
           </Row>
         </Table>
-        <BidForm auction={auction} onBid={onBid} />
+        <BidForm auction={auction} />
       </>
     )}
   </Card>
@@ -129,13 +130,4 @@ const Title = styled.h3.attrs({
   white-space: nowrap;
 `;
 
-function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
-  return {
-    onBid: () => dispatch(showInfoMessage('info', 'Cannot bid', 'Bid is not yet implemented')),
-  };
-}
-
-export default connect(
-  null,
-  mapDispatchToProps,
-)(AuctionView);
+export default AuctionView;

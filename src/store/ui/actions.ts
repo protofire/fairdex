@@ -5,8 +5,8 @@ export const HIDE_SIDEBAR = 'sidebar/HIDE';
 export const SHOW_SIDEBAR = 'sidebar/SHOW';
 export const TOGGLE_SIDEBAR = 'sidebar/TOGGLE_VISIBILITY';
 export const TOGGLE_FILTERS = 'filters/TOGGLE_VISIBILITY';
-export const SHOW_INFO_MESSAGE = 'infoMessage/SHOW';
-export const HIDE_INFO_MESSAGE = 'infoMessage/HIDE';
+export const SHOW_NOTIFICATION = 'notification/SHOW';
+export const HIDE_NOTIFICATION = 'notification/HIDE';
 
 export const hideSidebar: ActionCreator<UiAction> = () => {
   return {
@@ -32,13 +32,13 @@ export const toggleFilters: ActionCreator<UiAction> = () => {
   };
 };
 
-export const showInfoMessage: ActionCreator<UiAction> = (
+export const showNotification: ActionCreator<UiAction> = (
   type: InfoMessageType,
   title: string,
   content: ReactNode,
 ) => {
   return {
-    type: SHOW_INFO_MESSAGE,
+    type: SHOW_NOTIFICATION,
     payload: {
       infoMessage: {
         type,
@@ -49,8 +49,8 @@ export const showInfoMessage: ActionCreator<UiAction> = (
   };
 };
 
-export const hideInfoMessage: ActionCreator<UiAction> = () => {
+export const hideNotification: ActionCreator<UiAction> = () => {
   return {
-    type: HIDE_INFO_MESSAGE,
+    type: HIDE_NOTIFICATION,
   };
 };

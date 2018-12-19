@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
 import Message from '../../../components/Message';
-import { hideInfoMessage } from '../../../store/ui/actions';
+import { hideNotification } from '../../../store/ui/actions';
 
 type Props = StateProps & DispatchProps;
 
@@ -13,7 +13,7 @@ interface StateProps {
 
 interface DispatchProps {
   actions: {
-    dismiss: typeof hideInfoMessage;
+    dismiss: typeof hideNotification;
   };
 }
 
@@ -46,7 +46,7 @@ function mapStateToProps(state: AppState): StateProps {
 function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
-      dismiss: () => dispatch(hideInfoMessage()),
+      dismiss: () => dispatch(hideNotification()),
     },
   };
 }

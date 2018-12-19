@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Spinner from '../../../../components/Spinner';
-import * as images from '../../../../images';
+import Spinner from '../../../components/Spinner';
+import * as images from '../../../images';
 import AuctionView from './AuctionView';
 
 export interface AuctionListProps {

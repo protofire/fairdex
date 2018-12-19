@@ -1,25 +1,35 @@
+import React from 'react';
 import styled, { css } from 'styled-components';
 
+import Icon from './icons';
+
 interface DialogProps {
-  theme?: 'normal' | 'accent';
+  animate?: boolean;
+  children: React.ReactNode;
+  onBack?: (...args: any) => void | null;
+  title?: string | null;
+  theme?: 'accent' | null;
 }
 
-const Dialog = styled.div`
+const Dialog = ({ children, onBack, title, ...props }: DialogProps) => (
+  <Tooltip {...props}>
+    {title && (
+      <Title>
+        <BackButton onClick={onBack} />
+        <h4>{title}</h4>
+      </Title>
+    )}
+    <Content>{children}</Content>
+  </Tooltip>
+);
+
+const Tooltip = styled.div`
   position: absolute;
-  padding: var(--spacing-normal);
   font-size: 0.875rem;
   line-height: 1rem;
-  text-align: center;
   background-color: var(--color-main-bg);
   border-radius: 8px;
-  box-shadow: 0 20px 40px 0 rgba(48, 59, 62, 0.3);
-
-  p {
-    margin: 0 0 var(--spacing-normal);
-    padding: 0 var(--spacing-narrow);
-    line-height: 1.14;
-    letter-spacing: -0.4px;
-  }
+  box-shadow: 0 4px 40px 4px rgba(48, 59, 62, 0.3);
 
   &:after {
     position: absolute;
@@ -50,13 +60,44 @@ const Dialog = styled.div`
   }};
 `;
 
+const BackButton = styled(Icon.Back)`
+  cursor: pointer;
+`;
+
 const Container = styled.div`
   position: relative;
 
-  ${Dialog} {
+  ${Tooltip} {
     position: absolute;
     bottom: calc(100% + 15px);
-    width: 100%;
+    width: calc(100% + 2 * var(--spacing-normal));
+    left: calc(var(--spacing-normal) * -1);
+  }
+`;
+
+const Content = styled.div`
+  p {
+    margin: 0 0 var(--spacing-normal);
+    padding: 0 var(--spacing-narrow);
+    line-height: 1.14;
+    letter-spacing: -0.4px;
+  }
+`;
+
+const Title = styled.header`
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 calc(var(--spacing-title) * 2);
+  border-bottom: 1px solid var(--color-border);
+  user-select: none;
+
+  h4 {
+    line-height: var(--header-height);
+    text-align: center;
+    text-transform: uppercase;
+    flex: 1;
   }
 `;
 

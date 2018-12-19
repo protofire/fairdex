@@ -30,12 +30,24 @@ const Root = styled.section`
   width: 384px;
   margin-left: -192px;
   padding: var(--spacing-normal);
-  color: #fff;
+  color: var(--color-text-inverse);
   transition-property: opacity, transform;
   transition-duration: var(--animation-duration);
   opacity: ${(props: Props) => (props.visible ? 0.8 : 0)};
   transform: ${(props: Props) => (props.visible ? 'translateY(0)' : 'translateY(-150%)')};
   border-radius: 8px;
+
+  p {
+    margin-bottom: 0;
+  }
+
+  a {
+    &,
+    &:link,
+    &:visited {
+      color: var(--color-text-inverse);
+    }
+  }
 
   ${(props: Props) => {
     if (props.type === 'error') {

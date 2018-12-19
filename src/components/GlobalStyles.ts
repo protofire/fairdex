@@ -12,6 +12,7 @@ const variables = css`
     --color-text-primary: #131f3e;
     --color-text-secondary: #adadad;
     --color-text-orange: #f77902;
+    --color-text-inverse: #ffffff;
     --color-light-grey-blue: #85c3d6;
     --color-greyish: #adadad;
     --color-grey: #d9dee2;
@@ -21,6 +22,7 @@ const variables = css`
     --card-height: ${rem('256px')};
     --card-width: ${rem('280px')};
     --header-height: ${rem('72px')};
+    --input-height: ${rem('40px')};
     --sidebar-width: ${rem('320px')};
 
     // Spacing
@@ -55,6 +57,14 @@ const GlobalStyles = createGlobalStyle`
 
   a {
     text-decoration: none;
+    
+    &, &:link, &:visited {
+      color: var(--color-text-primary);  
+    }
+    
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   h1, h2, h3 {

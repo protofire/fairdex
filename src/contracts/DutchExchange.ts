@@ -3,7 +3,7 @@ import { DutchExchangeProxy } from '@gnosis.pm/dx-contracts/networks.json';
 import { BlockType } from 'web3/eth/types';
 
 import BaseContract from './BaseContract';
-import { fromFraction, timeout, toDecimal } from './utils';
+import { Decimal, fromFraction, timeout, toBigNumber, toDecimal, ZERO } from './utils';
 
 class DutchExchange extends BaseContract {
   constructor(networkId: string) {
@@ -13,8 +13,14 @@ class DutchExchange extends BaseContract {
     });
   }
 
-  get methods() {
-    return this.instance.methods;
+  postBuyOrder(sellToken: Address, buyToken: Address, auctionIndex: string, buyAmount: Decimal) {
+    const amount = toBigNumber(buyAmount);
+
+    if (amount && amount.isGreaterThan(ZERO)) {
+      // TODO
+    }
+
+    return this.methods.postBuyOrder(sellToken, buyToken, auctionIndex, amount.toString(10));
   }
 
   async getClearedAuctions(params: { fromBlock?: BlockType; toBlock?: BlockType } = {}) {
@@ -29,7 +35,7 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  async getAuctionStart(sellToken: Token, buyToken: Token): Promise<number | null> {
+  async getAuctionStart(sellToken: Token, buyToken: Token) {
     const auctionStart: string = await this.methods
       .getAuctionStart(sellToken.address, buyToken.address)
       .call();
@@ -84,7 +90,7 @@ class DutchExchange extends BaseContract {
       .getAuctionIndex(sellToken.address, buyToken.address)
       .call();
 
-    return auctionIndex;
+    return auctionIndex ? auctionIndex.toString() : '';
   }
 
   @timeout()
