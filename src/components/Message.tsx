@@ -46,6 +46,7 @@ const Root = styled.section`
     &:link,
     &:visited {
       color: var(--color-text-inverse);
+      text-decoration: underline;
     }
   }
 

@@ -61,10 +61,6 @@ const GlobalStyles = createGlobalStyle`
     &, &:link, &:visited {
       color: var(--color-text-primary);  
     }
-    
-    &:hover {
-      text-decoration: underline;
-    }
   }
 
   h1, h2, h3 {
