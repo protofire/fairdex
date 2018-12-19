@@ -1,9 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ellipsis } from 'polished';
 import React from 'react';
-import enhanceWithClickOutside from 'react-click-outside';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
 import Button from '../../../components/Button';
@@ -11,6 +9,7 @@ import Tooltip from '../../../components/Tooltip';
 
 import DecimalInput from '../../../components/DecimalInput';
 import { DecimalValue } from '../../../components/formatters';
+import Panel from '../../../components/Panel';
 import * as utils from '../../../contracts/utils';
 import { showNotification } from '../../../store/ui/actions';
 
@@ -28,7 +27,7 @@ interface AppStateProps {
 }
 
 interface DispatchProps {
-  dispatch: Dispatch;
+  dispatch: any;
 }
 
 interface State {
@@ -170,91 +169,94 @@ class BidForm extends React.PureComponent<Props, State> {
 
     return (
       <Tooltip.Container>
-        {this.state.showDialog && (
-          <Tooltip.Dialog
-            title={currentStep === 3 ? 'Your bid' : undefined}
-            onBack={currentStep === 3 ? this.showAmountForm : undefined}
-            theme={currentStep === 1 ? 'accent' : null}
-          >
-            {currentStep === 1 && (
-              <Step1 onSubmit={this.showAmountForm}>
-                <p>
-                  You are bidding above the previous closing price for {auction.sellToken}/{auction.buyToken}
-                </p>
-                <Text>
-                  <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
-                </Text>
-                <Button type='submit'>Proceed</Button>
-              </Step1>
-            )}
-
-            {currentStep === 2 && (
-              <Step2 onSubmit={this.showConfirmation}>
-                <div>
-                  <h4>Sell</h4>
+        <Panel onClickOutside={this.handleClickOutside}>
+          {this.state.showDialog && (
+            <Tooltip.Dialog
+              title={currentStep === 3 ? 'Your bid' : undefined}
+              onBack={currentStep === 3 ? this.showAmountForm : undefined}
+              theme={currentStep === 1 ? 'accent' : null}
+            >
+              {currentStep === 1 && (
+                <Step1 onSubmit={this.showAmountForm}>
                   <p>
-                    {auction.buyToken} (max <DecimalValue value={maxBuyTokenAmount} decimals={12} />)
+                    You are bidding above the previous closing price for {auction.sellToken}/
+                    {auction.buyToken}
                   </p>
-                  <DecimalInput
-                    value={buyTokenAmount.toString(10)}
-                    onValueChange={this.handleAmountChange}
-                    onFocus={this.handleInputFocus}
-                    autoFocus={true}
-                  />
-                </div>
-                <div>
-                  <h4>Buy</h4>
-                  <p>
-                    {auction.sellToken} (max <DecimalValue value={maxSellTokenAmount} decimals={12} />)
-                  </p>
-                  <DecimalInput value={sellTokenAmount.toString(10)} readOnly={true} />
-                </div>
-                <Button
-                  type='submit'
-                  disabled={
-                    !auction.currentPrice ||
-                    auction.currentPrice.lte(ZERO) ||
-                    buyTokenAmount.lte(ZERO) ||
-                    buyTokenAmount.gt(maxBuyTokenAmount)
-                  }
-                >
-                  Next
-                </Button>
-              </Step2>
-            )}
+                  <Text>
+                    <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
+                  </Text>
+                  <Button type='submit'>Proceed</Button>
+                </Step1>
+              )}
 
-            {currentStep === 3 && (
-              <Step3 onSubmit={this.handleSubmit}>
-                <div>
+              {currentStep === 2 && (
+                <Step2 onSubmit={this.showConfirmation}>
                   <div>
-                    <h4>
-                      <DecimalValue value={buyTokenAmount} decimals={2} />
-                    </h4>
-                    <span>{auction.buyToken}</span>
+                    <h4>Sell</h4>
+                    <p>
+                      {auction.buyToken} (max <DecimalValue value={maxBuyTokenAmount} decimals={12} />)
+                    </p>
+                    <DecimalInput
+                      value={buyTokenAmount.toString(10)}
+                      onValueChange={this.handleAmountChange}
+                      onFocus={this.handleInputFocus}
+                      autoFocus={true}
+                    />
                   </div>
                   <div>
-                    <h4>
-                      <DecimalValue value={sellTokenAmount} decimals={2} />
-                    </h4>
-                    <span>{auction.sellToken}</span>
+                    <h4>Buy</h4>
+                    <p>
+                      {auction.sellToken} (max <DecimalValue value={maxSellTokenAmount} decimals={12} />)
+                    </p>
+                    <DecimalInput value={sellTokenAmount.toString(10)} readOnly={true} />
                   </div>
-                </div>
-                <p>
-                  Fee: <DecimalValue value={fee} postfix={auction.buyToken} />
-                </p>
-                <Button type='submit' disabled={this.state.loading || buyTokenAmount.lte(ZERO)}>
-                  {this.state.loading ? 'Waiting confirmation...' : 'Confirm'}
-                </Button>
-              </Step3>
-            )}
-          </Tooltip.Dialog>
-        )}
+                  <Button
+                    type='submit'
+                    disabled={
+                      !auction.currentPrice ||
+                      auction.currentPrice.lte(ZERO) ||
+                      buyTokenAmount.lte(ZERO) ||
+                      buyTokenAmount.gt(maxBuyTokenAmount)
+                    }
+                  >
+                    Next
+                  </Button>
+                </Step2>
+              )}
 
-        {this.state.showDialog ? (
-          <CancelButton onClick={this.handleClose}>Cancel</CancelButton>
-        ) : (
-          <BidButton onClick={this.showDialog}>Bid</BidButton>
-        )}
+              {currentStep === 3 && (
+                <Step3 onSubmit={this.handleSubmit}>
+                  <div>
+                    <div>
+                      <h4>
+                        <DecimalValue value={buyTokenAmount} decimals={2} />
+                      </h4>
+                      <span>{auction.buyToken}</span>
+                    </div>
+                    <div>
+                      <h4>
+                        <DecimalValue value={sellTokenAmount} decimals={2} />
+                      </h4>
+                      <span>{auction.sellToken}</span>
+                    </div>
+                  </div>
+                  <p>
+                    Fee: <DecimalValue value={fee} postfix={auction.buyToken} />
+                  </p>
+                  <Button type='submit' disabled={this.state.loading || buyTokenAmount.lte(ZERO)}>
+                    {this.state.loading ? 'Waiting confirmation...' : 'Confirm'}
+                  </Button>
+                </Step3>
+              )}
+            </Tooltip.Dialog>
+          )}
+
+          {this.state.showDialog ? (
+            <CancelButton onClick={this.handleClose}>Cancel</CancelButton>
+          ) : (
+            <BidButton onClick={this.showDialog}>Bid</BidButton>
+          )}
+        </Panel>
       </Tooltip.Container>
     );
   }
@@ -363,7 +365,7 @@ function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
   };
 }
 
-function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
+function mapDispatchToProps(dispatch: any): DispatchProps {
   return {
     dispatch,
   };
@@ -372,4 +374,4 @@ function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(enhanceWithClickOutside(BidForm));
+)(BidForm);
