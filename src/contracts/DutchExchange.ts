@@ -16,10 +16,6 @@ class DutchExchange extends BaseContract {
   postBuyOrder(sellToken: Address, buyToken: Address, auctionIndex: string, buyAmount: Decimal) {
     const amount = toBigNumber(buyAmount);
 
-    if (amount && amount.isGreaterThan(ZERO)) {
-      // TODO
-    }
-
     return this.methods.postBuyOrder(sellToken, buyToken, auctionIndex, amount.toString(10));
   }
 
