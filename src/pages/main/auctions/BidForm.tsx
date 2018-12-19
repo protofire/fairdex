@@ -164,7 +164,7 @@ class BidForm extends React.PureComponent<Props, State> {
     const maxSellTokenAmount = utils.auction.getToEndVolume(auction) || ZERO;
 
     const maxBuyTokenAmount = BigNumber.minimum(
-      buyTokenBalance.minus(fee),
+      BigNumber.maximum(buyTokenBalance.minus(fee), ZERO),
       maxSellTokenAmount.times(auction.currentPrice || ZERO),
     );
 
