@@ -113,12 +113,12 @@ export function updateTokenBalances() {
         Array.from(tokens).map(async ([_, token]) => {
           const tokenContract = getTokenContract(token);
 
-          const [walletBalance, contractBalance] = await Promise.all([
+          const [contractBalance, walletBalance] = await Promise.all([
             dx.getBalance(token, accountAddress),
             tokenContract.getBalance(accountAddress),
           ]);
 
-          return [token.address, [walletBalance, contractBalance]];
+          return [token.address, [contractBalance, walletBalance]];
         }),
       );
 
