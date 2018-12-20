@@ -10,7 +10,12 @@ import Overlay from '../../../components/Overlay';
 import sortDownImage from '../../../images/sorting_arrow_down.svg';
 import sortUpImage from '../../../images/sorting_arrow_up.svg';
 import sortNoneImage from '../../../images/sorting_inactive.svg';
-import { getBuyTokens, getFilteredMyTokensAuctions, getSellTokens } from '../../../store/blockchain';
+import {
+  getBuyTokens,
+  getFilteredMyAuctions,
+  getFilteredMyTokensAuctions,
+  getSellTokens,
+} from '../../../store/blockchain';
 import { applyFilters, clearFilters } from '../../../store/filters/actions';
 import { toggleFilters } from '../../../store/ui/actions';
 import DynamicList from './DynamicList';
@@ -78,7 +83,15 @@ class Filters extends React.PureComponent<Props, State> {
   };
 
   render() {
-    const { actions, isOpen, sellTokens, buyTokens, filters, myTokensAuctionsCount } = this.props;
+    const {
+      actions,
+      isOpen,
+      sellTokens,
+      buyTokens,
+      filters,
+      myTokensAuctionsCount,
+      myAuctionsCount,
+    } = this.props;
     const sellTokensList = this.buildTokenList(
       this.filterTokens(sellTokens, this.state.sellTokenSearchQuery),
       'sellTokens',
@@ -136,7 +149,7 @@ class Filters extends React.PureComponent<Props, State> {
                     />
                     Only my auctions
                   </Label>
-                  <ItemCount>2</ItemCount>
+                  <ItemCount>{myAuctionsCount}</ItemCount>
                 </Item>
               </List>
             </Section>
@@ -345,6 +358,7 @@ const SortButton = styled.span`
 
 function mapStateToProps(state: AppState): StateProps {
   const myTokensAuctions = getFilteredMyTokensAuctions(state);
+  const myAuctions = getFilteredMyAuctions(state);
 
   return {
     isOpen: state.ui.filtersVisible,
@@ -352,6 +366,7 @@ function mapStateToProps(state: AppState): StateProps {
     buyTokens: getBuyTokens(state),
     filters: state.filters,
     myTokensAuctionsCount: myTokensAuctions.length,
+    myAuctionsCount: myAuctions.length,
   };
 }
 

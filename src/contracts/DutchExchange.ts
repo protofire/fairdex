@@ -59,6 +59,20 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
+  async getBuyerBalances(
+    sellToken: Address,
+    buyToken: Address,
+    auctionIndex: string,
+    accountAddress: Address,
+  ) {
+    const buyerBalance = await this.instance.methods
+      .buyerBalances(sellToken.address, buyToken.address, auctionIndex, accountAddress)
+      .call();
+
+    return toDecimal(buyerBalance, buyToken.decimals) || ZERO;
+  }
+
+  @timeout()
   async getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
     const currentPrice: Fraction = await this.methods
       .getCurrentAuctionPrice(sellToken.address, buyToken.address, auctionIndex)

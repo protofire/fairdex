@@ -30,6 +30,7 @@ export function loadAuctions() {
       const { blockchain } = getState();
 
       const markets = await dx.getAvailableMarkets();
+      const accountAddress = blockchain.currentAccount;
 
       const tokensCombinations = markets.reduce<Array<[Token, Token]>>((result, market) => {
         const t1 = blockchain.tokens.get(market[0].toLowerCase());
@@ -58,10 +59,11 @@ export function loadAuctions() {
                 dx.getBuyVolume(sellToken, buyToken),
               ]);
 
-              const [price, closingPrice, previousClosingPrice] = await Promise.all([
+              const [price, closingPrice, previousClosingPrice, buyerBalance] = await Promise.all([
                 dx.getPrice(sellToken, buyToken, auctionIndex),
                 dx.getClosingPrice(sellToken, buyToken, auctionIndex),
                 dx.getPreviousClosingPrice(sellToken, buyToken, auctionIndex),
+                dx.getBuyerBalances(sellToken, buyToken, auctionIndex, accountAddress),
               ]);
 
               const hasAuctionStarted = auctionStart && auctionStart < Date.now();
@@ -99,6 +101,7 @@ export function loadAuctions() {
                 auctionEnd: null,
                 closingPrice: previousClosingPrice,
                 currentPrice: fromFraction(price),
+                buyerBalance,
                 state,
               });
 

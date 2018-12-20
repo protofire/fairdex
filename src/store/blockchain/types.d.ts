@@ -28,6 +28,7 @@ interface Auction {
   buyVolume?: BigNumber;
   currentPrice?: BigNumber;
   closingPrice?: BigNumber;
+  buyerBalance?: BigNumber;
   state: AuctionState;
 }
 
