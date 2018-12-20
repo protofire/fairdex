@@ -40,6 +40,23 @@ class DutchExchange extends BaseContract {
     });
   }
 
+  listenEvent(event: string, account: Address, callback: (result: any) => void) {
+    this.instance.events[event](
+      {
+        fromBlock: 0,
+        filter: { user: account },
+      },
+      (error, result) => {
+        if (error) {
+          // console.error(error);
+          // TODO: Handle error
+        } else {
+          callback(result);
+        }
+      },
+    );
+  }
+
   @timeout()
   async getAuctionStart(sellToken: Token, buyToken: Token) {
     const auctionStart: string = await this.methods

@@ -2,6 +2,7 @@ import { Action, ActionCreator, Reducer } from 'redux';
 import Web3 from 'web3';
 
 import DutchExchange from '../../../contracts/DutchExchange';
+import { addBuyOrder } from '../auctions';
 import { loadAvailableTokens, updateFeeRatio } from '../tokens';
 
 export * from './selectors';
@@ -22,6 +23,7 @@ const reducer: Reducer<WalletState> = (state = {}, action) => {
       return {
         ...state,
         currentAccount: action.payload,
+        buyOrders: [],
       };
 
     case CHANGE_NETWORK:
@@ -65,6 +67,18 @@ export function initWallet(wallet: Wallet) {
 
           // Update fee ratio
           dispatch(updateFeeRatio());
+
+          dx.listenEvent('NewBuyOrder', selectedAddress, result => {
+            const { sellToken, buyToken, user, auctionIndex, amount } = result.returnValues;
+            dispatch(
+              addBuyOrder({
+                sellToken,
+                buyToken,
+                user,
+                auctionIndex,
+              }),
+            );
+          });
         }
       });
 

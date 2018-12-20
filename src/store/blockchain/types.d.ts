@@ -42,3 +42,10 @@ interface TokenInfo {
   name: string;
   count: number;
 }
+
+interface BuyOrder {
+  sellToken: TokenSymbol;
+  buyToken: sellToken;
+  user: Address;
+  auctionIndex: string;
+}

@@ -7,6 +7,7 @@ export * from './selectors';
 
 // Actions
 const SET_AUCTION_LIST = 'SET_AUCTION_LIST';
+const ADD_BUY_ORDER = 'ADD_BUY_ORDER';
 
 const reducer: Reducer<AuctionsState> = (state = {}, action) => {
   switch (action.type) {
@@ -14,6 +15,11 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
       return {
         ...state,
         auctions: action.payload,
+      };
+    case ADD_BUY_ORDER:
+      return {
+        ...state,
+        buyOrders: [...state.buyOrders, action.payload],
       };
 
     default:
@@ -122,6 +128,13 @@ const setAuctionList: ActionCreator<AnyAction> = (auctions: Auction[]) => {
   return {
     type: SET_AUCTION_LIST,
     payload: auctions,
+  };
+};
+
+export const addBuyOrder: ActionCreator<AnyAction> = (buyOrder: BuyOrder) => {
+  return {
+    type: ADD_BUY_ORDER,
+    payload: buyOrder,
   };
 };
 
