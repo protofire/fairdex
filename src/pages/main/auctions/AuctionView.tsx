@@ -78,6 +78,38 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
         <BidForm auction={auction} />
       </>
     )}
+
+    {auction.state === 'ended' && (
+      <>
+        <Table>
+          <Row>
+            <Label>Closing price</Label>
+            <Value>
+              {auction.closingPrice === undefined ? (
+                <Loading />
+              ) : (
+                <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+              )}
+              <small>
+                {' '}
+                {auction.buyToken}/{auction.sellToken}
+              </small>
+            </Value>
+          </Row>
+          <Row>
+            <Label>Sell volume</Label>
+            <Value>
+              {auction.sellVolume === undefined ? (
+                <Loading />
+              ) : (
+                <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
+              )}
+              <small> {auction.sellToken}</small>
+            </Value>
+          </Row>
+        </Table>
+      </>
+    )}
   </Card>
 ));
 
