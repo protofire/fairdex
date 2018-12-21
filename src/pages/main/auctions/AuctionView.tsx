@@ -1,18 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { DecimalValue, ElapsedTime } from '../../../components/formatters';
-import * as utils from '../../../contracts/utils';
+import { DecimalValue, Duration } from '../../../components/formatters';
+import { getEstimatedEndTime } from '../../../contracts/utils/auction';
 import BidForm from './BidForm';
 
 interface Props {
   data: Auction;
 }
 
+const DEFAULT_DECIMALS = 6;
+
 const AuctionView = React.memo(({ data: auction }: Props) => (
   <Card>
-    <Title>
-      {auction.sellToken}/{auction.buyToken}
+    <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`}>
+      <span>{auction.buyToken}</span>
+      <Separator>▶</Separator>
+      <span>{auction.sellToken}</span>
     </Title>
 
     {auction.state === 'running' && (
@@ -24,7 +28,7 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               {auction.currentPrice === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue value={auction.currentPrice} decimals={7} />
+                <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} />
               )}
             </Value>
           </Row>
@@ -34,24 +38,31 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               {auction.closingPrice === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue value={auction.closingPrice} decimals={7} />
+                <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
               )}
             </Value>
           </Row>
           <Row>
-            <Label>To end volume</Label>
+            <Label>Volume needed to end</Label>
             <Value>
               {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue value={utils.auction.getToEndVolume(auction)} decimals={7} />
+                <DecimalValue
+                  value={auction.sellVolume.minus(auction.buyVolume)}
+                  decimals={DEFAULT_DECIMALS}
+                />
               )}
             </Value>
           </Row>
           <Row>
-            <Label>Started time</Label>
+            <Label>Estimated time to end</Label>
             <Value>
-              {auction.auctionStart === undefined ? <Loading /> : <ElapsedTime from={auction.auctionStart} />}
+              {auction.auctionStart === undefined ? (
+                <Loading />
+              ) : (
+                <Duration to={getEstimatedEndTime(auction)} />
+              )}
             </Value>
           </Row>
         </Table>
@@ -117,17 +128,18 @@ const Table = styled.dl`
   letter-spacing: -0.4px;
 `;
 
-const Title = styled.h3.attrs({
-  title: (props: any) => props.children,
-})`
-  margin-bottom: 1rem;
+const Title = styled.h3`
+  display: inline-flex;
+  align-items: center;
   font-size: 2em;
   font-weight: 900;
-  text-align: left;
   color: var(--color-light-grey-blue);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+`;
+
+const Separator = styled.span`
+  font-size: 40%;
+  color: var(--color-grey);
+  margin: 0 var(--spacing-text);
 `;
 
 export default AuctionView;
