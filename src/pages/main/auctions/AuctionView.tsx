@@ -9,7 +9,7 @@ interface Props {
   data: Auction;
 }
 
-const DEFAULT_DECIMALS = 6;
+const DEFAULT_DECIMALS = 3;
 
 const AuctionView = React.memo(({ data: auction }: Props) => (
   <Card>
@@ -30,6 +30,10 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               ) : (
                 <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} />
               )}
+              <small>
+                {' '}
+                {auction.buyToken}/{auction.sellToken}
+              </small>
             </Value>
           </Row>
           <Row>
@@ -40,6 +44,10 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               ) : (
                 <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
               )}
+              <small>
+                {' '}
+                {auction.buyToken}/{auction.sellToken}
+              </small>
             </Value>
           </Row>
           <Row>
@@ -53,6 +61,7 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
                   decimals={DEFAULT_DECIMALS}
                 />
               )}
+              <small> {auction.sellToken}</small>
             </Value>
           </Row>
           <Row>
