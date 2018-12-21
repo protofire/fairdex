@@ -88,8 +88,10 @@ const Branding = styled.header`
 `;
 
 const Section = styled.section`
+  position: relative;
   display: grid;
   height: 100%;
+  min-height: calc(100vh - var(--header-height));
   padding: var(--spacing-normal);
 `;
 
