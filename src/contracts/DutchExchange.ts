@@ -19,6 +19,16 @@ class DutchExchange extends BaseContract {
     return this.methods.postBuyOrder(sellToken, buyToken, auctionIndex, amount.toString(10));
   }
 
+  async getAvailableMarkets(fromBlock = 0) {
+    const markets = await this.instance.getPastEvents('NewTokenPair', { fromBlock });
+
+    return markets.map<[Address, Address]>(log => {
+      const { buyToken, sellToken } = log.returnValues;
+
+      return [buyToken, sellToken];
+    });
+  }
+
   async getClearedAuctions(params: { fromBlock?: BlockType; toBlock?: BlockType } = {}) {
     const events = await this.instance.getPastEvents('AuctionCleared', params);
 
@@ -55,6 +65,24 @@ class DutchExchange extends BaseContract {
       .call();
 
     return fromFraction(currentPrice);
+  }
+
+  @timeout()
+  async getPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
+    const currentPrice: Fraction = await this.methods
+      .getCurrentAuctionPrice(sellToken.address, buyToken.address, auctionIndex)
+      .call();
+
+    return currentPrice;
+  }
+
+  @timeout()
+  async getClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
+    const closingPrice: Fraction = await this.methods
+      .closingPrices(sellToken.address, buyToken.address, auctionIndex)
+      .call();
+
+    return fromFraction(closingPrice);
   }
 
   @timeout()

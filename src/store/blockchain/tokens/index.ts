@@ -3,7 +3,7 @@ import { Action, ActionCreator, AnyAction, Reducer } from 'redux';
 import { getTokenContract } from '../../../contracts';
 import { Decimal } from '../../../contracts/utils';
 import { periodicAction } from '../../utils';
-import { loadRunningAuctions } from '../auctions';
+import { loadAuctions } from '../auctions';
 import { getNetworkType } from '../wallet';
 
 // Actions
@@ -69,8 +69,8 @@ export function loadAvailableTokens() {
 
         dispatch(setAvailableTokens(tokens));
 
-        // Load running auctions
-        dispatch(loadRunningAuctions());
+        // Load auctions
+        dispatch(loadAuctions());
 
         // Load token balances
         dispatch(updateTokenBalances());
