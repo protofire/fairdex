@@ -4,13 +4,21 @@ import styled from 'styled-components';
 
 import Separator from '../../components/Separator';
 import * as images from '../../images';
-import { initWallet } from '../../store/blockchain';
+import { getNetworkType, initWallet } from '../../store/blockchain';
+import spinner from './spinner';
+
+type Props = AppStateProps & DispatchProps;
+
+interface AppStateProps {
+  network?: Network | null;
+  wallet?: Wallet;
+}
 
 interface DispatchProps {
   onSelectWallet: (wallet: Wallet) => void;
 }
 
-class SelectWallet extends React.PureComponent<DispatchProps> {
+class SelectWallet extends React.PureComponent<Props> {
   handleWalletSelection = (wallet: Wallet) => {
     if (this.props.onSelectWallet) {
       this.props.onSelectWallet(wallet);
@@ -22,6 +30,12 @@ class SelectWallet extends React.PureComponent<DispatchProps> {
   selectLedgerWallet = () => this.handleWalletSelection('ledger');
 
   render() {
+    const { network, wallet } = this.props;
+
+    if (wallet && !network) {
+      return spinner;
+    }
+
     return (
       <>
         <h2>Select Wallet</h2>
@@ -104,6 +118,13 @@ const Logos = styled.div`
   }
 `;
 
+function mapStateToProps(state: AppState): AppStateProps {
+  return {
+    network: getNetworkType(state),
+    wallet: state.blockchain.wallet,
+  };
+}
+
 function mapDispatchToProps(dispatch: any): DispatchProps {
   return {
     onSelectWallet: wallet => dispatch(initWallet(wallet)),
@@ -111,6 +132,6 @@ function mapDispatchToProps(dispatch: any): DispatchProps {
 }
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(SelectWallet);

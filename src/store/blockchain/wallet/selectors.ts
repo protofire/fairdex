@@ -1,5 +1,9 @@
-export const getNetworkType = (state: AppState) => {
-  const networkId = Number(state.blockchain.networkId);
+export const getNetworkType = (state: AppState): Network | null => {
+  const { networkId } = state.blockchain;
+
+  if (!networkId) {
+    return null;
+  }
 
   switch (networkId) {
     case 1:
