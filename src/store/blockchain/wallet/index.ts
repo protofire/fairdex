@@ -68,6 +68,8 @@ export function initWallet(wallet: Wallet) {
           // Update fee ratio
           dispatch(updateFeeRatio());
 
+          const buyOrders = dx.getBuyOrders(selectedAddress);
+
           dispatch(initBuyOrder());
 
           dx.listenEvent('NewBuyOrder', selectedAddress, result => {

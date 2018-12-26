@@ -29,6 +29,15 @@ class DutchExchange extends BaseContract {
     });
   }
 
+  async getBuyOrders(account) {
+    const buyOrders = await this.instance.getPastEvents('NewBuyOrder', {
+      fromBlock: 0,
+      filter: { user: account },
+    });
+    console.log('buyOrders', buyOrders);
+    return buyOrders;
+  }
+
   async getClearedAuctions(params: { fromBlock?: BlockType; toBlock?: BlockType } = {}) {
     const events = await this.instance.getPastEvents('AuctionCleared', params);
 
