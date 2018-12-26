@@ -11,6 +11,6 @@ interface TokensState {
 
 interface WalletState {
   currentAccount?: Address;
-  networkId?: string;
+  networkId?: number;
   wallet?: Wallet;
 }

@@ -2,7 +2,7 @@ import { Action, ActionCreator, Reducer } from 'redux';
 import Web3 from 'web3';
 
 import DutchExchange from '../../../contracts/DutchExchange';
-import { loadAvailableTokens, updateFeeRatio } from '../tokens';
+import { loadAvailableTokens, updateFeeRatio, updateTokenBalances } from '../tokens';
 
 export * from './selectors';
 
@@ -15,7 +15,9 @@ const reducer: Reducer<WalletState> = (state = {}, action) => {
   switch (action.type) {
     case INIT_WALLET:
       return {
-        wallet: action.payload,
+        wallet: action.payload.wallet,
+        currentAccount: action.payload.account,
+        networkId: action.payload.network,
       };
 
     case CHANGE_ACCOUNT:
@@ -36,47 +38,53 @@ const reducer: Reducer<WalletState> = (state = {}, action) => {
 };
 
 export function initWallet(wallet: Wallet) {
-  return async (dispatch: any, getState: () => AppState) => {
+  return async (dispatch: any) => {
     const web3 = await createEthereumClient();
 
     if (web3) {
+      const ethereum: any = web3.currentProvider;
+
       // Save Web3 instance
       window.web3 = web3;
 
-      // Handle account/network switch
-      const provider: any = web3.currentProvider;
+      const [networkId, [accountAddress]] = await Promise.all([web3.eth.net.getId(), web3.eth.getAccounts()]);
 
-      // @ts-ignore
-      provider.publicConfigStore.on('update', ({ selectedAddress, networkVersion }) => {
-        const { blockchain } = getState();
+      // Instantiate DutchX contract
+      window.dx = new DutchExchange(networkId);
 
-        if (blockchain.networkId !== networkVersion) {
-          dispatch(changeNetwork(networkVersion));
+      dispatch(selectWallet(wallet, networkId, accountAddress));
 
-          // Instantiate DutchX contract
-          window.dx = new DutchExchange(networkVersion);
+      // Load list of available tokens
+      dispatch(loadAvailableTokens());
 
-          // Load available tokens
-          dispatch(loadAvailableTokens());
-        }
+      // Update user's fee ratio
+      dispatch(updateFeeRatio());
 
-        if (blockchain.currentAccount !== selectedAddress) {
-          dispatch(changeAccount(selectedAddress));
+      // Handle user account change
+      ethereum.on('accountsChanged', ([account]: Address[]) => {
+        dispatch(changeAccount(account));
 
-          // Update fee ratio
-          dispatch(updateFeeRatio());
-        }
+        // Update fee ratio
+        dispatch(updateFeeRatio());
+
+        // Update token balances
+        dispatch(updateTokenBalances());
       });
 
-      dispatch(selectWallet(wallet));
+      // Handle network change
+      ethereum.on('networkChanged', () => {
+        // Just reload page when network changed. MetaMask currently reloads pages on network change,
+        // but not immediately besides MetaMask team is planning to change this behavior soon
+        location.reload();
+      });
     }
   };
 }
 
-const selectWallet: ActionCreator<Action> = (wallet: Wallet) => {
+const selectWallet: ActionCreator<Action> = (wallet: Wallet, network: number, account: Address) => {
   return {
     type: INIT_WALLET,
-    payload: wallet,
+    payload: { wallet, network, account },
   };
 };
 
@@ -87,7 +95,7 @@ const changeAccount: ActionCreator<Action> = (accountAddress: Address) => {
   };
 };
 
-const changeNetwork: ActionCreator<Action> = (networkId: string | number) => {
+const changeNetwork: ActionCreator<Action> = (networkId: number) => {
   return {
     type: CHANGE_NETWORK,
     payload: networkId,

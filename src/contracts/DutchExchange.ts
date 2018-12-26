@@ -6,7 +6,7 @@ import BaseContract from './BaseContract';
 import { Decimal, fromFraction, timeout, toBigNumber, toDecimal, ZERO } from './utils';
 
 class DutchExchange extends BaseContract {
-  constructor(networkId: string) {
+  constructor(networkId: number) {
     super({
       jsonInterface: abi,
       address: DutchExchangeProxy[networkId].address,

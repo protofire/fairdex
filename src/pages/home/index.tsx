@@ -3,11 +3,9 @@ import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-import Spinner from '../../components/Spinner';
 import * as images from '../../images';
 import { getNetworkType } from '../../store/blockchain';
-
-const spinner = <Spinner size='large' />;
+import spinner from './spinner';
 
 const MainPage = Loadable({
   loader: () => import('../main'),
@@ -25,17 +23,15 @@ const SelectWallet = Loadable({
 });
 
 interface Props {
-  network?: Network;
+  network?: Network | null;
   wallet?: Wallet;
 }
 
 const HomePage = React.memo(({ network, wallet }: Props) => {
   let content = null;
 
-  if (!wallet) {
+  if (!wallet || !network) {
     content = <SelectWallet />;
-  } else if (!network) {
-    return spinner;
   } else if (network !== 'rinkeby') {
     content = <NetworkNotAvailable />;
   } else {
@@ -100,9 +96,11 @@ const Footer = styled.footer`
   }
 `;
 
-export default connect(
-  (state: AppState): Props => ({
+function mapStateToProps(state: AppState): Props {
+  return {
     network: getNetworkType(state),
     wallet: state.blockchain.wallet,
-  }),
-)(HomePage);
+  };
+}
+
+export default connect(mapStateToProps)(HomePage);
