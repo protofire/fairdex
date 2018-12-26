@@ -11,9 +11,23 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
         buyOrders: [],
       };
     case ADD_BUY_ORDER:
+      const { buyOrders } = state;
+      const { sellToken, buyToken, auctionIndex } = action.payload;
+      const orderExist =
+        buyOrders &&
+        buyOrders.find(order => {
+          return (
+            order.sellToken === sellToken &&
+            order.buyToken === buyToken &&
+            order.auctionIndex === auctionIndex
+          );
+        });
+
+      const nextBuyOrder = !orderExist ? [...buyOrders, action.payload] : [...buyOrders];
+
       return {
         ...state,
-        buyOrders: [...state.buyOrders, action.payload],
+        buyOrders: nextBuyOrder,
       };
 
     default:

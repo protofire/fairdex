@@ -12,7 +12,7 @@ import sortUpImage from '../../../images/sorting_arrow_up.svg';
 import sortNoneImage from '../../../images/sorting_inactive.svg';
 import {
   getBuyTokens,
-  getFilteredMyAuctions,
+  getFilteredClaimableAuctions,
   getFilteredMyTokensAuctions,
   getSellTokens,
 } from '../../../store/blockchain';
@@ -90,7 +90,7 @@ class Filters extends React.PureComponent<Props, State> {
       buyTokens,
       filters,
       myTokensAuctionsCount,
-      myAuctionsCount,
+      claimableCount,
     } = this.props;
     const sellTokensList = this.buildTokenList(
       this.filterTokens(sellTokens, this.state.sellTokenSearchQuery),
@@ -143,13 +143,13 @@ class Filters extends React.PureComponent<Props, State> {
                 <Item>
                   <Label>
                     <Checkbox
-                      name='onlyMyAuctions'
-                      checked={this.props.filters.onlyMyAuctions}
+                      name='claimableAuctions'
+                      checked={this.props.filters.claimableAuctions}
                       onChange={this.toggleOption}
                     />
-                    Only my auctions
+                    Only claimabe auctions
                   </Label>
-                  <ItemCount>{myAuctionsCount}</ItemCount>
+                  <ItemCount>{claimableCount}</ItemCount>
                 </Item>
               </List>
             </Section>
@@ -358,7 +358,7 @@ const SortButton = styled.span`
 
 function mapStateToProps(state: AppState): StateProps {
   const myTokensAuctions = getFilteredMyTokensAuctions(state);
-  const myAuctions = getFilteredMyAuctions(state);
+  const claimableAuctions = getFilteredClaimableAuctions(state);
 
   return {
     isOpen: state.ui.filtersVisible,
@@ -366,7 +366,7 @@ function mapStateToProps(state: AppState): StateProps {
     buyTokens: getBuyTokens(state),
     filters: state.filters,
     myTokensAuctionsCount: myTokensAuctions.length,
-    myAuctionsCount: myAuctions.length,
+    claimableCount: claimableAuctions.length,
   };
 }
 

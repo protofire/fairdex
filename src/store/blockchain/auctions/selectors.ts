@@ -43,9 +43,9 @@ export const getFilteredMyTokensAuctions = createSelector(
   filterMyTokensAuctions,
 );
 
-export const getFilteredMyAuctions = createSelector(
+export const getFilteredClaimableAuctions = createSelector(
   getAllAuctions,
-  filterMyAuctions,
+  filterClaimableAuctions,
 );
 
 function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
@@ -101,8 +101,8 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
     });
   }
 
-  if (filters.onlyMyAuctions) {
-    out = filterMyAuctions(out);
+  if (filters.claimableAuctions) {
+    out = filterClaimableAuctions(out);
   }
 
   if (filters.onlyMyTokens) {
@@ -133,6 +133,6 @@ function filterMyTokensAuctions(list: Auction[], tokens = new Map<Address, Token
   });
 }
 
-function filterMyAuctions(list: Auction[]) {
+function filterClaimableAuctions(list: Auction[]) {
   return list.filter(item => item.buyerBalance.gt(ZERO));
 }

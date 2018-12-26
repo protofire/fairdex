@@ -76,12 +76,7 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  async getBuyerBalances(
-    sellToken: Address,
-    buyToken: Address,
-    auctionIndex: string,
-    accountAddress: Address,
-  ) {
+  async getBuyerBalances(sellToken: Token, buyToken: Token, auctionIndex: string, accountAddress: Address) {
     const buyerBalance = await this.instance.methods
       .buyerBalances(sellToken.address, buyToken.address, auctionIndex, accountAddress)
       .call();

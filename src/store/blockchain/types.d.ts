@@ -44,8 +44,7 @@ interface TokenInfo {
 }
 
 interface BuyOrder {
-  sellToken: TokenSymbol;
-  buyToken: sellToken;
-  user: Address;
+  sellToken: Address;
+  buyToken: Address;
   auctionIndex: string;
 }

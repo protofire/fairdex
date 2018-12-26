@@ -2,6 +2,7 @@ import { Action, ActionCreator, Reducer } from 'redux';
 import Web3 from 'web3';
 
 import DutchExchange from '../../../contracts/DutchExchange';
+import { loadAuctions } from '../auctions';
 import { addBuyOrder, initBuyOrder } from '../buy-orders';
 import { loadAvailableTokens, updateFeeRatio } from '../tokens';
 
@@ -70,15 +71,17 @@ export function initWallet(wallet: Wallet) {
           dispatch(initBuyOrder());
 
           dx.listenEvent('NewBuyOrder', selectedAddress, result => {
-            const { sellToken, buyToken, user, auctionIndex, amount } = result.returnValues;
+            const { sellToken, buyToken, auctionIndex } = result.returnValues;
             dispatch(
               addBuyOrder({
                 sellToken,
                 buyToken,
-                user,
                 auctionIndex,
               }),
             );
+
+            // Load auctions
+            dispatch(loadAuctions());
           });
         }
       });
