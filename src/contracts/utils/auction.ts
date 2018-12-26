@@ -1,6 +1,20 @@
 import { addHours } from 'date-fns';
 
+import { ZERO } from './decimal';
+
 const AUCTION_DURATION = 6; // 6 hours
+
+export function getAvailableVolume(auction: Auction) {
+  if (auction.sellVolume && auction.sellVolume.gt(0)) {
+    if (auction.buyVolume && auction.buyVolume.gt(0)) {
+      if (auction.currentPrice && auction.currentPrice.gt(0)) {
+        return auction.sellVolume.minus(auction.buyVolume.div(auction.currentPrice));
+      }
+    }
+  }
+
+  return ZERO;
+}
 
 export function getEstimatedEndTime(auction: Auction) {
   if (auction.auctionStart) {

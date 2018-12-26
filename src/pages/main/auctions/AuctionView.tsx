@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { DecimalValue, Duration } from '../../../components/formatters';
-import { getEstimatedEndTime } from '../../../contracts/utils/auction';
+import { getAvailableVolume, getEstimatedEndTime } from '../../../contracts/utils/auction';
 import BidForm from './BidForm';
 
 interface Props {
@@ -56,10 +56,7 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue
-                  value={auction.sellVolume.minus(auction.buyVolume)}
-                  decimals={DEFAULT_DECIMALS}
-                />
+                <DecimalValue value={getAvailableVolume(auction)} decimals={DEFAULT_DECIMALS} />
               )}
               <small> {auction.sellToken}</small>
             </Value>
