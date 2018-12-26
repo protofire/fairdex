@@ -59,36 +59,14 @@ export function initWallet(wallet: Wallet) {
       // Load list of available tokens
       dispatch(loadAvailableTokens());
 
-      // Update user's fee ratio
-      dispatch(updateFeeRatio());
+      // // Update user's fee ratio
+      // dispatch(updateFeeRatio());
+      acountChangeHandler(dispatch, accountAddress);
 
       // Handle user account change
       ethereum.on('accountsChanged', ([account]: Address[]) => {
         dispatch(changeAccount(account));
-
-        // Update fee ratio
-        dispatch(updateFeeRatio());
-
-        const buyOrders = dx.getBuyOrders(selectedAddress);
-
-        dispatch(initBuyOrder());
-
-        dx.listenEvent('NewBuyOrder', selectedAddress, result => {
-          const { sellToken, buyToken, auctionIndex } = result.returnValues;
-          dispatch(
-            addBuyOrder({
-              sellToken,
-              buyToken,
-              auctionIndex,
-            }),
-          );
-
-          // Load auctions
-          dispatch(loadAuctions());
-        });
-
-        // Update token balances
-        dispatch(updateTokenBalances());
+        acountChangeHandler(dispatch, account);
       });
 
       // Handle network change
@@ -99,6 +77,38 @@ export function initWallet(wallet: Wallet) {
       });
     }
   };
+}
+
+async function acountChangeHandler(dispatch, account) {
+  // Update fee ratio
+  dispatch(updateFeeRatio());
+
+  const buyOrders = await dx.getBuyOrders(account);
+
+  dispatch(initBuyOrder(buyOrders));
+
+  const lastBuyOrderBlock = buyOrders.length ? buyOrders[buyOrders.length - 1].blockNumber + 1 : 0;
+
+  dx.listenEvent('NewBuyOrder', lastBuyOrderBlock, account, result => {
+    const {
+      blockNumber,
+      returnValues: { sellToken, buyToken, auctionIndex },
+    } = result;
+    dispatch(
+      addBuyOrder({
+        blockNumber,
+        sellToken: sellToken.toLowerCase(),
+        buyToken: buyToken.toLowerCase(),
+        auctionIndex,
+      }),
+    );
+
+    // Load auctions
+    dispatch(loadAuctions());
+  });
+
+  // Update token balances
+  dispatch(updateTokenBalances());
 }
 
 const selectWallet: ActionCreator<Action> = (wallet: Wallet, network: number, account: Address) => {

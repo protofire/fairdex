@@ -34,8 +34,24 @@ class DutchExchange extends BaseContract {
       fromBlock: 0,
       filter: { user: account },
     });
-    console.log('buyOrders', buyOrders);
-    return buyOrders;
+
+    const uniqBuyOrders = buyOrders.reduce((acc, log) => {
+      const {
+        blockNumber,
+        returnValues: { sellToken, buyToken, auctionIndex },
+      } = log;
+
+      acc[`${sellToken}-${buyToken}-${auctionIndex}`] = {
+        blockNumber,
+        sellToken: sellToken.toLowerCase(),
+        buyToken: buyToken.toLowerCase(),
+        auctionIndex,
+      };
+
+      return acc;
+    }, {});
+
+    return Object.values(uniqBuyOrders);
   }
 
   async getClearedAuctions(params: { fromBlock?: BlockType; toBlock?: BlockType } = {}) {
@@ -49,10 +65,10 @@ class DutchExchange extends BaseContract {
     });
   }
 
-  listenEvent(event: string, account: Address, callback: (result: any) => void) {
+  listenEvent(event: string, fromBlock, account: Address, callback: (result: any) => void) {
     this.instance.events[event](
       {
-        fromBlock: 0,
+        fromBlock: fromBlock || 0,
         filter: { user: account },
       },
       (error, result) => {

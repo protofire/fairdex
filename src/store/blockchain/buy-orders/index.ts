@@ -8,7 +8,7 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
     case INIT_BUY_ORDER:
       return {
         ...state,
-        buyOrders: [],
+        buyOrders: [...action.payload],
       };
     case ADD_BUY_ORDER:
       const { buyOrders } = state;
@@ -35,9 +35,10 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
   }
 };
 
-export const initBuyOrder: ActionCreator<AnyAction> = () => {
+export const initBuyOrder: ActionCreator<AnyAction> = (buyOrders: BuyOrder[]) => {
   return {
     type: INIT_BUY_ORDER,
+    payload: buyOrders,
   };
 };
 
