@@ -15,6 +15,7 @@ import Cell, { DecimalContent, Description, IntContent } from './cell';
 
 export interface AccountProps {
   currentAccount: Address;
+  magnolia: TokenFRT;
   bids: number;
   feeRatio?: BigNumber;
   toClaim?: number;
@@ -22,7 +23,7 @@ export interface AccountProps {
 
 const DEFAULT_DECIMALS = 3;
 
-const Account = ({ currentAccount, bids, feeRatio, toClaim }): AccountProps => (
+const Account = ({ currentAccount, magnolia, bids, feeRatio, toClaim }): AccountProps => (
   <Container>
     <Header>
       <WalletIcon>
@@ -31,8 +32,8 @@ const Account = ({ currentAccount, bids, feeRatio, toClaim }): AccountProps => (
       <StyledAddress address={currentAccount} />
     </Header>
     <Cell borders={['top', 'right']}>
-      <DecimalContent value={12.5} decimals={DEFAULT_DECIMALS} />
-      <Description>MGN</Description>
+      <DecimalContent value={magnolia.balance} decimals={DEFAULT_DECIMALS} />
+      <Description>{magnolia.symbol}</Description>
     </Cell>
     <Cell borders={['top']}>
       <DecimalContent value={feeRatio} decimals={DEFAULT_DECIMALS} postfix={'%'} />
@@ -88,9 +89,11 @@ const StyledAddress = styled(Address)`
 function mapStateToProps(state: AppState): AccountProps {
   const claimableAuctions = getFilteredClaimableAuctions(state);
   const bids = state.blockchain.buyOrders ? state.blockchain.buyOrders.length : 0;
-  const { currentAccount } = state.blockchain;
+  const { currentAccount, magnolia = { balance: 0, symbol: '' } } = state.blockchain;
+
   return {
     currentAccount,
+    magnolia,
     bids,
     feeRatio: state.blockchain.feeRatio,
     toClaim: claimableAuctions.length,
