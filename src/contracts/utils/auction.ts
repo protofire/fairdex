@@ -6,8 +6,8 @@ const AUCTION_DURATION = 6; // 6 hours
 
 export function getAvailableVolume(auction: Auction) {
   if (auction.sellVolume && auction.sellVolume.gt(0)) {
-    if (auction.buyVolume && auction.buyVolume.gt(0)) {
-      if (auction.currentPrice && auction.currentPrice.gt(0)) {
+    if (auction.buyVolume && auction.buyVolume.gte(0)) {
+      if (auction.currentPrice && auction.currentPrice.gte(0)) {
         return auction.sellVolume.minus(auction.buyVolume.div(auction.currentPrice));
       }
     }
