@@ -6,10 +6,14 @@ interface Props extends DecimalFormat {
   value?: Decimal;
   defaultValue?: string;
   showTitle?: boolean;
+  className?: string;
 }
 
-const DecimalValue = ({ value, defaultValue, decimals, showTitle, prefix, postfix }: Props) => (
-  <span title={showTitle && value ? formatNumber(value, { prefix, postfix }) : undefined}>
+const DecimalValue = ({ className, value, defaultValue, decimals, showTitle, prefix, postfix }: Props) => (
+  <span
+    className={className}
+    title={showTitle && value ? formatNumber(value, { prefix, postfix }) : undefined}
+  >
     {value ? formatNumber(value, { decimals, prefix, postfix }) || defaultValue : ''}
   </span>
 );
