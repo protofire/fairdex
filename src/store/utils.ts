@@ -23,9 +23,8 @@ export function periodicAction({ name, task, interval = DEFAULT_INTERVAL }: Peri
     async function checkForUpdates() {
       try {
         await task(dispatch, getState);
-      } catch (e) {
+      } catch {
         // TODO: log error
-        // console.error(e)
       }
 
       if (subscription) {

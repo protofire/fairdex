@@ -61,12 +61,12 @@ export function initWallet(wallet: Wallet) {
 
       // // Update user's fee ratio
       // dispatch(updateFeeRatio());
-      acountChangeHandler(dispatch, accountAddress);
+      accountChangeHandler(dispatch, accountAddress);
 
       // Handle user account change
       ethereum.on('accountsChanged', ([account]: Address[]) => {
         dispatch(changeAccount(account));
-        acountChangeHandler(dispatch, account);
+        accountChangeHandler(dispatch, account);
       });
 
       // Handle network change
@@ -79,7 +79,7 @@ export function initWallet(wallet: Wallet) {
   };
 }
 
-async function acountChangeHandler(dispatch, account) {
+async function accountChangeHandler(dispatch, account) {
   // Update fee ratio
   dispatch(updateFeeRatio());
 

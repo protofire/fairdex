@@ -30,7 +30,7 @@ export function loadAuctions() {
       const { blockchain } = getState();
 
       const markets = await dx.getAvailableMarkets();
-      const accountAddress = blockchain.currentAccount;
+      const currentAccount = blockchain.currentAccount;
       const buyOrders = blockchain.buyOrders;
 
       const tokensCombinations = markets.reduce<Array<[Token, Token]>>((result, market) => {
@@ -53,11 +53,11 @@ export function loadAuctions() {
             let auctionIndex = await dx.getLatestAuctionIndex(sellToken, buyToken);
 
             while (toBigNumber(auctionIndex).gte(0) && state !== 'ended') {
-              const auctionIfo = await getAuctioInfo(dx, sellToken, buyToken, auctionIndex, accountAddress);
+              const auctionInfo = await getAuctionInfo(dx, sellToken, buyToken, auctionIndex, currentAccount);
 
-              state = auctionIfo.state;
+              state = auctionInfo.state;
 
-              auctionList.push(auctionIfo);
+              auctionList.push(auctionInfo);
 
               auctionIndex = toBigNumber(auctionIndex)
                 .minus(1)
@@ -95,7 +95,7 @@ export function loadAuctions() {
             .filter(a => a !== null)
             .map(order => {
               const { sellToken, buyToken, auctionIndex } = order;
-              return getAuctioInfo(dx, sellToken, buyToken, auctionIndex, accountAddress);
+              return getAuctionInfo(dx, sellToken, buyToken, auctionIndex, currentAccount);
             }),
         );
 
@@ -110,7 +110,7 @@ export function loadAuctions() {
   });
 }
 
-async function getAuctioInfo(dx, sellToken, buyToken, auctionIndex, accountAddress) {
+async function getAuctionInfo(dx, sellToken, buyToken, auctionIndex, currentAccount) {
   const [auctionStart, sellVolume, buyVolume] = await Promise.all([
     dx.getAuctionStart(sellToken, buyToken),
     dx.getSellVolume(sellToken, buyToken),
@@ -121,7 +121,7 @@ async function getAuctioInfo(dx, sellToken, buyToken, auctionIndex, accountAddre
     dx.getPrice(sellToken, buyToken, auctionIndex),
     dx.getClosingPrice(sellToken, buyToken, auctionIndex),
     dx.getPreviousClosingPrice(sellToken, buyToken, auctionIndex),
-    dx.getBuyerBalances(sellToken, buyToken, auctionIndex, accountAddress),
+    dx.getBuyerBalances(sellToken, buyToken, auctionIndex, currentAccount),
   ]);
 
   const hasAuctionStarted = auctionStart && auctionStart < Date.now();

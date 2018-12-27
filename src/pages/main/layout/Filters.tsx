@@ -147,7 +147,7 @@ class Filters extends React.PureComponent<Props, State> {
                       checked={this.props.filters.claimableAuctions}
                       onChange={this.toggleOption}
                     />
-                    Only claimabe auctions
+                    Only claimable auctions
                   </Label>
                   <ItemCount>{claimableCount}</ItemCount>
                 </Item>

@@ -73,7 +73,6 @@ class DutchExchange extends BaseContract {
       },
       (error, result) => {
         if (error) {
-          // console.error(error);
           // TODO: Handle error
         } else {
           callback(result);
