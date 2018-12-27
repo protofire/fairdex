@@ -2,6 +2,8 @@ import { Action, ActionCreator, Reducer } from 'redux';
 import Web3 from 'web3';
 
 import DutchExchange from '../../../contracts/DutchExchange';
+import { loadAuctions } from '../auctions';
+import { addBuyOrder, initBuyOrder } from '../buy-orders';
 import { loadAvailableTokens, updateFeeRatio, updateTokenBalances } from '../tokens';
 
 export * from './selectors';
@@ -57,18 +59,12 @@ export function initWallet(wallet: Wallet) {
       // Load list of available tokens
       dispatch(loadAvailableTokens());
 
-      // Update user's fee ratio
-      dispatch(updateFeeRatio());
+      accountChangeHandler(dispatch, accountAddress);
 
       // Handle user account change
       ethereum.on('accountsChanged', ([account]: Address[]) => {
         dispatch(changeAccount(account));
-
-        // Update fee ratio
-        dispatch(updateFeeRatio());
-
-        // Update token balances
-        dispatch(updateTokenBalances());
+        accountChangeHandler(dispatch, account);
       });
 
       // Handle network change
@@ -79,6 +75,38 @@ export function initWallet(wallet: Wallet) {
       });
     }
   };
+}
+
+async function accountChangeHandler(dispatch, account) {
+  // Update fee ratio
+  dispatch(updateFeeRatio());
+
+  const buyOrders = await dx.getBuyOrders(account);
+
+  dispatch(initBuyOrder(buyOrders));
+
+  const lastBuyOrderBlock = buyOrders.length ? buyOrders[buyOrders.length - 1].blockNumber + 1 : 0;
+
+  dx.listenEvent('NewBuyOrder', lastBuyOrderBlock, account, result => {
+    const {
+      blockNumber,
+      returnValues: { sellToken, buyToken, auctionIndex },
+    } = result;
+    dispatch(
+      addBuyOrder({
+        blockNumber,
+        sellToken: sellToken.toLowerCase(),
+        buyToken: buyToken.toLowerCase(),
+        auctionIndex,
+      }),
+    );
+
+    // Load auctions
+    dispatch(loadAuctions());
+  });
+
+  // Update token balances
+  dispatch(updateTokenBalances());
 }
 
 const selectWallet: ActionCreator<Action> = (wallet: Wallet, network: number, account: Address) => {

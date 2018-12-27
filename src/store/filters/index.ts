@@ -8,7 +8,7 @@ const initialState: FiltersState = {
   sortBy: 'start-time',
   sortDir: 'asc',
   onlyMyTokens: false,
-  onlyMyAuctions: false,
+  claimableAuctions: false,
 };
 
 const reducer: Reducer<FiltersState, FiltersAction> = (state = initialState, action) => {

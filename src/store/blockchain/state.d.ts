@@ -1,4 +1,4 @@
-type BlockchainState = AuctionsState & TokensState & WalletState;
+type BlockchainState = AuctionsState & TokensState & WalletState & BuyOrdersState;
 
 interface AuctionsState {
   auctions?: Auction[];
@@ -13,4 +13,8 @@ interface WalletState {
   currentAccount?: Address;
   networkId?: number;
   wallet?: Wallet;
+}
+
+interface BuyOrdersState {
+  buyOrders?: BuyOrder[];
 }

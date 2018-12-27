@@ -7,7 +7,7 @@ interface FiltersState {
   sortBy: SortField;
   sortDir: SortDir;
   onlyMyTokens: boolean;
-  onlyMyAuctions: boolean;
+  claimableAuctions: boolean;
 }
 
 interface FiltersAction {

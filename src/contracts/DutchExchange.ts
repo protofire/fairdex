@@ -6,6 +6,8 @@ import BaseContract from './BaseContract';
 import { Decimal, fromFraction, timeout, toBigNumber, toDecimal, ZERO } from './utils';
 
 class DutchExchange extends BaseContract {
+  subscriptions = {};
+
   constructor(networkId: number) {
     super({
       jsonInterface: abi,
@@ -29,6 +31,31 @@ class DutchExchange extends BaseContract {
     });
   }
 
+  async getBuyOrders(account) {
+    const buyOrders = await this.instance.getPastEvents('NewBuyOrder', {
+      fromBlock: 0,
+      filter: { user: account },
+    });
+
+    const uniqBuyOrders = buyOrders.reduce((acc, log) => {
+      const {
+        blockNumber,
+        returnValues: { sellToken, buyToken, auctionIndex },
+      } = log;
+
+      acc[`${sellToken}-${buyToken}-${auctionIndex}`] = {
+        blockNumber,
+        sellToken: sellToken.toLowerCase(),
+        buyToken: buyToken.toLowerCase(),
+        auctionIndex,
+      };
+
+      return acc;
+    }, {});
+
+    return Object.values(uniqBuyOrders);
+  }
+
   async getClearedAuctions(params: { fromBlock?: BlockType; toBlock?: BlockType } = {}) {
     const events = await this.instance.getPastEvents('AuctionCleared', params);
 
@@ -38,6 +65,34 @@ class DutchExchange extends BaseContract {
         data: marshallAuction(result.returnValues),
       };
     });
+  }
+
+  listenEvent(event: string, fromBlock, account: Address, callback: (result: any) => void) {
+    this.unsubscribe(event);
+
+    this.subscriptions[event] = this.instance.events[event](
+      {
+        fromBlock: fromBlock || 0,
+        filter: { user: account },
+      },
+      (error, result) => {
+        if (error) {
+          // TODO: Handle error
+        } else {
+          callback(result);
+        }
+      },
+    );
+  }
+
+  unsubscribe(event: string) {
+    if (this.subscriptions[event]) {
+      this.subscriptions[event].unsubscribe();
+    }
+  }
+
+  unsubscribeAll() {
+    Object.keys(this.subscriptions).forEach(this.unsubscribe.bind(this));
   }
 
   @timeout()
@@ -56,6 +111,15 @@ class DutchExchange extends BaseContract {
     const balance = await this.instance.methods.balances(token.address, accountAddress).call();
 
     return toDecimal(balance, token.decimals) || ZERO;
+  }
+
+  @timeout()
+  async getBuyerBalances(sellToken: Token, buyToken: Token, auctionIndex: string, accountAddress: Address) {
+    const buyerBalance = await this.instance.methods
+      .buyerBalances(sellToken.address, buyToken.address, auctionIndex, accountAddress)
+      .call();
+
+    return toDecimal(buyerBalance, buyToken.decimals) || ZERO;
   }
 
   @timeout()

@@ -28,6 +28,7 @@ interface Auction {
   buyVolume?: BigNumber;
   currentPrice?: BigNumber;
   closingPrice?: BigNumber;
+  buyerBalance?: BigNumber;
   state: AuctionState;
 }
 
@@ -40,4 +41,11 @@ interface TokenInfo {
   id: TokenSymbol;
   name: string;
   count: number;
+}
+
+interface BuyOrder {
+  blockNumber: number;
+  sellToken: Address;
+  buyToken: Address;
+  auctionIndex: string;
 }
