@@ -6,14 +6,14 @@ import BaseContract from './BaseContract';
 import { Decimal, fromFraction, timeout, toBigNumber, toDecimal, ZERO } from './utils';
 
 class DutchExchange extends BaseContract {
+  subscriptions = {};
+
   constructor(networkId: number) {
     super({
       jsonInterface: abi,
       address: DutchExchangeProxy[networkId].address,
     });
   }
-
-  subscriptions = {};
 
   postBuyOrder(sellToken: Address, buyToken: Address, auctionIndex: string, buyAmount: Decimal) {
     const amount = toBigNumber(buyAmount);
