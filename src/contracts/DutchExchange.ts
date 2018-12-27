@@ -13,6 +13,8 @@ class DutchExchange extends BaseContract {
     });
   }
 
+  subscriptions = {};
+
   postBuyOrder(sellToken: Address, buyToken: Address, auctionIndex: string, buyAmount: Decimal) {
     const amount = toBigNumber(buyAmount);
 
@@ -66,7 +68,9 @@ class DutchExchange extends BaseContract {
   }
 
   listenEvent(event: string, fromBlock, account: Address, callback: (result: any) => void) {
-    this.instance.events[event](
+    this.unsubscribe(event);
+
+    this.subscriptions[event] = this.instance.events[event](
       {
         fromBlock: fromBlock || 0,
         filter: { user: account },
@@ -79,6 +83,16 @@ class DutchExchange extends BaseContract {
         }
       },
     );
+  }
+
+  unsubscribe(event: string) {
+    if (this.subscriptions[event]) {
+      this.subscriptions[event].unsubscribe();
+    }
+  }
+
+  unsubscribeAll() {
+    Object.keys(this.subscriptions).forEach(this.unsubscribe.bind(this));
   }
 
   @timeout()

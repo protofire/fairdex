@@ -59,8 +59,6 @@ export function initWallet(wallet: Wallet) {
       // Load list of available tokens
       dispatch(loadAvailableTokens());
 
-      // // Update user's fee ratio
-      // dispatch(updateFeeRatio());
       accountChangeHandler(dispatch, accountAddress);
 
       // Handle user account change
