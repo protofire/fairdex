@@ -200,6 +200,13 @@ class DutchExchange extends BaseContract {
 
     return pairs;
   }
+
+  @timeout()
+  async getFrtTokenAddress() {
+    const frtAddress = await this.instance.methods.frtToken().call();
+
+    return frtAddress;
+  }
 }
 
 function marshallAuction(data: any): Partial<Auction> {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { shortenAddress, isAddress } from '../../contracts/utils';
+import { isAddress, shortenAddress } from '../../contracts/utils';
 
 interface AddressProps {
   address: Address;

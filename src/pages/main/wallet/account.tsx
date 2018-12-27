@@ -2,16 +2,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import * as images from '../../../images';
 import Card from '../../../components/Card';
-import Cell, { DecimalContent, IntContent, Description } from './cell';
 import { Address } from '../../../components/formatters';
+import * as images from '../../../images';
 import {
   getBuyTokens,
   getFilteredClaimableAuctions,
   getFilteredMyTokensAuctions,
   getSellTokens,
 } from '../../../store/blockchain';
+import Cell, { DecimalContent, Description, IntContent } from './cell';
 
 export interface AccountProps {
   currentAccount: Address;
