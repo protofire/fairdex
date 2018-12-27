@@ -153,17 +153,19 @@ class BidForm extends React.PureComponent<Props, State> {
     const { amount: buyTokenAmount, currentStep = this.getInitialStep() } = this.state;
 
     const fee = buyTokenAmount.times(feeRate);
-    const buyTokenBalance = utils.token.getDxBalance(buyToken);
+    const bidTokenBalanceInContract = utils.token.getDxBalance(buyToken);
+    const bidTokenBalanceInWallet = utils.token.getWalletBalance(buyToken);
+    const bidTokenBalance = bidTokenBalanceInContract.plus(bidTokenBalanceInWallet);
 
     const sellTokenAmount =
       auction.currentPrice && !auction.currentPrice.isZero()
         ? buyTokenAmount.div(auction.currentPrice)
         : ZERO;
 
-    const maxSellTokenAmount = utils.auction.getToEndVolume(auction) || ZERO;
+    const maxSellTokenAmount = utils.auction.getAvailableVolume(auction);
 
-    const maxBuyTokenAmount = BigNumber.minimum(
-      BigNumber.maximum(buyTokenBalance.minus(fee), ZERO),
+    const maxBidTokenAmount = BigNumber.minimum(
+      BigNumber.maximum(bidTokenBalance, ZERO),
       maxSellTokenAmount.times(auction.currentPrice || ZERO),
     );
 
@@ -194,7 +196,7 @@ class BidForm extends React.PureComponent<Props, State> {
                   <div>
                     <h4>Sell</h4>
                     <p>
-                      {auction.buyToken} (max <DecimalValue value={maxBuyTokenAmount} decimals={12} />)
+                      {auction.buyToken} (max <DecimalValue value={maxBidTokenAmount} decimals={12} />)
                     </p>
                     <DecimalInput
                       value={buyTokenAmount.toString(10)}
@@ -216,7 +218,7 @@ class BidForm extends React.PureComponent<Props, State> {
                       !auction.currentPrice ||
                       auction.currentPrice.lte(ZERO) ||
                       buyTokenAmount.lte(ZERO) ||
-                      buyTokenAmount.gt(maxBuyTokenAmount)
+                      buyTokenAmount.gt(maxBidTokenAmount)
                     }
                   >
                     Next
