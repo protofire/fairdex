@@ -6,6 +6,10 @@ import { getFrt } from '../frt';
 
 export const getAllTokens = (state: AppState) => state.blockchain.tokens || [];
 
+export const getFeePercentage = (state: AppState) => {
+  return state.blockchain.feeRatio ? state.blockchain.feeRatio.times(100) : ZERO;
+};
+
 export const getTokensWithBalance = createSelector(
   getAllTokens,
   getFrt,

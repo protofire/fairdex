@@ -12,6 +12,7 @@ import {
 } from '../../../store/blockchain';
 import { getBidsCount } from '../../../store/blockchain/buy-orders';
 import { getFrt } from '../../../store/blockchain/frt';
+import { getFeePercentage } from '../../../store/blockchain/tokens';
 
 import WalletCard, { Content, Header, Item } from './wallet-card';
 
@@ -19,13 +20,13 @@ export interface AccountProps {
   currentAccount: Address;
   frt: Token;
   bids: number;
-  feeRatio?: BigNumber;
+  lc?: BigNumber;
   toClaim?: number;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const Account = ({ currentAccount, frt, bids, feeRatio, toClaim }): AccountProps => (
+const Account = ({ currentAccount, frt, bids, lc, toClaim }): AccountProps => (
   <Container>
     <Header>
       <Icon>
@@ -39,8 +40,8 @@ const Account = ({ currentAccount, frt, bids, feeRatio, toClaim }): AccountProps
         <div>{frt.symbol}</div>
       </Item>
       <Item>
-        <DecimalValue value={feeRatio} decimals={DEFAULT_DECIMALS} postfix={'%'} />
-        <div>Fee level</div>
+        <DecimalValue value={lc} decimals={DEFAULT_DECIMALS} postfix={'%'} />
+        <div title='Liquidity Contribution'>LC</div>
       </Item>
       <Item>
         <div>{bids}</div>
@@ -77,19 +78,21 @@ const Icon = styled.div`
   border-radius: 80px;
   text-align: center;
   padding-top: 15px;
+  user-select: none;
 `;
 
 function mapStateToProps(state: AppState): AccountProps {
   const claimableAuctions = getFilteredClaimableAuctions(state);
   const bids = getBidsCount(state);
   const frt = getFrt(state);
+  const lc = getFeePercentage(state);
   const { currentAccount } = state.blockchain;
 
   return {
     currentAccount,
     frt,
     bids,
-    feeRatio: state.blockchain.feeRatio,
+    lc,
     toClaim: claimableAuctions.length,
   };
 }
