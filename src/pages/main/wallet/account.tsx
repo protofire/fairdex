@@ -2,8 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import Card from '../../../components/Card';
-import { Address } from '../../../components/formatters';
+import { Address, DecimalValue } from '../../../components/formatters';
 import * as images from '../../../images';
 import {
   getBuyTokens,
@@ -11,11 +10,14 @@ import {
   getFilteredMyTokensAuctions,
   getSellTokens,
 } from '../../../store/blockchain';
-import Cell, { DecimalContent, Description, IntContent } from './cell';
+import { getBidsCount } from '../../../store/blockchain/buy-orders';
+import { getFrt } from '../../../store/blockchain/frt';
+
+import WalletCard, { Content, Header, Item } from './wallet-card';
 
 export interface AccountProps {
   currentAccount: Address;
-  magnolia: TokenFRT;
+  frt: Token;
   bids: number;
   feeRatio?: BigNumber;
   toClaim?: number;
@@ -23,60 +25,41 @@ export interface AccountProps {
 
 const DEFAULT_DECIMALS = 3;
 
-const Account = ({ currentAccount, magnolia, bids, feeRatio, toClaim }): AccountProps => (
+const Account = ({ currentAccount, frt, bids, feeRatio, toClaim }): AccountProps => (
   <Container>
     <Header>
-      <WalletIcon>
+      <Icon>
         <img src={images.wallet.MetaMask} alt='MetaMask' />
-      </WalletIcon>
-      <StyledAddress address={currentAccount} />
+      </Icon>
+      <HeaderAddress address={currentAccount} />
     </Header>
-    <Cell borders={['top', 'right']}>
-      <DecimalContent value={magnolia.balance} decimals={DEFAULT_DECIMALS} />
-      <Description>{magnolia.symbol}</Description>
-    </Cell>
-    <Cell borders={['top']}>
-      <DecimalContent value={feeRatio} decimals={DEFAULT_DECIMALS} postfix={'%'} />
-      <Description>Fee level</Description>
-    </Cell>
-    <Cell borders={['top', 'right']}>
-      <IntContent>{bids}</IntContent>
-      <Description>Bids</Description>
-    </Cell>
-    <Cell borders={['top']}>
-      <IntContent>{toClaim}</IntContent>
-      <Description>To claim</Description>
-    </Cell>
+    <Content>
+      <Item>
+        <DecimalValue value={frt.balance} decimals={DEFAULT_DECIMALS} />
+        <div>{frt.symbol}</div>
+      </Item>
+      <Item>
+        <DecimalValue value={feeRatio} decimals={DEFAULT_DECIMALS} postfix={'%'} />
+        <div>Fee level</div>
+      </Item>
+      <Item>
+        <div>{bids}</div>
+        <div>Bids</div>
+      </Item>
+      <Item>
+        <div>{toClaim}</div>
+        <div>To claim</div>
+      </Item>
+    </Content>
   </Container>
 );
 
-const Container = styled(Card)`
+const Container = styled(WalletCard)`
   height: 336px;
   background-image: linear-gradient(37deg, #8bc6ec, #a8f6e4);
-  box-shadow: 0 8px 24px 0 rgba(139, 198, 236, 0.5);
-  display: grid;
-  padding: 0;
-  grid-template-rows: 3fr 1fr 1fr;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas: 'a a' 'b c' 'd e';
 `;
 
-const Header = styled(Cell)`
-  grid-area: a;
-  justify-content: space-evenly;
-`;
-
-const WalletIcon = styled.div`
-  width: 80px;
-  height: 80px;
-  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
-  border-radius: 80px;
-  text-align: center;
-  padding-top: 15px;
-`;
-
-const StyledAddress = styled(Address)`
+const HeaderAddress = styled(Address)`
   font-size: 14px;
   font-weight: bold;
   font-style: normal;
@@ -86,14 +69,25 @@ const StyledAddress = styled(Address)`
   color: var(--color-text-primary);
 `;
 
+const Icon = styled.div`
+  width: 80px;
+  height: 80px;
+  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border-radius: 80px;
+  text-align: center;
+  padding-top: 15px;
+`;
+
 function mapStateToProps(state: AppState): AccountProps {
   const claimableAuctions = getFilteredClaimableAuctions(state);
-  const bids = state.blockchain.buyOrders ? state.blockchain.buyOrders.length : 0;
-  const { currentAccount, magnolia = { balance: 0, symbol: '' } } = state.blockchain;
+  const bids = getBidsCount(state);
+  const frt = getFrt(state);
+  const { currentAccount } = state.blockchain;
 
   return {
     currentAccount,
-    magnolia,
+    frt,
     bids,
     feeRatio: state.blockchain.feeRatio,
     toClaim: claimableAuctions.length,

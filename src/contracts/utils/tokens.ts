@@ -17,7 +17,7 @@ export function getTotalBalance(token?: Token) {
 }
 
 export function getWalletBalance(token?: Token) {
-  if (!token || !token.balance || !token.balance.length) {
+  if (!token || !token.balance || !token.balance.length || token.balance.length <= 1) {
     return ZERO;
   }
 

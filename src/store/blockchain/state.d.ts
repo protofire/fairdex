@@ -1,4 +1,4 @@
-type BlockchainState = AuctionsState & TokensState & WalletState & BuyOrdersState & MagnoliaState;
+type BlockchainState = AuctionsState & TokensState & WalletState & BuyOrdersState & FrtState;
 
 interface AuctionsState {
   auctions?: Auction[];
@@ -6,11 +6,11 @@ interface AuctionsState {
 
 interface TokensState {
   feeRatio?: BigNumber;
-  tokens: Map<Address, TokenERC20>;
+  tokens: Map<Address, Token>;
 }
 
-interface MagnoliaState {
-  magnolia: TokenFRT;
+interface FrtState {
+  frt: Token;
 }
 
 interface WalletState {

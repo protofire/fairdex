@@ -202,7 +202,7 @@ class DutchExchange extends BaseContract {
   }
 
   @timeout()
-  async getFrtTokenAddress() {
+  async getFrtAddress() {
     const frtAddress = await this.instance.methods.frtToken().call();
 
     return frtAddress;

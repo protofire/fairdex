@@ -6,6 +6,8 @@ import { periodicAction } from '../../utils';
 import { loadAuctions } from '../auctions';
 import { getNetworkType } from '../wallet';
 
+export * from './selectors';
+
 // Actions
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
 const SET_FEE_RATIO = 'SET_FEE_RATIO';

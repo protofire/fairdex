@@ -6,21 +6,12 @@ type Wallet = 'standard' | 'ledger';
 
 type TokenSymbol = string;
 
-type TokenType = 'ERC20' | 'FRT';
-
 interface Token {
   address: Address;
   decimals: number;
   name: string;
   symbol: TokenSymbol;
-}
-
-interface TokenERC20 extends Token {
   balance?: BigNumber[];
-}
-
-interface TokenFRT extends Token {
-  balance?: BigNumber;
 }
 
 type AuctionState = 'running' | 'ended' | 'scheduled';
