@@ -9,7 +9,9 @@ interface AddressProps {
 }
 
 const Address = ({ className, address, shorten }: AddressProps) => (
-  <span className={className}>{isAddress(address) && shorten ? shortenAddress(address) : address}</span>
+  <span className={className} title={address}>
+    {isAddress(address) && shorten ? shortenAddress(address) : address}
+  </span>
 );
 
 Address.defaultProps = {
