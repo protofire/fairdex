@@ -239,7 +239,9 @@ class BidForm extends React.PureComponent<Props, State> {
                       <h4>
                         <DecimalValue value={sellTokenAmount} decimals={2} />
                       </h4>
-                      <span>{auction.sellToken}</span>
+                      <span>
+                        <small>min getting of</small> <br /> {auction.sellToken}
+                      </span>
                     </div>
                   </div>
                   <p>
