@@ -116,3 +116,13 @@ export function isAbovePriorClosingPrice(auction: Auction) {
 
   return auction.currentPrice.isGreaterThan(auction.closingPrice.times(AUCTION_ABOVE_PRIOR_PRICE_THRESHOLD));
 }
+
+export function getSellVolumeInEth(auction: Auction, tokens: Token[]) {
+  const sellToken = tokens.get(auction.sellTokenAddress);
+
+  if (auction.sellVolume && auction.sellVolume.gt(0) && sellToken.priceEth && sellToken.priceEth.gt(0)) {
+    return auction.sellVolume.times(sellToken.priceEth);
+  }
+
+  return ZERO;
+}

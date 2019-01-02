@@ -1,7 +1,9 @@
 import { createSelector } from 'reselect';
 
+import { getAllTokens } from '../tokens';
 import { ZERO } from '../../../contracts/utils';
 import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
+import { getSellVolumeInEth } from '../../../contracts/utils/auctions';
 
 const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
 
@@ -18,7 +20,7 @@ export const getBuyTokens = createSelector(
 export const getFilteredAuctions = createSelector(
   getAllAuctions,
   (state: AppState) => state.filters,
-  (state: AppState) => state.blockchain,
+  getAllTokens,
   filterAuctions,
 );
 
@@ -75,25 +77,23 @@ function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
   return outputList;
 }
 
-function filterAuctions(list: Auction[], filters: FiltersState, blockchain: BlockchainState) {
+function filterAuctions(list: Auction[], filters: FiltersState, tokens: Map<Address, Token>) {
   let out = Array.from(list);
 
-  const sortMap: { [filter in SortField]: keyof Auction } = {
-    'buy-token': 'buyToken',
-    'sell-volume': 'sellVolume',
-    'start-time': 'auctionStart',
+  const sortMap: { [filter in SortField]: (a: Auction, b: Auction) => boolean } = {
+    'buy-token': (a: Auction, b: Auction) => a.buyToken > b.buyToken,
+    'sell-volume': (a: Auction, b: Auction) =>
+      getSellVolumeInEth(a, tokens).gt(getSellVolumeInEth(b, tokens)),
+    'start-time': (a: Auction, b: Auction) => a.auctionStart > b.auctionStart,
   };
 
-  const sortField = sortMap[filters.sortBy] as keyof Auction;
+  const sortFunc = sortMap[filters.sortBy] as (a: Auction, b: Auction) => boolean;
 
-  if (sortField) {
+  if (sortFunc) {
     out.sort((a: Auction, b: Auction) => {
-      const field1 = a[sortField] || 0;
-      const field2 = b[sortField] || 0;
-
-      if (field1 > field2) {
+      if (sortFunc(a, b)) {
         return filters.sortDir === 'asc' ? -1 : 1;
-      } else if (field1 < field2) {
+      } else if (sortFunc(b, a)) {
         return filters.sortDir === 'asc' ? 1 : -1;
       }
 
@@ -106,7 +106,7 @@ function filterAuctions(list: Auction[], filters: FiltersState, blockchain: Bloc
   }
 
   if (filters.onlyMyTokens) {
-    out = filterMyTokensAuctions(out, blockchain.tokens);
+    out = filterMyTokensAuctions(out, tokens);
   }
 
   if (filters.sellTokens.length > 0) {
