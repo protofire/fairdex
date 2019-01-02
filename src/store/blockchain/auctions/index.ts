@@ -1,7 +1,10 @@
 import { ActionCreator, AnyAction, Reducer } from 'redux';
 
-import { fromFraction, toBigNumber } from '../../../contracts/utils';
+import { toBigNumber } from '../../../contracts/utils';
+import { getAuctionInfo, getBuyerBalance } from '../../../contracts/utils/auctions';
 import { periodicAction } from '../../utils';
+import { getToken } from '../tokens';
+import { getCurrentAccount } from '../wallet';
 
 export * from './selectors';
 
@@ -27,15 +30,11 @@ export function loadAuctions() {
     interval: 60_000, // check for running auction every 1 minute,
 
     async task(dispatch, getState) {
-      const { blockchain } = getState();
-
       const markets = await dx.getAvailableMarkets();
-      const currentAccount = blockchain.currentAccount;
-      const buyOrders = blockchain.buyOrders;
 
       const tokensCombinations = markets.reduce<Array<[Token, Token]>>((result, market) => {
-        const t1 = blockchain.tokens.get(market[0].toLowerCase());
-        const t2 = blockchain.tokens.get(market[1].toLowerCase());
+        const t1 = getToken(getState(), market[0].toLowerCase());
+        const t2 = getToken(getState(), market[1].toLowerCase());
 
         if (t1 && t2) {
           result.push([t1, t2], [t2, t1]);
@@ -45,122 +44,82 @@ export function loadAuctions() {
       }, []);
 
       if (markets.length) {
-        const auctionList: Auction[] = [];
+        const auctions: Auction[] = [];
 
         await Promise.all(
           tokensCombinations.map(async ([sellToken, buyToken]) => {
-            let state: AuctionState = 'running';
+            let auction: Auction | undefined;
+
             let auctionIndex = await dx.getLatestAuctionIndex(sellToken, buyToken);
 
-            while (toBigNumber(auctionIndex).gte(0) && state !== 'ended') {
-              const auctionInfo = await getAuctionInfo(dx, sellToken, buyToken, auctionIndex, currentAccount);
+            do {
+              auction = await getAuctionInfo(sellToken, buyToken, auctionIndex);
 
-              state = auctionInfo.state;
+              if (auction) {
+                const currentAccount = getCurrentAccount(getState());
 
-              auctionList.push(auctionInfo);
+                auction.buyerBalance = await getBuyerBalance(
+                  sellToken,
+                  buyToken,
+                  auctionIndex,
+                  currentAccount,
+                );
 
-              auctionIndex = toBigNumber(auctionIndex)
-                .minus(1)
-                .toString(10);
-            }
+                auctions.push(auction);
+
+                auctionIndex = toBigNumber(auctionIndex)
+                  .minus(1)
+                  .toString(10);
+              }
+            } while (!auctionIndex.startsWith('-') && auction && auction.state !== 'ended');
           }),
         );
 
-        const buyOrdersAuctions = await Promise.all(
-          buyOrders.map(async order => {
-            const sellToken = blockchain.tokens.get(order.sellToken.toLowerCase());
-            const buyToken = blockchain.tokens.get(order.buyToken.toLowerCase());
-            const isOrderInList = auctionList.find(auction => {
-              return (
-                auction.sellTokenAddress === order.sellToken &&
-                auction.buyTokenAddress === order.buyToken &&
-                auction.auctionIndex === order.auctionIndex
-              );
-            });
+        // Append claimable auctions
+        const { blockchain } = getState();
 
-            if (isOrderInList) {
-              return null;
-            }
+        if (blockchain.buyOrders) {
+          await Promise.all(
+            blockchain.buyOrders.map(async order => {
+              const sellToken = getToken(getState(), order.sellToken);
+              const buyToken = getToken(getState(), order.buyToken);
+              const auctionIndex = order.auctionIndex;
 
-            return {
-              ...order,
-              sellToken,
-              buyToken,
-            };
-          }),
-        );
+              if (sellToken && buyToken && auctionIndex) {
+                const alreadyInList = auctions.find(
+                  auction =>
+                    auction.sellTokenAddress === sellToken.address &&
+                    auction.buyTokenAddress === buyToken.address &&
+                    auction.auctionIndex === auctionIndex,
+                );
 
-        const buyOrdersAuctionList = await Promise.all(
-          buyOrdersAuctions
-            .filter(a => a !== null)
-            .map(order => {
-              const { sellToken, buyToken, auctionIndex } = order;
-              return getAuctionInfo(dx, sellToken, buyToken, auctionIndex, currentAccount);
+                if (!alreadyInList) {
+                  const auction = await getAuctionInfo(sellToken, buyToken, auctionIndex);
+
+                  if (auction && auction.state === 'ended') {
+                    const currentAccount = getCurrentAccount(getState());
+
+                    auction.buyerBalance = await getBuyerBalance(
+                      sellToken,
+                      buyToken,
+                      auctionIndex,
+                      currentAccount,
+                    );
+
+                    if (auction.buyerBalance && auction.buyerBalance.gt(0)) {
+                      auctions.push(auction);
+                    }
+                  }
+                }
+              }
             }),
-        );
+          );
+        }
 
-        dispatch(
-          setAuctionList([
-            ...auctionList,
-            ...buyOrdersAuctionList.filter(({ buyerBalance }) => buyerBalance.gt(0)),
-          ]),
-        );
+        dispatch(setAuctionList(auctions));
       }
     },
   });
-}
-
-async function getAuctionInfo(dx, sellToken, buyToken, auctionIndex, currentAccount) {
-  const [auctionStart, sellVolume, buyVolume] = await Promise.all([
-    dx.getAuctionStart(sellToken, buyToken),
-    dx.getSellVolume(sellToken, buyToken),
-    dx.getBuyVolume(sellToken, buyToken),
-  ]);
-
-  const [price, closingPrice, previousClosingPrice, buyerBalance] = await Promise.all([
-    dx.getPrice(sellToken, buyToken, auctionIndex),
-    dx.getClosingPrice(sellToken, buyToken, auctionIndex),
-    dx.getPreviousClosingPrice(sellToken, buyToken, auctionIndex),
-    dx.getBuyerBalances(sellToken, buyToken, auctionIndex, currentAccount),
-  ]);
-
-  const hasAuctionStarted = auctionStart && auctionStart < Date.now();
-
-  const isClosed =
-    !sellVolume || !sellVolume.isFinite() || sellVolume.isZero()
-      ? hasAuctionStarted
-      : closingPrice && closingPrice.isFinite();
-
-  const isTheoreticalClosed =
-    price && hasAuctionStarted
-      ? toBigNumber(price.num)
-          .times(sellVolume || 0)
-          .minus(toBigNumber(price.den).times(buyVolume || 0))
-          .isZero()
-      : false;
-
-  let state = 'running';
-  if (auctionStart && auctionStart >= Date.now()) {
-    state = 'scheduled';
-  } else if (isClosed || isTheoreticalClosed) {
-    state = 'ended';
-  }
-
-  return {
-    auctionIndex,
-    sellToken: sellToken.symbol,
-    sellTokenAddress: sellToken.address,
-    sellVolume,
-    buyToken: buyToken.symbol,
-    buyTokenAddress: buyToken.address,
-    buyVolume,
-    auctionStart,
-    auctionEnd: null,
-    closingPrice: previousClosingPrice,
-    currentPrice: fromFraction(price),
-    buyerBalance,
-    state,
-  };
 }
 
 const setAuctionList: ActionCreator<AnyAction> = (auctions: Auction[]) => {

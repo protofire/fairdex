@@ -27,16 +27,6 @@ export function formatNumber(value: Decimal, options: DecimalFormat = {}): strin
   return '';
 }
 
-export function toBigNumber(value: Decimal, defaultValue = ZERO) {
-  try {
-    const num = new BigNumber(value);
-
-    return num && num.isFinite() ? num : defaultValue;
-  } catch {
-    return defaultValue;
-  }
-}
-
 export function fromDecimal(value: BigNumber, decimals: number) {
   try {
     const base = TEN.pow(decimals);
@@ -48,28 +38,24 @@ export function fromDecimal(value: BigNumber, decimals: number) {
   }
 }
 
+export function toBigNumber(value: Decimal, defaultValue = ZERO) {
+  try {
+    const num = new BigNumber(value);
+
+    return num && num.isFinite() ? num : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+}
+
 export function toDecimal(value: Decimal, decimals: number) {
   try {
     const val = toBigNumber(value, NAN);
     const base = TEN.pow(decimals);
+    const result = val.div(base);
 
-    return val.div(base);
+    return result && result.isFinite() ? result : undefined;
   } catch {
     return undefined;
   }
-}
-
-export function fromFraction(value?: Fraction) {
-  if (value) {
-    const num = toBigNumber(value.num) || ZERO;
-    const den = toBigNumber(value.den) || ZERO;
-
-    if (num.isZero()) {
-      return den.isZero() ? INF : ZERO;
-    }
-
-    return num.div(den);
-  }
-
-  return undefined;
 }

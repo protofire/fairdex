@@ -61,7 +61,7 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
 export function loadAvailableTokens() {
   return periodicAction({
     name: 'loadAvailableTokens',
-    interval: 15_000, // check for tokens every 15 seconds
+    interval: 2 * 60_000, // check for tokens every 2 minutes
 
     async task(dispatch, getState) {
       const network = getNetworkType(getState());
@@ -96,7 +96,7 @@ export function updateFeeRatio() {
         const ratio = await dx.getFeeRatio(blockchain.currentAccount);
 
         if (ratio) {
-          dispatch(setFeeRatio(ratio));
+          dispatch(setFeeRatio(ratio.value));
         }
       }
     },

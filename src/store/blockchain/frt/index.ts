@@ -65,12 +65,12 @@ function loadFrt() {
     const address = await dx.getFrtAddress();
     contract = new FeeReductionToken(address);
 
-    await contract.initInfo();
+    await contract.initialise();
 
     const {
       blockchain: { currentAccount },
     } = getState();
-    const frtInfo = await contract.initInfo(currentAccount);
+    const frtInfo = await contract.initialise(currentAccount);
 
     dispatch(initFrt(frtInfo));
   };

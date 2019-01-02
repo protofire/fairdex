@@ -1,3 +1,5 @@
+export const getCurrentAccount = (state: AppState): Address => state.blockchain.currentAccount || '';
+
 export const getNetworkType = (state: AppState): Network | null => {
   const { networkId } = state.blockchain;
 

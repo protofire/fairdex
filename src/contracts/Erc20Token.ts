@@ -13,7 +13,7 @@ class Erc20Token extends BaseContract {
 
   @timeout()
   async getBalance(account: Address) {
-    const balance = await this.instance.methods.balanceOf(account).call();
+    const balance = await this.contract.methods.balanceOf(account).call();
 
     return toDecimal(balance, this.token.decimals) || ZERO;
   }

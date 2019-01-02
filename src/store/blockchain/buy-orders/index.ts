@@ -3,28 +3,29 @@ import { ActionCreator, AnyAction, Reducer } from 'redux';
 export * from './selectors';
 
 // Actions
-const INIT_BUY_ORDER = 'INIT_BUY_ORDER';
+const INIT_BUY_ORDERS = 'INIT_BUY_ORDERS';
 const ADD_BUY_ORDER = 'ADD_BUY_ORDER';
 
-const reducer: Reducer<AuctionsState> = (state = {}, action) => {
+const reducer: Reducer<BuyOrdersState> = (state = {}, action) => {
   switch (action.type) {
-    case INIT_BUY_ORDER:
+    case INIT_BUY_ORDERS:
       return {
         ...state,
         buyOrders: [...action.payload],
       };
+
     case ADD_BUY_ORDER:
-      const { buyOrders } = state;
       const { sellToken, buyToken, auctionIndex } = action.payload;
+      const { buyOrders = [] } = state;
+
       const orderExist =
         buyOrders &&
-        buyOrders.find(order => {
-          return (
+        buyOrders.find(
+          order =>
             order.sellToken === sellToken &&
             order.buyToken === buyToken &&
-            order.auctionIndex === auctionIndex
-          );
-        });
+            order.auctionIndex === auctionIndex,
+        );
 
       const nextBuyOrder = !orderExist ? [...buyOrders, action.payload] : [...buyOrders];
 
@@ -40,7 +41,7 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
 
 export const initBuyOrder: ActionCreator<AnyAction> = (buyOrders: BuyOrder[]) => {
   return {
-    type: INIT_BUY_ORDER,
+    type: INIT_BUY_ORDERS,
     payload: buyOrders,
   };
 };

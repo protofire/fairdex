@@ -62,51 +62,53 @@ export function initWallet(wallet: Wallet) {
       // Load list of available tokens
       dispatch(loadAvailableTokens());
 
-      accountChangeHandler(dispatch, accountAddress);
+      await accountChangeHandler(dispatch, accountAddress);
 
       // Handle user account change
-      ethereum.on('accountsChanged', ([account]: Address[]) => {
+      ethereum.on('accountsChanged', async ([account]: Address[]) => {
         dispatch(changeAccount(account));
-        accountChangeHandler(dispatch, account);
+
+        await accountChangeHandler(dispatch, account);
       });
 
       // Handle network change
       ethereum.on('networkChanged', () => {
-        // Just reload page when network changed. MetaMask currently reloads pages on network change,
-        // but not immediately besides MetaMask team is planning to change this behavior soon
+        // Just reload page on network changed. MetaMask currently reloads pages but not immediately
+        // besides MetaMask team is planning to change this behavior soon
         location.reload();
       });
     }
   };
 }
 
-async function accountChangeHandler(dispatch, account) {
-  // Update fee ratio
-  dispatch(updateFeeRatio());
-
+async function accountChangeHandler(dispatch: any, account: Address) {
   const buyOrders = await dx.getBuyOrders(account);
+  const lastBuyOrderBlock = buyOrders.length ? buyOrders[buyOrders.length - 1].blockNumber + 1 : 0;
 
   dispatch(initBuyOrder(buyOrders));
 
-  const lastBuyOrderBlock = buyOrders.length ? buyOrders[buyOrders.length - 1].blockNumber + 1 : 0;
+  dx.subscribe(
+    { event: 'NewBuyOrder', fromBlock: lastBuyOrderBlock, filter: { user: account } },
+    ({ sellToken, buyToken, auctionIndex }, { blockNumber }) => {
+      dispatch(
+        addBuyOrder({
+          blockNumber,
+          sellToken: sellToken.toLowerCase(),
+          buyToken: buyToken.toLowerCase(),
+          auctionIndex,
+        }),
+      );
 
-  dx.listenEvent('NewBuyOrder', lastBuyOrderBlock, account, result => {
-    const {
-      blockNumber,
-      returnValues: { sellToken, buyToken, auctionIndex },
-    } = result;
-    dispatch(
-      addBuyOrder({
-        blockNumber,
-        sellToken: sellToken.toLowerCase(),
-        buyToken: buyToken.toLowerCase(),
-        auctionIndex,
-      }),
-    );
+      // Load auctions
+      dispatch(loadAuctions());
+    },
+  );
 
-    // Load auctions
-    dispatch(loadAuctions());
-  });
+  // Load auctions
+  dispatch(loadAuctions());
+
+  // Update fee ratio
+  dispatch(updateFeeRatio());
 
   // Update token balances
   dispatch(updateTokenBalances());

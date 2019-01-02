@@ -1,6 +1,6 @@
-import { BigNumber } from 'bignumber.js';
 import { createSelector } from 'reselect';
-import { ZERO } from '../../../contracts/utils/decimal';
+
+import { ZERO } from '../../../contracts/utils';
 import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
 
 const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
@@ -134,5 +134,5 @@ function filterMyTokensAuctions(list: Auction[], tokens = new Map<Address, Token
 }
 
 function filterClaimableAuctions(list: Auction[]) {
-  return list.filter(item => item.buyerBalance.gt(ZERO));
+  return list.filter(item => item.buyerBalance && item.buyerBalance.gt(ZERO));
 }

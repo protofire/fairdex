@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { DecimalValue, Duration } from '../../../components/formatters';
-import { getAvailableVolume, getEstimatedEndTime } from '../../../contracts/utils/auction';
+import { DecimalValue, Duration, Timestamp } from '../../../components/formatters';
+import { getAvailableVolume, getEstimatedEndTime } from '../../../contracts/utils/auctions';
 import BidForm from './BidForm';
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 const DEFAULT_DECIMALS = 3;
 
 const AuctionView = React.memo(({ data: auction }: Props) => (
-  <Card>
+  <Card id={`${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}>
     <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`}>
       <span>{auction.buyToken}</span>
       <Separator>▶</Separator>
@@ -28,12 +28,14 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               {auction.currentPrice === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} />
+                <>
+                  <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} />
+                  <small>
+                    {' '}
+                    {auction.buyToken}/{auction.sellToken}
+                  </small>
+                </>
               )}
-              <small>
-                {' '}
-                {auction.buyToken}/{auction.sellToken}
-              </small>
             </Value>
           </Row>
           <Row>
@@ -42,12 +44,14 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               {auction.closingPrice === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+                <>
+                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+                  <small>
+                    {' '}
+                    {auction.buyToken}/{auction.sellToken}
+                  </small>
+                </>
               )}
-              <small>
-                {' '}
-                {auction.buyToken}/{auction.sellToken}
-              </small>
             </Value>
           </Row>
           <Row>
@@ -56,9 +60,11 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue value={getAvailableVolume(auction)} decimals={DEFAULT_DECIMALS} />
+                <>
+                  <DecimalValue value={getAvailableVolume(auction)} decimals={DEFAULT_DECIMALS} />
+                  <small> {auction.sellToken}</small>
+                </>
               )}
-              <small> {auction.sellToken}</small>
             </Value>
           </Row>
           <Row>
@@ -76,21 +82,23 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
       </>
     )}
 
-    {auction.state === 'ended' && (
+    {auction.state === 'scheduled' && (
       <>
         <Table>
           <Row>
-            <Label>Closing price</Label>
+            <Label>{auction.auctionIndex === '0' ? 'Initial' : 'Previous'} closing price</Label>
             <Value>
               {auction.closingPrice === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+                <>
+                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+                  <small>
+                    {' '}
+                    {auction.buyToken}/{auction.sellToken}
+                  </small>
+                </>
               )}
-              <small>
-                {' '}
-                {auction.buyToken}/{auction.sellToken}
-              </small>
             </Value>
           </Row>
           <Row>
@@ -99,9 +107,72 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
               {auction.sellVolume === undefined ? (
                 <Loading />
               ) : (
-                <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
+                <>
+                  <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
+                  <small> {auction.sellToken}</small>
+                </>
               )}
-              <small> {auction.sellToken}</small>
+            </Value>
+          </Row>
+          <Row>
+            <Label>Estimated time to start</Label>
+            <Value>
+              {auction.auctionStart === undefined ? <Loading /> : <Duration to={auction.auctionStart} />}
+            </Value>
+          </Row>
+        </Table>
+      </>
+    )}
+
+    {auction.state === 'ended' && (
+      <>
+        <Table>
+          <Row>
+            <Label>{auction.auctionIndex === '0' ? 'Initial' : 'Closing'} price</Label>
+            <Value>
+              {auction.closingPrice === undefined ? (
+                <Loading />
+              ) : (
+                <>
+                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+                  <small>
+                    {' '}
+                    {auction.buyToken}/{auction.sellToken}
+                  </small>
+                </>
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label>Sell volume</Label>
+            <Value>
+              {auction.sellVolume === undefined ? (
+                <Loading />
+              ) : (
+                <>
+                  <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
+                  <small> {auction.sellToken}</small>
+                </>
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label>Buy volume</Label>
+            <Value>
+              {auction.buyVolume === undefined ? (
+                <Loading />
+              ) : (
+                <>
+                  <DecimalValue value={auction.buyVolume} decimals={DEFAULT_DECIMALS} />
+                  <small> {auction.buyToken}</small>
+                </>
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label>End time</Label>
+            <Value>
+              {auction.auctionEnd === undefined ? <Loading /> : <Timestamp value={auction.auctionEnd} />}
             </Value>
           </Row>
         </Table>

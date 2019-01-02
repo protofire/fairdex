@@ -11,6 +11,7 @@ import DecimalInput from '../../../components/DecimalInput';
 import { DecimalValue } from '../../../components/formatters';
 import Panel from '../../../components/Panel';
 import * as utils from '../../../contracts/utils';
+import { getCurrentAccount, getCurrentFeeRatio, getToken } from '../../../store/blockchain';
 import { showNotification } from '../../../store/ui/actions';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
@@ -361,9 +362,9 @@ const Step3 = styled(Container)`
 
 function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
   return {
-    currentAccount: state.blockchain.currentAccount || '',
-    buyToken: state.blockchain.tokens.get(props.auction.buyTokenAddress),
-    feeRate: state.blockchain.feeRatio || ZERO,
+    currentAccount: getCurrentAccount(state),
+    buyToken: getToken(state, props.auction.buyTokenAddress),
+    feeRate: getCurrentFeeRatio(state) || ZERO,
   };
 }
 
