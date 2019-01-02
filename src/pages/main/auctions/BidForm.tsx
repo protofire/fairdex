@@ -153,7 +153,6 @@ class BidForm extends React.PureComponent<Props, State> {
     const { auction, buyToken, feeRate } = this.props;
     const { amount: buyTokenAmount, currentStep = this.getInitialStep() } = this.state;
 
-    const fee = buyTokenAmount.times(feeRate);
     const bidTokenBalanceInContract = utils.token.getDxBalance(buyToken);
     const bidTokenBalanceInWallet = utils.token.getWalletBalance(buyToken);
     const bidTokenBalance = bidTokenBalanceInContract.plus(bidTokenBalanceInWallet);
@@ -244,7 +243,8 @@ class BidForm extends React.PureComponent<Props, State> {
                     </div>
                   </div>
                   <p>
-                    Fee: <DecimalValue value={fee} postfix={auction.buyToken} />
+                    included <abbr title='Liquidity Contribution'>LC</abbr> of{' '}
+                    <DecimalValue value={feeRate.times(100)} />%
                   </p>
                   <Button type='submit' disabled={this.state.loading || buyTokenAmount.lte(ZERO)}>
                     {this.state.loading ? 'Waiting confirmation...' : 'Confirm'}
