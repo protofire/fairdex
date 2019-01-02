@@ -6,4 +6,5 @@ interface Token {
   decimals: number;
   name: string;
   symbol: TokenSymbol;
+  priceEth?: BigNumber;
 }

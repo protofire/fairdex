@@ -36,6 +36,8 @@ export const Item = styled.div`
   justify-content: center;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   border-left: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  min-width: 0;
 
   &:nth-child(odd) {
     border-left: none;
@@ -45,6 +47,10 @@ export const Item = styled.div`
     font-size: 20px;
     font-weight: 500;
     color: #ffffff;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 100%;
   }
 
   & > *:nth-child(2) {

@@ -11,7 +11,7 @@ export * from './selectors';
 // Actions
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
 const SET_FEE_RATIO = 'SET_FEE_RATIO';
-const SET_TOKEN_BALANCES = 'SET_TOKEN_BALANCES';
+const SET_TOKEN_BALANCES_AND_PRICE = 'SET_TOKEN_BALANCES_AND_PRICE';
 
 const initialState: TokensState = {
   tokens: new Map<Address, Token>(),
@@ -39,13 +39,13 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
         feeRatio: action.payload,
       };
 
-    case SET_TOKEN_BALANCES:
+    case SET_TOKEN_BALANCES_AND_PRICE:
       return {
         ...state,
         tokens: new Map<Address, Token>(
           Array.from(state.tokens).map(
             ([_, token]): [Address, Token] => {
-              token.balance = action.payload.get(token.address);
+              [token.balance, token.priceEth] = action.payload.get(token.address);
 
               return [token.address, token];
             },
@@ -75,7 +75,7 @@ export function loadAvailableTokens() {
         dispatch(loadAuctions());
 
         // Load token balances
-        dispatch(updateTokenBalances());
+        dispatch(updateTokenBalancesAndPrice());
       } catch (err) {
         // TODO: Handle error
       }
@@ -103,7 +103,7 @@ export function updateFeeRatio() {
   });
 }
 
-export function updateTokenBalances() {
+export function updateTokenBalancesAndPrice() {
   return async (dispatch: any, getState: () => AppState) => {
     const { blockchain } = getState();
 
@@ -115,12 +115,13 @@ export function updateTokenBalances() {
         Array.from(tokens).map(async ([_, token]) => {
           const tokenContract = getTokenContract(token);
 
-          const [contractBalance, walletBalance] = await Promise.all([
+          const [contractBalance, walletBalance, priceEth] = await Promise.all([
             dx.getBalance(token, accountAddress),
             tokenContract.getBalance(accountAddress),
+            dx.getPriceOfTokenInLastAuction(token),
           ]);
 
-          return [token.address, [contractBalance, walletBalance]];
+          return [token.address, [[contractBalance, walletBalance], priceEth]];
         }),
       );
 
@@ -143,9 +144,11 @@ const setFeeRatio: ActionCreator<AnyAction> = (ratio: BigNumber) => {
   };
 };
 
-const setTokenBalances: ActionCreator<Action> = (balances: Array<[Address, [Decimal, Decimal]]>) => {
+const setTokenBalances: ActionCreator<Action> = (
+  balances: Array<[Address, [[Decimal, Decimal], BigNumber]]>,
+) => {
   return {
-    type: SET_TOKEN_BALANCES,
+    type: SET_TOKEN_BALANCES_AND_PRICE,
     payload: new Map(balances),
   };
 };

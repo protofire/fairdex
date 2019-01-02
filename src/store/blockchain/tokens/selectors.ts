@@ -8,9 +8,12 @@ export const getToken = (state: AppState, address: Address) => state.blockchain.
 
 export const getAllTokens = (state: AppState) => state.blockchain.tokens || new Map();
 
-export const getFeePercentage = (state: AppState) => {
-  return state.blockchain.feeRatio ? state.blockchain.feeRatio.times(100) : ZERO;
-};
+export const getCurrentFeeRatio = (state: AppState) => state.blockchain.feeRatio && state.blockchain.feeRatio;
+
+export const getFeePercentage = createSelector(
+  getCurrentFeeRatio,
+  (feeRatio: BigNumber) => (tate.blockchain.feeRatio ? state.blockchain.feeRatio.times(100) : ZERO),
+);
 
 export const getTokensWithBalance = createSelector(
   getAllTokens,
@@ -28,4 +31,22 @@ export const getTokensWithBalance = createSelector(
   },
 );
 
-export const getCurrentFeeRatio = (state: AppState) => state.blockchain.feeRatio && state.blockchain.feeRatio;
+export const getTopBalances = createSelector(
+  getAllTokens,
+  (tokens: Token[]) => {
+    const topBalances = Array.from(tokens)
+      .map(
+        ([_, token]): [Address, Token] => ({
+          ...token,
+          totalBalance: getTotalBalance(token),
+        }),
+      )
+      .sort((a, b) => {
+        const aEthBalance = a.totalBalance.times(a.priceEth);
+        const bEthBalance = b.totalBalance.times(b.priceEth);
+        return bEthBalance.minus(aEthBalance);
+      });
+
+    return topBalances;
+  },
+);

@@ -177,6 +177,13 @@ class DutchExchange extends BaseContract<Event> {
 
     return frtAddress;
   }
+
+  @timeout()
+  async getPriceOfTokenInLastAuction(token: Token) {
+    const price = await this.instance.methods.getPriceOfTokenInLastAuction(token.address).call();
+
+    return fromFraction(price);
+  }
 }
 
 export default DutchExchange;

@@ -4,17 +4,22 @@ import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 import Card from '../../../components/Card';
+import { DecimalValue } from '../../../components/formatters';
 import arrowImage from '../../../images/arrow.svg';
-import { getTokensWithBalance } from '../../../store/blockchain';
+import { getTokensWithBalance, getTopBalances } from '../../../store/blockchain';
 import WalletCard, { Content, Header, Item } from './wallet-card';
+import { getTotalBalance } from '../../contracts/utils/tokens';
 
 interface StateProps {
   tokens: Token[];
+  topBalances: Token[];
 }
 
 type WalletProps = StateProps & RouteComponentProps;
 
-const Account = ({ tokens }): WalletProps => {
+const DEFAULT_DECIMALS = 3;
+
+const Account = ({ tokens, topBalances }): WalletProps => {
   return (
     <Container>
       <WalletHeader>
@@ -23,20 +28,20 @@ const Account = ({ tokens }): WalletProps => {
       </WalletHeader>
       <Content>
         <Item>
-          <div>1</div>
-          <div>ETH</div>
+          <DecimalValue value={topBalances[0].totalBalance} decimals={DEFAULT_DECIMALS} />
+          <div>{topBalances[0].symbol}</div>
         </Item>
         <Item>
-          <div>1</div>
-          <div>ETH</div>
+          <DecimalValue value={topBalances[1].totalBalance} decimals={DEFAULT_DECIMALS} />
+          <div>{topBalances[1].symbol}</div>
         </Item>
         <Item>
-          <div>1</div>
-          <div>ETH</div>
+          <DecimalValue value={topBalances[2].totalBalance} decimals={DEFAULT_DECIMALS} />
+          <div>{topBalances[2].symbol}</div>
         </Item>
         <Item>
-          <div>1</div>
-          <div>ETH</div>
+          <DecimalValue value={topBalances[3].totalBalance} decimals={DEFAULT_DECIMALS} />
+          <div>{topBalances[3].symbol}</div>
         </Item>
       </Content>
     </Container>
@@ -72,9 +77,11 @@ const WalletHeader = styled(Header)`
 
 function mapStateToProps(state: AppState): WalletProps {
   const tokens = getTokensWithBalance(state);
+  const topBalances = getTopBalances(state);
 
   return {
     tokens,
+    topBalances,
   };
 }
 
