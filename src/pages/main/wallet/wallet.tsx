@@ -24,7 +24,7 @@ const Account = ({ tokens, topBalances }): WalletProps => {
     <Container>
       <WalletHeader>
         <div>Wallet</div>
-        <ViewAllCurrencies to='/running'>VIEW ALL {tokens.length} CURRENCIES &#x279C;</ViewAllCurrencies>
+        <ViewAllTokens to='/running'>VIEW ALL {tokens.length} TOKENS &#x279C;</ViewAllTokens>
       </WalletHeader>
       <Content>
         <Item>
@@ -53,7 +53,7 @@ const Container = styled(WalletCard)`
   background-image: linear-gradient(49deg, #e5c234, #ffd8be);
 `;
 
-const ViewAllCurrencies = styled(NavLink)``;
+const ViewAllTokens = styled(NavLink)``;
 
 const WalletHeader = styled(Header)`
   height: 79px;
@@ -67,7 +67,7 @@ const WalletHeader = styled(Header)`
     color: var(--color-text-primary);
   }
 
-  & > ${ViewAllCurrencies} {
+  & > ${ViewAllTokens} {
     font-size: 10px;
     font-weight: bold;
     letter-spacing: -0.3px;
