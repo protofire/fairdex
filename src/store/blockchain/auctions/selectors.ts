@@ -1,9 +1,9 @@
 import { createSelector } from 'reselect';
 
-import { getAllTokens } from '../tokens';
 import { ZERO } from '../../../contracts/utils';
-import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
 import { getSellVolumeInEth } from '../../../contracts/utils/auctions';
+import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
+import { getAllTokens } from '../tokens';
 
 const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
 
