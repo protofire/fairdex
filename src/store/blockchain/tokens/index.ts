@@ -121,7 +121,7 @@ export function updateTokenBalancesAndPrice() {
             dx.getPriceOfTokenInLastAuction(token),
           ]);
 
-          return [token.address, [[contractBalance, walletBalance], priceEth]];
+          return [token.address, [[contractBalance, walletBalance], priceEth.value]];
         }),
       );
 

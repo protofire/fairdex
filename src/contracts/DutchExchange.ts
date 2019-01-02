@@ -180,9 +180,9 @@ class DutchExchange extends BaseContract<Event> {
 
   @timeout()
   async getPriceOfTokenInLastAuction(token: Token) {
-    const price = await this.instance.methods.getPriceOfTokenInLastAuction(token.address).call();
+    const price = await this.contract.methods.getPriceOfTokenInLastAuction(token.address).call();
 
-    return fromFraction(price);
+    return toFractional(price);
   }
 }
 

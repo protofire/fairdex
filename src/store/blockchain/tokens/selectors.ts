@@ -12,7 +12,7 @@ export const getCurrentFeeRatio = (state: AppState) => state.blockchain.feeRatio
 
 export const getFeePercentage = createSelector(
   getCurrentFeeRatio,
-  (feeRatio: BigNumber) => (tate.blockchain.feeRatio ? state.blockchain.feeRatio.times(100) : ZERO),
+  (feeRatio: BigNumber) => (feeRatio ? feeRatio.times(100) : ZERO),
 );
 
 export const getTokensWithBalance = createSelector(
