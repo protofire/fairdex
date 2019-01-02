@@ -7,8 +7,8 @@ import Card from '../../../components/Card';
 import { DecimalValue } from '../../../components/formatters';
 import arrowImage from '../../../images/arrow.svg';
 import { getTokensWithBalance, getTopBalances } from '../../../store/blockchain';
-import WalletCard, { Content, Header, Item } from './wallet-card';
 import { getTotalBalance } from '../../contracts/utils/tokens';
+import WalletCard, { Content, Header, Item } from './wallet-card';
 
 interface StateProps {
   tokens: Token[];
