@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { DecimalValue } from '../../../components/formatters';
 import Toggle from '../../../components/Toggle';
 import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contracts/utils/tokens';
+import TokenForm from './TokenForm';
 
 interface Props {
   data: Token;
@@ -61,10 +62,13 @@ class TokenView extends React.PureComponent<Props> {
             </Value>
           </Row>
           <Row>
-            <Label>Enable for trading</Label>
-            <Toggle onChange={this.enableForTradingHandler} isOn={enableForTrading} />
+            <Label className={'no-dots'}>Enable for trading</Label>
+            <dd>
+              <TradingToggle onChange={this.enableForTradingHandler} isOn={enableForTrading} />
+            </dd>
           </Row>
         </Table>
+        <TokenForm token={token} />
       </Card>
     );
   }
@@ -89,6 +93,10 @@ const Label = styled.dt`
     content: '${'.'.repeat(200)}';
     color: var(--color-grey);
     margin-left: var(--spacing-text);
+  }
+
+  &.no-dots:after {
+    content: ' ';
   }
 `;
 
@@ -118,6 +126,10 @@ const Row = styled.div`
   ${Label}, ${Value} {
     line-height: 1.5rem;
   }
+`;
+
+const TradingToggle = styled(Toggle)`
+  margin-top: 4px;
 `;
 
 const Table = styled.dl`
