@@ -57,10 +57,6 @@ class BidForm extends React.PureComponent<Props, State> {
     }
   };
 
-  handleClickOutside = () => {
-    this.handleClose();
-  };
-
   handleInputFocus: React.FocusEventHandler<HTMLInputElement> = event => {
     event.target.select();
   };
@@ -171,7 +167,7 @@ class BidForm extends React.PureComponent<Props, State> {
 
     return (
       <Popup.Container>
-        <Panel onClickOutside={this.handleClickOutside}>
+        <Panel onClickOutside={this.handleClose} onEscPress={this.handleClose}>
           {this.state.showDialog && (
             <Popup.Dialog
               title={currentStep === 3 ? 'Your bid' : undefined}

@@ -3,24 +3,37 @@ import styled from 'styled-components';
 
 interface Props {
   onClickOutside?: () => void;
+  onEscPress?: () => void;
 }
 
 class Panel extends React.PureComponent<Props> {
   private node = React.createRef<HTMLDivElement>();
 
   componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyPress, false);
     document.addEventListener('mousedown', this.handleClick, false);
   }
 
   componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress, false);
     document.removeEventListener('mousedown', this.handleClick, false);
   }
 
   handleClick = (event: MouseEvent) => {
-    if (typeof this.props.onClickOutside === 'function' && this.node.current) {
+    const { onClickOutside } = this.props;
+
+    if (typeof onClickOutside === 'function' && this.node.current) {
       if (!this.node.current.contains(event.target as Node)) {
-        this.props.onClickOutside();
+        onClickOutside();
       }
+    }
+  };
+
+  handleKeyPress = (event: KeyboardEvent) => {
+    const { onEscPress } = this.props;
+
+    if (typeof onEscPress === 'function' && event.key === 'Escape') {
+      onEscPress();
     }
   };
 
