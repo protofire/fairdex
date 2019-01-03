@@ -73,6 +73,7 @@ class TokenForm extends React.PureComponent<Props, State> {
     const { amount } = this.state;
 
     const tokenBalanceInWallet = utils.token.getWalletBalance(token);
+    const tokenBalanceInDx = utils.token.getDxBalance(token);
 
     return (
       <Tooltip.Container>
@@ -108,10 +109,14 @@ class TokenForm extends React.PureComponent<Props, State> {
             {this.state.showDialog ? (
               <CancelButton onClick={this.handleClose}>Cancel</CancelButton>
             ) : (
-              <DepositButton onClick={this.showDialog}>Deposit</DepositButton>
+              <DepositButton disabled={tokenBalanceInWallet.lte(ZERO)} onClick={this.showDialog}>
+                Deposit
+              </DepositButton>
             )}
 
-            <WithdrawButton onClick={this.showDialog}>Withdraw</WithdrawButton>
+            <WithdrawButton disabled={tokenBalanceInDx.lte(ZERO)} onClick={this.showDialog}>
+              Withdraw
+            </WithdrawButton>
           </Actions>
         </Panel>
       </Tooltip.Container>
