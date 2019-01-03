@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '../../../components/Button';
-import Tooltip from '../../../components/Tooltip';
+import Popup from '../../../components/Popup';
 
 import DecimalInput from '../../../components/DecimalInput';
 import { DecimalValue } from '../../../components/formatters';
@@ -170,10 +170,10 @@ class BidForm extends React.PureComponent<Props, State> {
     );
 
     return (
-      <Tooltip.Container>
+      <Popup.Container>
         <Panel onClickOutside={this.handleClickOutside}>
           {this.state.showDialog && (
-            <Tooltip.Dialog
+            <Popup.Dialog
               title={currentStep === 3 ? 'Your bid' : undefined}
               onBack={currentStep === 3 ? this.showAmountForm : undefined}
               theme={currentStep === 1 ? 'accent' : null}
@@ -253,7 +253,7 @@ class BidForm extends React.PureComponent<Props, State> {
                   </Button>
                 </Step3>
               )}
-            </Tooltip.Dialog>
+            </Popup.Dialog>
           )}
 
           {this.state.showDialog ? (
@@ -262,7 +262,7 @@ class BidForm extends React.PureComponent<Props, State> {
             <BidButton onClick={this.showDialog}>Bid</BidButton>
           )}
         </Panel>
-      </Tooltip.Container>
+      </Popup.Container>
     );
   }
 }

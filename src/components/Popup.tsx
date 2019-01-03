@@ -12,7 +12,7 @@ interface DialogProps {
 }
 
 const Dialog = ({ children, onBack, title, ...props }: DialogProps) => (
-  <Tooltip {...props}>
+  <Popup {...props}>
     {title && (
       <Title>
         <BackButton onClick={onBack} />
@@ -20,10 +20,10 @@ const Dialog = ({ children, onBack, title, ...props }: DialogProps) => (
       </Title>
     )}
     <Content>{children}</Content>
-  </Tooltip>
+  </Popup>
 );
 
-const Tooltip = styled.div`
+const Popup = styled.div`
   position: absolute;
   font-size: 0.875rem;
   line-height: 1rem;
@@ -67,11 +67,10 @@ const BackButton = styled(Icon.Back)`
 const Container = styled.div`
   position: relative;
 
-  ${Tooltip} {
+  ${Popup} {
     position: absolute;
     bottom: calc(100% + 15px);
-    width: calc(100% + 2 * var(--spacing-normal));
-    left: calc(var(--spacing-normal) * -1);
+    width: 100%;
   }
 `;
 
