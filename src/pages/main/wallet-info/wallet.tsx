@@ -21,7 +21,7 @@ const Account = ({ tokens, topBalances }: WalletProps) => {
     <Container>
       <WalletHeader>
         <div>Wallet</div>
-        <ViewAllTokens to='/running'>VIEW ALL {tokens.length} TOKENS &#x279C;</ViewAllTokens>
+        <ViewAllTokens to='/wallet'>VIEW ALL {tokens.length} TOKENS &#x279C;</ViewAllTokens>
       </WalletHeader>
       <Content>
         <Item>
