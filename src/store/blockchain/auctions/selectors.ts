@@ -50,6 +50,11 @@ export const getFilteredClaimableAuctions = createSelector(
   filterClaimableAuctions,
 );
 
+export const getClaimableAuctionsCount = createSelector(
+  getFilteredClaimableAuctions,
+  auctions => auctions.length || 0,
+);
+
 function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
   const output = list.reduce<Record<string, TokenInfo>>((tokenMap, value) => {
     const id = value[type];

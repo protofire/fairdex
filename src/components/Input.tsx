@@ -1,23 +1,33 @@
 import React from 'react';
 import styled from 'styled-components';
 
-type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  left?: React.ReactNode;
+  right?: React.ReactNode;
+}
 
-const Input = (props: InputProps) => (
-  <Wrapper>
+const Input = ({ left, right, ...props }: InputProps) => (
+  <Wrapper {...props}>
+    {left && <Left>{left}</Left>}
     <Control {...props} />
+    {right && <Right>{right}</Right>}
   </Wrapper>
 );
 
 const Wrapper = styled.div`
+  display: inline-flex;
   height: var(--input-height);
-  background-color: var(--color-content-bg);
+  background: var(--color-content-bg);
   border-radius: 4px;
   padding: 12px 10px;
   overflow: hidden;
 
   &:focus {
     background-color: #eaeff3;
+  }
+
+  input {
+    flex: 1;
   }
 `;
 
@@ -32,8 +42,15 @@ const Control = styled.input`
 
   &:read-only {
     color: var(--color-text-secondary);
-    opacity: 0.5;
   }
+`;
+
+const Left = styled.span`
+  margin-right: var(--spacing-text);
+`;
+
+const Right = styled.span`
+  margin-left: var(--spacing-text);
 `;
 
 export default Input;

@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import { ellipsis } from 'polished';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -7,11 +6,13 @@ import styled from 'styled-components';
 import Button from '../../../components/Button';
 import Popup from '../../../components/Popup';
 
+import { Link } from 'react-router-dom';
 import DecimalInput from '../../../components/DecimalInput';
 import { DecimalValue } from '../../../components/formatters';
 import Panel from '../../../components/Panel';
+import Tooltip from '../../../components/Tooltip';
 import * as utils from '../../../contracts/utils';
-import { getCurrentAccount, getCurrentFeeRatio, getToken } from '../../../store/blockchain';
+import { getCurrentAccount, getLiqContribPercentage, getToken } from '../../../store/blockchain';
 import { showNotification } from '../../../store/ui/actions';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
@@ -22,8 +23,7 @@ interface OwnProps {
 
 interface AppStateProps {
   currentAccount: Address;
-  buyToken?: Token;
-  sellToken?: Token;
+  buyToken: Token;
   feeRate: BigNumber;
 }
 
@@ -147,23 +147,23 @@ class BidForm extends React.PureComponent<Props, State> {
 
   render() {
     const { auction, buyToken, feeRate } = this.props;
-    const { amount: buyTokenAmount, currentStep = this.getInitialStep() } = this.state;
 
-    const bidTokenBalanceInContract = utils.token.getDxBalance(buyToken);
-    const bidTokenBalanceInWallet = utils.token.getWalletBalance(buyToken);
-    const bidTokenBalance = bidTokenBalanceInContract.plus(bidTokenBalanceInWallet);
+    if (auction.state !== 'running') {
+      return null;
+    }
 
-    const sellTokenAmount =
-      auction.currentPrice && !auction.currentPrice.isZero()
-        ? buyTokenAmount.div(auction.currentPrice)
-        : ZERO;
+    const { amount: bidAmount, currentStep = this.getInitialStep() } = this.state;
+    const currentPrice = auction.currentPrice || ZERO;
+    const sellTokenAmount = currentPrice.isZero() ? ZERO : bidAmount.div(currentPrice);
+    const availableSellVolume = utils.auction.getAvailableVolume(auction);
+    const availableBidVolume = availableSellVolume.times(auction.currentPrice || ZERO);
 
-    const maxSellTokenAmount = utils.auction.getAvailableVolume(auction);
+    const bidTokenBalance = utils.token.getDxBalance(buyToken);
 
-    const maxBidTokenAmount = BigNumber.minimum(
-      BigNumber.maximum(bidTokenBalance, ZERO),
-      maxSellTokenAmount.times(auction.currentPrice || ZERO),
-    );
+    const setMaxVolume = (event: any) => {
+      event.preventDefault();
+      this.setState({ amount: availableBidVolume.decimalPlaces(4, 1) });
+    };
 
     return (
       <Popup.Container>
@@ -177,45 +177,56 @@ class BidForm extends React.PureComponent<Props, State> {
               {currentStep === 1 && (
                 <Step1 onSubmit={this.showAmountForm}>
                   <p>
-                    You are bidding above the previous closing price for {auction.sellToken}/
+                    You are bidding above the previous <br /> closing price for {auction.sellToken}/
                     {auction.buyToken}
                   </p>
                   <Text>
                     <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
                   </Text>
-                  <Button type='submit'>Proceed</Button>
+                  <Button type='submit' autoFocus>
+                    Proceed
+                  </Button>
                 </Step1>
               )}
 
               {currentStep === 2 && (
                 <Step2 onSubmit={this.showConfirmation}>
-                  <div>
-                    <h4>Sell</h4>
-                    <p>
-                      {auction.buyToken} (max <DecimalValue value={maxBidTokenAmount} decimals={12} />)
-                    </p>
-                    <DecimalInput
-                      value={buyTokenAmount.toString(10)}
-                      onValueChange={this.handleAmountChange}
-                      onFocus={this.handleInputFocus}
-                      autoFocus={true}
-                    />
-                  </div>
-                  <div>
-                    <h4>Buy</h4>
-                    <p>
-                      {auction.sellToken} (max <DecimalValue value={maxSellTokenAmount} decimals={12} />)
-                    </p>
-                    <DecimalInput value={sellTokenAmount.toString(10)} readOnly={true} />
-                  </div>
+                  <Field>
+                    <label>Bid volume</label>
+                    <Tooltip
+                      content={
+                        bidAmount.gt(availableBidVolume) && (
+                          <p>
+                            You will close this auction with <br />
+                            <DecimalValue value={availableBidVolume} decimals={4} postfix={buyToken.symbol} />
+                            <br />
+                            <a href='' onClick={setMaxVolume}>
+                              [set max]
+                            </a>
+                          </p>
+                        )
+                      }
+                    >
+                      <DecimalInput
+                        value={bidAmount.toString(10)}
+                        right={auction.buyToken}
+                        onValueChange={this.handleAmountChange}
+                        onFocus={this.handleInputFocus}
+                        autoFocus={true}
+                      />
+                    </Tooltip>
+                  </Field>
+
+                  <Field>
+                    <label>To buy at least:</label>
+                    <TextBox align='right'>
+                      <DecimalValue value={sellTokenAmount} decimals={4} postfix={auction.sellToken} />
+                    </TextBox>
+                  </Field>
+
                   <Button
                     type='submit'
-                    disabled={
-                      !auction.currentPrice ||
-                      auction.currentPrice.lte(ZERO) ||
-                      buyTokenAmount.lte(ZERO) ||
-                      buyTokenAmount.gt(maxBidTokenAmount)
-                    }
+                    disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
                   >
                     Next
                   </Button>
@@ -226,25 +237,39 @@ class BidForm extends React.PureComponent<Props, State> {
                 <Step3 onSubmit={this.handleSubmit}>
                   <div>
                     <div>
+                      <small>&nbsp;</small>
                       <h4>
-                        <DecimalValue value={buyTokenAmount} decimals={2} />
+                        <DecimalValue value={bidAmount} decimals={2} />
                       </h4>
                       <span>{auction.buyToken}</span>
                     </div>
+                    <Separator>▶</Separator>
                     <div>
+                      <small>min getting</small>
                       <h4>
                         <DecimalValue value={sellTokenAmount} decimals={2} />
                       </h4>
-                      <span>
-                        <small>min getting of</small> <br /> {auction.sellToken}
-                      </span>
+                      <span>{auction.sellToken}</span>
                     </div>
                   </div>
-                  <p>
-                    included <abbr title='Liquidity Contribution'>LC</abbr> of{' '}
-                    <DecimalValue value={feeRate.times(100)} />%
-                  </p>
-                  <Button type='submit' disabled={this.state.loading || buyTokenAmount.lte(ZERO)}>
+
+                  {bidTokenBalance.lt(bidAmount) ? (
+                    <p>
+                      You don't have enough {buyToken.symbol} available.{' '}
+                      <Link to='/wallet'>Deposit more</Link>
+                    </p>
+                  ) : (
+                    <p>
+                      liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' />)
+                      included
+                    </p>
+                  )}
+
+                  <Button
+                    type='submit'
+                    disabled={this.state.loading || bidAmount.lte(ZERO) || bidTokenBalance.lt(bidAmount)}
+                    autoFocus
+                  >
                     {this.state.loading ? 'Waiting confirmation...' : 'Confirm'}
                   </Button>
                 </Step3>
@@ -271,16 +296,6 @@ const CancelButton = styled(Button).attrs({ mode: 'dark' })`
   margin-top: var(--spacing-normal);
 `;
 
-const Text = styled.h4`
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-align: center;
-  line-height: 1.25;
-  letter-spacing: -0.6px;
-  color: var(--color-text-primary);
-  margin: var(--spacing-normal) 0;
-`;
-
 const Container = styled.form`
   width: 100%;
   display: inline-grid;
@@ -299,9 +314,8 @@ const Container = styled.form`
 
   p {
     margin: 0;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     letter-spacing: -0.3px;
-    color: var(--color-text-secondary);
   }
 
   div {
@@ -325,25 +339,61 @@ const Step1 = styled(Container)`
   }
 `;
 
+const Text = styled.h4`
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.25;
+  letter-spacing: -0.6px;
+  color: var(--color-text-primary);
+  margin: var(--spacing-normal) 0;
+`;
+
 const Step2 = styled(Container)`
-  p {
-    padding: 0 0 var(--spacing-text) 0;
+  display: grid;
+  align-items: baseline;
+  justify-items: left;
+
+  & > p {
+    width: 100%;
+    line-height: var(--spacing-narrow);
+    text-align: center;
+    color: var(--color-text-secondary);
+
+    a {
+      color: var(--color-text-orange);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
+
+  input {
+    text-align: right;
+  }
+`;
+
+const Field = styled.div`
+  display: block;
+  min-height: var(--input-height);
+`;
+
+const TextBox = styled.div`
+  display: inline-flex;
+  ${ellipsis('100%')};
+  height: var(--input-height);
+  padding: 12px 10px;
+  text-align: ${(props: { align?: 'left' | 'right' }) => props.align};
+  overflow: hidden;
 `;
 
 const Step3 = styled(Container)`
   & > div {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin: var(--spacing-narrow) 0;
-
-    &:first-child:after {
-      content: '▶';
-      position: absolute;
-      top: 45%;
-      right: 47.5%;
-      color: var(--color-grey);
-    }
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin: var(--spacing-text) 0 var(--spacing-narrow);
 
     div {
       text-align: center;
@@ -354,15 +404,28 @@ const Step3 = styled(Container)`
         letter-spacing: -0.6px;
         text-align: center;
       }
+
+      small {
+        color: var(--color-text-secondary);
+      }
     }
   }
+
+  & > p {
+    text-align: center;
+  }
+`;
+
+const Separator = styled.span`
+  color: var(--color-grey);
+  margin: 0 var(--spacing-text);
 `;
 
 function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
   return {
+    buyToken: getToken(state, props.auction.buyTokenAddress) as Token,
     currentAccount: getCurrentAccount(state),
-    buyToken: getToken(state, props.auction.buyTokenAddress),
-    feeRate: getCurrentFeeRatio(state) || ZERO,
+    feeRate: getLiqContribPercentage(state),
   };
 }
 

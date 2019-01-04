@@ -1,9 +1,9 @@
 import React from 'react';
 
 import { toBigNumber } from '../contracts/utils';
-import Input from './Input';
+import Input, { InputProps } from './Input';
 
-interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+interface Props extends InputProps {
   onValueChange?: (value: BigNumber) => void;
 }
 

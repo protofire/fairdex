@@ -39,6 +39,10 @@ const variables = css`
 
 const GlobalStyles = createGlobalStyle`
   ${variables}
+  
+  #root {
+    background-color: var(--color-content-bg);
+  }
 
   html {
     box-sizing: border-box;
@@ -67,9 +71,12 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
     font-size: 1rem;
   }
-
-  #root {
-    background-color: var(--color-content-bg);
+  
+  label {
+    font-weight: bold;
+    line-height: 1.75;
+    letter-spacing: -0.4px;
+    color: var(--color-text-primary);
   }
 `;
 
