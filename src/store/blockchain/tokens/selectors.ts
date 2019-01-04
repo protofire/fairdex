@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { ZERO } from '../../../contracts/utils';
-import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contracts/utils/tokens';
+import { getTotalBalance } from '../../../contracts/utils/tokens';
 import { getFrt } from '../frt';
 
 export const getToken = (state: AppState, address: Address) => state.blockchain.tokens.get(address);
@@ -19,10 +19,10 @@ export const getLiqContribPercentage = createSelector(
 export const getTokensWithBalance = createSelector(
   getAllTokens,
   getFrt,
-  (tokens: Token[], frt: Token) => {
-    const tokensWithBalance = Array.from(tokens).filter(
-      ([_, token]): [Address, Token] => getDxBalance(token).gt(0) || getWalletBalance(token).gt(0),
-    );
+  (tokens, frt) => {
+    const tokensWithBalance = Array.from(tokens)
+      .map(([_, token]: [Address, Token]) => token)
+      .filter((token: Token) => getTotalBalance(token).gt(0));
 
     if (frt && getTotalBalance(frt).gt(0)) {
       tokensWithBalance.push(frt);
@@ -34,20 +34,19 @@ export const getTokensWithBalance = createSelector(
 
 export const getTopBalances = createSelector(
   getAllTokens,
-  (tokens: Token[]) => {
-    const topBalances = Array.from(tokens)
+  tokens => {
+    return Array.from(tokens)
       .map(
-        ([_, token]): [Address, Token] => ({
+        ([_, token]: [Address, Token]): TokenWithBalance => ({
           ...token,
           totalBalance: getTotalBalance(token),
         }),
       )
       .sort((a, b) => {
-        const aEthBalance = a.totalBalance.times(a.priceEth);
-        const bEthBalance = b.totalBalance.times(b.priceEth);
-        return bEthBalance.minus(aEthBalance);
-      });
+        const aEthBalance = a.totalBalance.times(a.priceEth || ZERO);
+        const bEthBalance = b.totalBalance.times(b.priceEth || ZERO);
 
-    return topBalances;
+        return bEthBalance.minus(aEthBalance).toNumber();
+      });
   },
 );

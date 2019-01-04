@@ -9,7 +9,7 @@ import WalletCard, { Content, Header, Item } from './wallet-card';
 
 interface StateProps {
   tokens: Token[];
-  topBalances: Token[];
+  topBalances: TokenWithBalance[];
 }
 
 type WalletProps = StateProps & RouteComponentProps;
@@ -72,13 +72,10 @@ const WalletHeader = styled(Header)`
   }
 `;
 
-function mapStateToProps(state: AppState): WalletProps {
-  const tokens = getTokensWithBalance(state);
-  const topBalances = getTopBalances(state);
-
+function mapStateToProps(state: AppState): StateProps {
   return {
-    tokens,
-    topBalances,
+    tokens: getTokensWithBalance(state),
+    topBalances: getTopBalances(state),
   };
 }
 

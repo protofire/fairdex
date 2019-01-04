@@ -8,3 +8,7 @@ interface Token {
   symbol: TokenSymbol;
   priceEth?: BigNumber;
 }
+
+interface TokenWithBalance extends Token {
+  totalBalance: BigNumber;
+}
