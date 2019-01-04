@@ -33,7 +33,7 @@ interface DispatchProps {
 
 interface State {
   amount: BigNumber;
-  currentStep?: 1 | 2 | 3;
+  currentStep?: number;
   loading?: boolean;
   showDialog?: boolean;
 }
@@ -49,6 +49,14 @@ class BidForm extends React.PureComponent<Props, State> {
 
   handleAmountChange = (amount: BigNumber) => {
     this.setState({ amount });
+  };
+
+  handleBack = () => {
+    this.setState(() => {
+      const previousStep = Math.max(1, (this.state.currentStep || 0) - 1);
+
+      return { currentStep: previousStep };
+    });
   };
 
   handleClose = () => {
@@ -167,7 +175,11 @@ class BidForm extends React.PureComponent<Props, State> {
 
     return (
       <Popup.Container>
-        <Panel onClickOutside={this.handleClose} onEscPress={this.handleClose}>
+        <Panel
+          onClickOutside={this.handleClose}
+          onEscPress={this.handleClose}
+          onBackspacePress={this.handleBack}
+        >
           {this.state.showDialog && (
             <Popup.Dialog
               title={currentStep === 3 ? 'Your bid' : undefined}

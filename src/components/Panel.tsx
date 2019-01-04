@@ -2,38 +2,49 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface Props {
-  onClickOutside?: () => void;
-  onEscPress?: () => void;
+  onClickOutside?: () => void | null;
+  onBackspacePress?: () => void | null;
+  onEscPress?: () => void | null;
 }
 
 class Panel extends React.PureComponent<Props> {
   private node = React.createRef<HTMLDivElement>();
 
   componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyPress, false);
-    document.addEventListener('mousedown', this.handleClick, false);
+    if (this.props.onBackspacePress || this.props.onEscPress) {
+      document.addEventListener('keydown', this.handleKeyPress, false);
+    }
+
+    if (this.props.onClickOutside) {
+      document.addEventListener('mousedown', this.handleClick, false);
+    }
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleKeyPress, false);
-    document.removeEventListener('mousedown', this.handleClick, false);
+    if (this.props.onEscPress) {
+      document.removeEventListener('keydown', this.handleKeyPress, false);
+    }
+
+    if (this.props.onClickOutside) {
+      document.removeEventListener('mousedown', this.handleClick, false);
+    }
   }
 
   handleClick = (event: MouseEvent) => {
-    const { onClickOutside } = this.props;
-
-    if (typeof onClickOutside === 'function' && this.node.current) {
+    if (this.props.onClickOutside && this.node.current) {
       if (!this.node.current.contains(event.target as Node)) {
-        onClickOutside();
+        this.props.onClickOutside();
       }
     }
   };
 
   handleKeyPress = (event: KeyboardEvent) => {
-    const { onEscPress } = this.props;
+    if (this.props.onBackspacePress && event.key === 'Backspace') {
+      this.props.onBackspacePress();
+    }
 
-    if (typeof onEscPress === 'function' && event.key === 'Escape') {
-      onEscPress();
+    if (this.props.onEscPress && event.key === 'Escape') {
+      this.props.onEscPress();
     }
   };
 
