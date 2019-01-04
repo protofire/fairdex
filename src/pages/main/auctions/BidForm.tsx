@@ -33,7 +33,7 @@ interface DispatchProps {
 
 interface State {
   amount: BigNumber;
-  currentStep?: number;
+  currentStep?: 1 | 2 | 3;
   loading?: boolean;
   showDialog?: boolean;
 }
@@ -52,11 +52,9 @@ class BidForm extends React.PureComponent<Props, State> {
   };
 
   handleBack = () => {
-    this.setState(() => {
-      const previousStep = Math.max(1, (this.state.currentStep || 0) - 1);
-
-      return { currentStep: previousStep };
-    });
+    if (this.state.currentStep === 3) {
+      this.setState({ currentStep: 2 });
+    }
   };
 
   handleClose = () => {
