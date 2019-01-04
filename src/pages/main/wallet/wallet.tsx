@@ -1,13 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import Card from '../../../components/Card';
 import { DecimalValue } from '../../../components/formatters';
-import arrowImage from '../../../images/arrow.svg';
 import { getTokensWithBalance, getTopBalances } from '../../../store/blockchain';
-import { getTotalBalance } from '../../contracts/utils/tokens';
 import WalletCard, { Content, Header, Item } from './wallet-card';
 
 interface StateProps {
@@ -19,7 +16,7 @@ type WalletProps = StateProps & RouteComponentProps;
 
 const DEFAULT_DECIMALS = 3;
 
-const Account = ({ tokens, topBalances }): WalletProps => {
+const Account = ({ tokens, topBalances }: WalletProps) => {
   return (
     <Container>
       <WalletHeader>
@@ -29,19 +26,19 @@ const Account = ({ tokens, topBalances }): WalletProps => {
       <Content>
         <Item>
           <DecimalValue value={topBalances[0].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <div>{topBalances[0].symbol}</div>
+          <small>{topBalances[0].symbol}</small>
         </Item>
         <Item>
           <DecimalValue value={topBalances[1].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <div>{topBalances[1].symbol}</div>
+          <small>{topBalances[1].symbol}</small>
         </Item>
         <Item>
           <DecimalValue value={topBalances[2].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <div>{topBalances[2].symbol}</div>
+          <small>{topBalances[2].symbol}</small>
         </Item>
         <Item>
           <DecimalValue value={topBalances[3].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <div>{topBalances[3].symbol}</div>
+          <small>{topBalances[3].symbol}</small>
         </Item>
       </Content>
     </Container>

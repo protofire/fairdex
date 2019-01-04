@@ -4,7 +4,7 @@ import { isAddress, shortenAddress } from '../../contracts/utils';
 
 interface AddressProps {
   address: Address;
-  shorten: boolean;
+  shorten?: boolean;
   className?: string;
 }
 

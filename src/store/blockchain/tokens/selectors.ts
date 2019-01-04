@@ -8,11 +8,12 @@ export const getToken = (state: AppState, address: Address) => state.blockchain.
 
 export const getAllTokens = (state: AppState) => state.blockchain.tokens || new Map();
 
-export const getCurrentFeeRatio = (state: AppState) => state.blockchain.feeRatio && state.blockchain.feeRatio;
+export const getLiqContribRatio = (state: AppState) =>
+  state.blockchain.feeRatio ? state.blockchain.feeRatio : ZERO;
 
-export const getFeePercentage = createSelector(
-  getCurrentFeeRatio,
-  (feeRatio: BigNumber) => (feeRatio ? feeRatio.times(100) : ZERO),
+export const getLiqContribPercentage = createSelector(
+  getLiqContribRatio,
+  (feeRatio: BigNumber) => feeRatio.times(100),
 );
 
 export const getTokensWithBalance = createSelector(

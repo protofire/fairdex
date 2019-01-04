@@ -1,32 +1,28 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { Address, DecimalValue } from '../../../components/formatters';
+import { ZERO } from '../../../contracts/utils';
 import * as images from '../../../images';
-import {
-  getBuyTokens,
-  getFilteredClaimableAuctions,
-  getFilteredMyTokensAuctions,
-  getSellTokens,
-} from '../../../store/blockchain';
+import { getClaimableAuctionsCount } from '../../../store/blockchain';
 import { getBidsCount } from '../../../store/blockchain/buy-orders';
 import { getFrt } from '../../../store/blockchain/frt';
-import { getFeePercentage } from '../../../store/blockchain/tokens';
 
+import { getLiqContribPercentage } from '../../../store/blockchain/tokens';
 import WalletCard, { Content, Header, Item } from './wallet-card';
 
 export interface AccountProps {
+  bids: number;
+  claimableCount?: number;
   currentAccount: Address;
   frt: Token;
-  bids: number;
   lc?: BigNumber;
-  toClaim?: number;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const Account = ({ currentAccount, frt, bids, lc, toClaim }): AccountProps => (
+const Account = ({ currentAccount, frt, bids, lc, claimableCount }: AccountProps) => (
   <Container>
     <Header>
       <Icon>
@@ -36,20 +32,20 @@ const Account = ({ currentAccount, frt, bids, lc, toClaim }): AccountProps => (
     </Header>
     <Content>
       <Item>
-        <DecimalValue value={frt.balance} decimals={DEFAULT_DECIMALS} />
-        <div>{frt.symbol}</div>
+        <DecimalValue value={(frt.balance && frt.balance[1]) || ZERO} decimals={DEFAULT_DECIMALS} />
+        <small>{frt.symbol}</small>
       </Item>
       <Item>
         <DecimalValue value={lc} decimals={DEFAULT_DECIMALS} postfix={'%'} />
-        <div title='Liquidity Contribution'>LC</div>
+        <small>Liquidity Contribution</small>
       </Item>
       <Item>
         <div>{bids}</div>
-        <div>Bids</div>
+        <small>Bids</small>
       </Item>
       <Item>
-        <div>{toClaim}</div>
-        <div>To claim</div>
+        <div>{claimableCount}</div>
+        <small>To claim</small>
       </Item>
     </Content>
   </Container>
@@ -82,18 +78,12 @@ const Icon = styled.div`
 `;
 
 function mapStateToProps(state: AppState): AccountProps {
-  const claimableAuctions = getFilteredClaimableAuctions(state);
-  const bids = getBidsCount(state);
-  const frt = getFrt(state);
-  const lc = getFeePercentage(state);
-  const { currentAccount } = state.blockchain;
-
   return {
-    currentAccount,
-    frt,
-    bids,
-    lc,
-    toClaim: claimableAuctions.length,
+    currentAccount: state.blockchain.currentAccount,
+    bids: getBidsCount(state),
+    frt: getFrt(state),
+    lc: getLiqContribPercentage(state),
+    claimableCount: getClaimableAuctionsCount(state),
   };
 }
 

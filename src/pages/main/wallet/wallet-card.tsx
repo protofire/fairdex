@@ -54,7 +54,6 @@ export const Item = styled.div`
   }
 
   & > *:nth-child(2) {
-    font-size: 12px;
     color: var(--color-text-primary);
   }
 `;
