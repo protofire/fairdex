@@ -321,6 +321,10 @@ const Container = styled.form`
   div {
     width: 100%;
   }
+
+  label {
+    font-weight: bold;
+  }
 `;
 
 const Step1 = styled(Container)`

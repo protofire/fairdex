@@ -73,7 +73,6 @@ const GlobalStyles = createGlobalStyle`
   }
   
   label {
-    font-weight: bold;
     line-height: 1.75;
     letter-spacing: -0.4px;
     color: var(--color-text-primary);
