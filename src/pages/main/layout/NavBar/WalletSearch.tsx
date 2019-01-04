@@ -5,7 +5,7 @@ import SearchInput from '../SearchInput';
 
 import searchIcon from '../../../../images/search.svg';
 
-interface Props {
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   searchText: string;
   onSearch: (value: string) => void;
 }
@@ -52,9 +52,9 @@ class WalletSearch extends React.Component<Props, State> {
             onClose={this.endSearch}
           />
         ) : (
-          <>
-            <SearchIcon onClick={this.startSearch} />
-          </>
+          <SearchIcon onClick={this.startSearch}>
+            <span>Search</span>
+          </SearchIcon>
         )}
       </Container>
     );
@@ -64,40 +64,21 @@ class WalletSearch extends React.Component<Props, State> {
 const Container = styled.div`
   ${SearchInput} {
     background-color: #eaedef;
+    width: 256px;
   }
 `;
 
-const Title = styled.h3`
-  min-height: 2.2rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  font-size: 0.9em;
-  font-weight: bold;
-
-  ${SearchInput} {
-    flex: 1 1 auto;
-  }
-`;
-
-const Text = styled.span`
-  flex: 1 1 auto;
-`;
-
-const Icon = styled.span`
+const SearchIcon = styled.span`
   display: inline-block;
   width: 24px;
   height: 24px;
   cursor: pointer;
-`;
-
-const SearchIcon = styled(Icon)`
   background: url(${searchIcon}) no-repeat center;
 
-  &:after {
-    content: 'Search';
-    margin-left: var(--spacing-normal);
-    font-size: 0.75rem;
+  span {
+    padding-left: var(--spacing-normal);
+    font-size: 14px;
+    line-height: 24px;
     letter-spacing: -0.3px;
     color: var(--color-text-secondary);
 

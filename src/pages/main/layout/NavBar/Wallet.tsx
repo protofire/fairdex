@@ -1,3 +1,4 @@
+import { rem } from 'polished';
 import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
@@ -7,6 +8,7 @@ import styled from 'styled-components';
 import Icon from '../../../../components/icons';
 import { toggleFilters, toggleSidebar } from '../../../../store/ui/actions';
 import ActionBar from '../ActionBar';
+import HideZeroBalance from './HideZeroBalance';
 import WalletSearch from './WalletSearch';
 
 type NavBarProps = DispatchProps & RouteComponentProps;
@@ -25,10 +27,14 @@ const NavBar = ({ actions }: NavBarProps) => (
       <ActionSearch searchText={''} onSearch={} />
     </LeftAction>
     <RightAction>
-      <Sorting>SORTING</Sorting>
+      <Sorting>
+        <div>SORTING</div>
+      </Sorting>
       <ActionSearch searchText={''} onSearch={} />
     </RightAction>
-    <Hide>HIDE</Hide>
+    <HideWrapper>
+      <HideZeroBalance onChange={} />
+    </HideWrapper>
   </Container>
 );
 
@@ -37,7 +43,7 @@ const Container = styled.nav`
   background-color: transparent;
   border-bottom: 1px solid var(--color-border);
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr ${rem('145px')};
   grid-template-rows: var(--header-height);
 
   transition: background-color var(--animation-duration) ease;
@@ -52,12 +58,19 @@ const Container = styled.nav`
 `;
 
 const ToggleSidebar = styled(Icon.Menu)``;
-const ActionSearch = styled(WalletSearch)``;
+
+const ActionSearch = styled(WalletSearch)`
+  display: flex;
+  height: var(--header-height);
+  align-items: center;
+`;
 
 const Sorting = styled.div`
-  background-color: red;
+  display: flex;
+  justify-content: space-around;
 `;
-const Hide = styled(ActionBar)`
+
+const HideWrapper = styled(ActionBar)`
   @media (max-width: 800px) {
     background-color: var(--color-content-bg);
     grid-column: 1 / 3;
@@ -89,17 +102,22 @@ const LeftAction = styled(ActionBar)`
 
 const RightAction = styled(ActionBar)`
   justify-content: flex-end;
+  position: relative;
 
   @media (max-width: 800px) {
     padding-right: var(--spacing-normal);
     border-bottom: 1px solid var(--color-border);
 
     ${Sorting} {
-      flex: 1;
+      position: absolute;
+      left: 50%;
+      transform: translateX(calc(-50% - var(--spacing-normal)));
     }
   }
 
   ${ActionSearch} {
+    position: absolute;
+    right: var(--spacing-normal);
     @media (min-width: 801px) {
       display: none;
     }

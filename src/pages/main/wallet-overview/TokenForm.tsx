@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '../../../components/Button';
-import Tooltip from '../../../components/Tooltip';
+import Popup from '../../../components/Popup';
 
 import DecimalInput from '../../../components/DecimalInput';
 import { DecimalValue } from '../../../components/formatters';
@@ -76,7 +76,7 @@ class TokenForm extends React.PureComponent<Props, State> {
     const tokenBalanceInDx = utils.token.getDxBalance(token);
 
     return (
-      <Tooltip.Container>
+      <Popup.Container>
         <Panel onClickOutside={this.handleClickOutside}>
           {this.state.showDialog && (
             <Dialog>
@@ -119,7 +119,7 @@ class TokenForm extends React.PureComponent<Props, State> {
             </WithdrawButton>
           </Actions>
         </Panel>
-      </Tooltip.Container>
+      </Popup.Container>
     );
   }
 }
@@ -129,9 +129,9 @@ const WithdrawButton = styled(Button).attrs({ mode: 'secondary' })``;
 
 const CancelButton = styled(Button).attrs({ mode: 'dark' })``;
 
-const Dialog = styled(Tooltip.Dialog)`
+const Dialog = styled(Popup.Dialog)`
   &:after {
-    left: 25%;
+    left: 20%;
   }
 `;
 
