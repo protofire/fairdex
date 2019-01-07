@@ -131,19 +131,51 @@ class DutchExchange extends BaseContract<Event> {
   }
 
   @timeout()
-  async getSellVolume(sellToken: Token, buyToken: Token) {
-    const volume: string = await this.contract.methods
-      .sellVolumesCurrent(sellToken.address, buyToken.address)
-      .call();
+  async getSellVolume(sellToken: Token, buyToken: Token, auctionIndex?: string) {
+    if (auctionIndex) {
+      const [event] = await this.contract.getPastEvents('AuctionCleared', {
+        fromBlock: 0,
+        filter: {
+          sellToken: sellToken.address,
+          buyToken: buyToken.address,
+          auctionIndex,
+        },
+      });
 
-    return toDecimal(volume, sellToken.decimals);
+      if (event) {
+        return toDecimal(event.returnValues.sellVolume, sellToken.decimals);
+      }
+    } else {
+      const volume: string = await this.contract.methods
+        .sellVolumesCurrent(sellToken.address, buyToken.address)
+        .call();
+
+      return toDecimal(volume, sellToken.decimals);
+    }
   }
 
   @timeout()
-  async getBuyVolume(sellToken: Token, buyToken: Token) {
-    const volume: string = await this.contract.methods.buyVolumes(sellToken.address, buyToken.address).call();
+  async getBuyVolume(sellToken: Token, buyToken: Token, auctionIndex?: string) {
+    if (auctionIndex) {
+      const [event] = await this.contract.getPastEvents('AuctionCleared', {
+        fromBlock: 0,
+        filter: {
+          sellToken: sellToken.address,
+          buyToken: buyToken.address,
+          auctionIndex,
+        },
+      });
 
-    return toDecimal(volume, buyToken.decimals);
+      if (event) {
+        return toDecimal(event.returnValues.buyVolume, buyToken.decimals);
+      }
+    } else {
+      const volume: string = await this.contract.methods
+        .buyVolumes(sellToken.address, buyToken.address)
+        .call();
+
+      return toDecimal(volume, buyToken.decimals);
+    }
   }
 
   @timeout()
