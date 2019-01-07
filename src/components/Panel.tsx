@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface Props {
-  onClickOutside?: () => void | null;
-  onBackspacePress?: () => void | null;
-  onEscPress?: () => void | null;
+  onClickOutside?: (() => void) | null;
+  onBackspacePress?: (() => void) | null;
+  onEscPress?: (() => void) | null;
 }
 
 class Panel extends React.PureComponent<Props> {
@@ -31,20 +31,25 @@ class Panel extends React.PureComponent<Props> {
   }
 
   handleClick = (event: MouseEvent) => {
-    if (this.props.onClickOutside && this.node.current) {
+    if (event && this.props.onClickOutside && this.node.current) {
       if (!this.node.current.contains(event.target as Node)) {
+        event.preventDefault();
         this.props.onClickOutside();
       }
     }
   };
 
   handleKeyPress = (event: KeyboardEvent) => {
-    if (this.props.onBackspacePress && event.key === 'Backspace') {
-      this.props.onBackspacePress();
-    }
+    if (event) {
+      if (this.props.onBackspacePress && event.key === 'Backspace') {
+        event.preventDefault();
+        this.props.onBackspacePress();
+      }
 
-    if (this.props.onEscPress && event.key === 'Escape') {
-      this.props.onEscPress();
+      if (this.props.onEscPress && event.key === 'Escape') {
+        event.preventDefault();
+        this.props.onEscPress();
+      }
     }
   };
 

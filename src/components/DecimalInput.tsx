@@ -4,6 +4,7 @@ import { toBigNumber } from '../contracts/utils';
 import Input, { InputProps } from './Input';
 
 interface Props extends InputProps {
+  inputRef: React.Ref<HTMLInputElement>;
   onValueChange?: (value: BigNumber) => void;
 }
 
@@ -12,10 +13,10 @@ interface State {
 }
 
 class DecimalInput extends React.PureComponent<Props, State> {
-  state: State = { value: this.props.value ? this.props.value.toString(10) : '' };
+  state: State = { value: this.props.value ? this.props.value.toString() : '' };
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
-    const value = this.props.value ? this.props.value.toString(10) : '';
+    const value = this.props.value ? this.props.value.toString() : '';
 
     if (value !== prevState.value) {
       this.setState({ value });
@@ -41,10 +42,12 @@ class DecimalInput extends React.PureComponent<Props, State> {
   };
 
   render() {
-    const { onValueChange, ...props } = this.props;
+    const { inputRef, onValueChange, ...props } = this.props;
 
-    return <Input {...props} value={this.state.value} onChange={this.handleChange} />;
+    return <Input ref={inputRef} {...props} value={this.state.value} onChange={this.handleChange} />;
   }
 }
 
-export default DecimalInput;
+export default React.forwardRef<HTMLInputElement, Omit<Props, 'inputRef'>>((props, ref) => (
+  <DecimalInput inputRef={ref} {...props} />
+));

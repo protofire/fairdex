@@ -43,6 +43,8 @@ const { ZERO } = utils;
 class BidForm extends React.PureComponent<Props, State> {
   state: State = { amount: ZERO };
 
+  private inputRef = React.createRef<HTMLInputElement>();
+
   getInitialStep = () => {
     return utils.auction.isAbovePriorClosingPrice(this.props.auction) ? 1 : 2;
   };
@@ -53,7 +55,7 @@ class BidForm extends React.PureComponent<Props, State> {
 
   handleBack = () => {
     if (this.state.currentStep === 3) {
-      this.setState({ currentStep: 2 });
+      this.showAmountForm();
     }
   };
 
@@ -67,7 +69,7 @@ class BidForm extends React.PureComponent<Props, State> {
     event.target.select();
   };
 
-  handleSubmit = (event: any) => {
+  handleSubmit = (event?: any) => {
     const { amount } = this.state;
 
     if (amount && amount.isGreaterThan(ZERO)) {
@@ -134,20 +136,28 @@ class BidForm extends React.PureComponent<Props, State> {
         });
     }
 
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
   };
 
   showDialog = () => {
     this.setState({ showDialog: true });
   };
 
-  showAmountForm = (event: any) => {
-    event.preventDefault();
+  showAmountForm = (event?: any) => {
+    if (event) {
+      event.preventDefault();
+    }
+
     this.setState({ currentStep: 2 });
   };
 
-  showConfirmation = (event: any) => {
-    event.preventDefault();
+  showConfirmation = (event?: any) => {
+    if (event) {
+      event.preventDefault();
+    }
+
     this.setState({ currentStep: 3 });
   };
 
@@ -166,9 +176,18 @@ class BidForm extends React.PureComponent<Props, State> {
 
     const bidTokenBalance = utils.token.getDxBalance(buyToken);
 
-    const setMaxVolume = (event: any) => {
-      event.preventDefault();
-      this.setState({ amount: availableBidVolume.decimalPlaces(4, 1) });
+    const setMaxVolume = (event?: any) => {
+      if (event) {
+        event.preventDefault();
+      }
+
+      this.setState({ amount: availableBidVolume.decimalPlaces(4, 1) }, () =>
+        setImmediate(() => {
+          if (this.inputRef.current) {
+            this.inputRef.current.select();
+          }
+        }),
+      );
     };
 
     return (
@@ -176,7 +195,7 @@ class BidForm extends React.PureComponent<Props, State> {
         <Panel
           onClickOutside={this.handleClose}
           onEscPress={this.handleClose}
-          onBackspacePress={this.handleBack}
+          onBackspacePress={currentStep === 3 ? this.handleBack : null}
         >
           {this.state.showDialog && (
             <Popup.Dialog
@@ -220,6 +239,7 @@ class BidForm extends React.PureComponent<Props, State> {
                       <DecimalInput
                         value={bidAmount.toString(10)}
                         right={auction.buyToken}
+                        ref={this.inputRef}
                         onValueChange={this.handleAmountChange}
                         onFocus={this.handleInputFocus}
                         autoFocus={true}

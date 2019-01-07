@@ -6,13 +6,13 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   right?: React.ReactNode;
 }
 
-const Input = ({ left, right, ...props }: InputProps) => (
+const Input = React.forwardRef<HTMLInputElement, InputProps>(({ left, right, ...props }: InputProps, ref) => (
   <Wrapper {...props}>
     {left && <Left>{left}</Left>}
-    <Control {...props} />
+    <Control ref={ref} {...props} />
     {right && <Right>{right}</Right>}
   </Wrapper>
-);
+));
 
 const Wrapper = styled.div`
   display: inline-flex;
