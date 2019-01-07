@@ -427,7 +427,7 @@ const Step3 = styled(Container)`
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    margin: var(--spacing-text) 0 var(--spacing-narrow);
+    margin: var(--spacing-text) 0;
 
     div {
       text-align: center;
