@@ -284,10 +284,10 @@ class BidForm extends React.PureComponent<Props, State> {
                   </div>
 
                   {bidTokenBalance.lt(bidAmount) ? (
-                    <p>
+                    <ErrorMessage>
                       You don't have enough {buyToken.symbol} available.{' '}
                       <Link to='/wallet'>Deposit more</Link>
-                    </p>
+                    </ErrorMessage>
                   ) : (
                     <p>
                       liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' />)
@@ -447,6 +447,20 @@ const Step3 = styled(Container)`
 
   & > p {
     text-align: center;
+  }
+`;
+
+const ErrorMessage = styled.p`
+  &&& {
+    padding: var(--spacing-text);
+    border-radius: 4px;
+    background: #fce4e4;
+    border: 1px solid #fcc2c3;
+  }
+
+  a {
+    font-weight: bold;
+    text-decoration: underline;
   }
 `;
 
