@@ -44,11 +44,11 @@ class SelectWallet extends React.PureComponent<Props> {
           <Wallet onClick={this.selectStandardWallet}>
             <Logos>
               <img src={images.wallet.MetaMask} alt='MetaMask' />
-              <img src={images.wallet.Parity} alt='Parity' />
+              <img src={images.wallet.Safe} alt='Gnosis Safe' />
               <img src={images.wallet.Cipher} alt='Cipher' />
             </Logos>
             <h3>Standard Wallet</h3>
-            <p>MetaMask, Parity, Cipher, Local Node</p>
+            <p>MetaMask, Safe, Cipher</p>
           </Wallet>
           <Wallet disabled={true} onClick={this.selectLedgerWallet}>
             <Logos>
