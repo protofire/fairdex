@@ -4,7 +4,7 @@ import { createGlobalStyle, css } from 'styled-components';
 const variables = css`
   :root {
     // Colors
-    --color-accent: rgb(219, 184, 44);
+    --color-accent: #dbb82c;
     --color-accent-shadow: rgba(219, 184, 44, 0.7);
     --color-border: rgba(0, 0, 0, 0.05);
     --color-content-bg: #f4f6f8;

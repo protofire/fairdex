@@ -2,13 +2,18 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
 import { Dispatch } from 'redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Icon from '../../../components/icons';
+import { isFiltering } from '../../../store/filters';
 import { toggleFilters, toggleSidebar } from '../../../store/ui/actions';
 import ActionBar from './ActionBar';
 
-type NavBarProps = DispatchProps & RouteComponentProps;
+type NavBarProps = StateProps & DispatchProps & RouteComponentProps;
+
+interface StateProps {
+  filterIndicator: boolean;
+}
 
 interface DispatchProps {
   actions: {
@@ -17,7 +22,7 @@ interface DispatchProps {
   };
 }
 
-const NavBar = ({ actions }: NavBarProps) => (
+const NavBar = ({ actions, filterIndicator }: NavBarProps) => (
   <Container>
     <ActionBar side='left'>
       <ToggleSidebar onClick={actions.toggleSidebar} />
@@ -34,7 +39,9 @@ const NavBar = ({ actions }: NavBarProps) => (
       </Tab>
     </TabBar>
     <ActionBar side='right'>
-      <ToggleFilters onClick={actions.toggleFilters} />
+      <ToggleFilters onClick={actions.toggleFilters} pinned={filterIndicator}>
+        <Icon.Preferences />
+      </ToggleFilters>
     </ActionBar>
   </Container>
 );
@@ -62,9 +69,26 @@ const ToggleSidebar = styled(Icon.Menu)`
   }
 `;
 
-const ToggleFilters = styled(Icon.Preferences)`
+const ToggleFilters = styled.div`
+  position: relative;
   cursor: pointer;
   user-select: none;
+
+  ${(props: { pinned?: boolean }) =>
+    props.pinned &&
+    css`
+      &:after {
+        content: '';
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 15px;
+        height: 15px;
+        background-color: var(--color-accent);
+        border: 2px solid var(--color-content-bg);
+        border-radius: 50%;
+      }
+    `};
 `;
 
 export const TabBar = styled.ul`
@@ -119,6 +143,12 @@ export const Tab = styled.li`
   }
 `;
 
+function mapStateToProps(state: AppState): StateProps {
+  return {
+    filterIndicator: isFiltering(state),
+  };
+}
+
 function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
@@ -130,7 +160,7 @@ function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
 
 export default withRouter(
   connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps,
   )(NavBar),
 );
