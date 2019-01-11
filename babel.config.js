@@ -13,7 +13,5 @@ module.exports = function(api) {
       'react-loadable/babel',
       'styled-components',
     ],
-
-    ignore: ['**/__tests__', '**/*.spec.*', '**/*.test.*'],
   };
 };
