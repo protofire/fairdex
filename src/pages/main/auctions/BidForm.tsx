@@ -1,19 +1,24 @@
 import { ellipsis } from 'polished';
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-import Button from '../../../components/Button';
-import Popup from '../../../components/Popup';
+import * as utils from '../../../contracts/utils';
+import {
+  getCurrentAccount,
+  getLiqContribPercentage,
+  getToken,
+  loadAvailableTokens,
+} from '../../../store/blockchain';
+import { showNotification } from '../../../store/ui/actions';
 
-import { Link } from 'react-router-dom';
+import Button from '../../../components/Button';
 import DecimalInput from '../../../components/DecimalInput';
 import { DecimalValue } from '../../../components/formatters';
-import Panel from '../../../components/Panel';
+import Icon from '../../../components/icons';
+import Popup from '../../../components/Popup';
 import Tooltip from '../../../components/Tooltip';
-import * as utils from '../../../contracts/utils';
-import { getCurrentAccount, getLiqContribPercentage, getToken } from '../../../store/blockchain';
-import { showNotification } from '../../../store/ui/actions';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
@@ -77,7 +82,7 @@ class BidForm extends React.PureComponent<Props, State> {
 
       this.setState({ loading: true });
 
-      dx.postBuyOrder(
+      dx.postBid(
         auction.sellTokenAddress,
         auction.buyTokenAddress,
         auction.auctionIndex,
@@ -92,7 +97,7 @@ class BidForm extends React.PureComponent<Props, State> {
           this.props.dispatch(
             showNotification(
               'info',
-              'Transaction sent',
+              'Bid request sent',
               <p>
                 Bid transaction has been sent.{' '}
                 <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
@@ -106,7 +111,7 @@ class BidForm extends React.PureComponent<Props, State> {
           this.props.dispatch(
             showNotification(
               'success',
-              'Transaction confirmed',
+              'Bid confirmed',
               <p>
                 Bid transaction has been confirmed.{' '}
                 <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
@@ -116,6 +121,9 @@ class BidForm extends React.PureComponent<Props, State> {
             ),
           );
 
+          // Reload token balances and auction list
+          this.props.dispatch(loadAvailableTokens());
+
           this.setState({ loading: false });
           this.handleClose();
         })
@@ -123,7 +131,7 @@ class BidForm extends React.PureComponent<Props, State> {
           this.props.dispatch(
             showNotification(
               'error',
-              'Transaction failed',
+              'Bid failed',
               <p>
                 {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
                 <br />
@@ -191,79 +199,79 @@ class BidForm extends React.PureComponent<Props, State> {
     };
 
     return (
-      <Popup.Container>
-        <Panel
-          onClickOutside={this.handleClose}
-          onEscPress={this.handleClose}
-          onBackspacePress={currentStep === 3 ? this.handleBack : null}
-        >
-          {this.state.showDialog && (
-            <Popup.Dialog
-              title={currentStep === 3 ? 'Your bid' : undefined}
-              onBack={currentStep === 3 ? this.showAmountForm : undefined}
-              theme={currentStep === 1 ? 'accent' : null}
-            >
-              {currentStep === 1 && (
-                <Step1 onSubmit={this.showAmountForm}>
-                  <p>
-                    You are bidding above the previous <br /> closing price for {auction.sellToken}/
-                    {auction.buyToken}
-                  </p>
-                  <Text>
-                    <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
-                  </Text>
-                  <Button type='submit' autoFocus>
-                    Proceed
-                  </Button>
-                </Step1>
-              )}
+      <Popup.Container
+        onClickOutside={this.handleClose}
+        onEscPress={this.handleClose}
+        onBackspacePress={currentStep === 3 ? this.handleBack : null}
+      >
+        {this.state.showDialog && (
+          <Popup.Content theme={currentStep === 1 ? 'accent' : 'default'}>
+            {currentStep === 1 && (
+              <Step1 onSubmit={this.showAmountForm}>
+                <p>
+                  You are bidding above the previous <br /> closing price for {auction.sellToken}/
+                  {auction.buyToken}
+                </p>
+                <Text>
+                  <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
+                </Text>
+                <Button type='submit' autoFocus>
+                  Proceed
+                </Button>
+              </Step1>
+            )}
 
-              {currentStep === 2 && (
-                <Step2 onSubmit={this.showConfirmation}>
-                  <Field>
-                    <label>Bid volume</label>
-                    <Tooltip
-                      content={
-                        bidAmount.gt(availableBidVolume) && (
-                          <p>
-                            You will close this auction with <br />
-                            <DecimalValue value={availableBidVolume} decimals={4} postfix={buyToken.symbol} />
-                            <br />
-                            <a href='' onClick={setMaxVolume}>
-                              [set max]
-                            </a>
-                          </p>
-                        )
-                      }
-                    >
-                      <DecimalInput
-                        value={bidAmount.toString(10)}
-                        right={auction.buyToken}
-                        ref={this.inputRef}
-                        onValueChange={this.handleAmountChange}
-                        onFocus={this.handleInputFocus}
-                        autoFocus={true}
-                      />
-                    </Tooltip>
-                  </Field>
-
-                  <Field>
-                    <label>To buy at least:</label>
-                    <TextBox align='right'>
-                      <DecimalValue value={sellTokenAmount} decimals={4} postfix={auction.sellToken} />
-                    </TextBox>
-                  </Field>
-
-                  <Button
-                    type='submit'
-                    disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
+            {currentStep === 2 && (
+              <Step2 onSubmit={this.showConfirmation}>
+                <Field>
+                  <label>Bid volume</label>
+                  <Tooltip
+                    content={
+                      bidAmount.gt(availableBidVolume) && (
+                        <p>
+                          You will close this auction with <br />
+                          <DecimalValue value={availableBidVolume} decimals={4} postfix={buyToken.symbol} />
+                          <br />
+                          <a href='' onClick={setMaxVolume}>
+                            [set max]
+                          </a>
+                        </p>
+                      )
+                    }
                   >
-                    Next
-                  </Button>
-                </Step2>
-              )}
+                    <DecimalInput
+                      value={bidAmount.toString(10)}
+                      right={auction.buyToken}
+                      ref={this.inputRef}
+                      onValueChange={this.handleAmountChange}
+                      onFocus={this.handleInputFocus}
+                      autoFocus={true}
+                    />
+                  </Tooltip>
+                </Field>
 
-              {currentStep === 3 && (
+                <Field>
+                  <label>To buy at least:</label>
+                  <TextBox align='right'>
+                    <DecimalValue value={sellTokenAmount} decimals={4} postfix={auction.sellToken} />
+                  </TextBox>
+                </Field>
+
+                <Button
+                  type='submit'
+                  disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
+                >
+                  Next
+                </Button>
+              </Step2>
+            )}
+
+            {currentStep === 3 && (
+              <>
+                <Popup.Header>
+                  <BackButton onClick={currentStep === 3 ? this.showAmountForm : undefined} />
+                  <h4>Your bid</h4>
+                </Popup.Header>
                 <Step3 onSubmit={this.handleSubmit}>
                   <div>
                     <div>
@@ -300,33 +308,29 @@ class BidForm extends React.PureComponent<Props, State> {
                     disabled={this.state.loading || bidAmount.lte(ZERO) || bidTokenBalance.lt(bidAmount)}
                     autoFocus
                   >
-                    {this.state.loading ? 'Waiting confirmation...' : 'Confirm'}
+                    {this.state.loading ? 'Bid in progress...' : 'Confirm'}
                   </Button>
                 </Step3>
-              )}
-            </Popup.Dialog>
-          )}
+              </>
+            )}
+          </Popup.Content>
+        )}
 
-          {this.state.showDialog ? (
-            <CancelButton onClick={this.handleClose}>Cancel</CancelButton>
-          ) : (
-            <BidButton onClick={this.showDialog}>Bid</BidButton>
-          )}
-        </Panel>
+        {this.state.showDialog ? (
+          <Button mode='dark' onClick={this.handleClose}>
+            Cancel
+          </Button>
+        ) : (
+          <Button mode='secondary' onClick={this.showDialog}>
+            Bid
+          </Button>
+        )}
       </Popup.Container>
     );
   }
 }
 
-const BidButton = styled(Button).attrs({ mode: 'secondary' })`
-  margin-top: var(--spacing-normal);
-`;
-
-const CancelButton = styled(Button).attrs({ mode: 'dark' })`
-  margin-top: var(--spacing-normal);
-`;
-
-const Container = styled.form`
+const Step = styled.form`
   width: 100%;
   display: inline-grid;
   grid-template-columns: 1fr;
@@ -357,7 +361,7 @@ const Container = styled.form`
   }
 `;
 
-const Step1 = styled(Container)`
+const Step1 = styled(Step)`
   grid-gap: var(--spacing-normal);
 
   h4 {
@@ -383,7 +387,7 @@ const Text = styled.h4`
   margin: var(--spacing-normal) 0;
 `;
 
-const Step2 = styled(Container)`
+const Step2 = styled(Step)`
   display: grid;
   align-items: baseline;
   justify-items: left;
@@ -422,7 +426,7 @@ const TextBox = styled.div`
   overflow: hidden;
 `;
 
-const Step3 = styled(Container)`
+const Step3 = styled(Step)`
   & > div {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -448,6 +452,10 @@ const Step3 = styled(Container)`
   & > p {
     text-align: center;
   }
+`;
+
+const BackButton = styled(Icon.Back)`
+  cursor: pointer;
 `;
 
 const ErrorMessage = styled.p`

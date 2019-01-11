@@ -19,7 +19,7 @@ class DutchExchange extends BaseContract<Event> {
     });
   }
 
-  postBuyOrder(sellToken: Address, buyToken: Address, auctionIndex: string, buyAmount: Decimal) {
+  postBid(sellToken: Address, buyToken: Address, auctionIndex: string, buyAmount: Decimal) {
     const amount = toBigNumber(buyAmount);
 
     return this.contract.methods.postBuyOrder(sellToken, buyToken, auctionIndex, amount.toString(10));
