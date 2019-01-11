@@ -7,6 +7,9 @@ import { renderWithRedux } from './utils';
 import { toBigNumber } from '../contracts/utils';
 
 import ClaimForm from '../pages/main/auctions/claim/ClaimForm';
+import { ClaimProvider } from '../pages/main/auctions/claim/ClaimContext';
+
+beforeEach(jest.resetAllMocks);
 
 afterEach(cleanup);
 
@@ -82,9 +85,48 @@ describe('in running auctions', () => {
 
       expect(queryByText('You can claim')).toBeDefined();
     });
+
+    test('should display confirm button', async () => {
+      const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      const confirmButton = await waitForElement(() => getByTestId('confirm-claim-button'));
+
+      expect(confirmButton).toBeVisible();
+      expect(confirmButton).not.toBeDisabled();
+    });
+
+    test('should be able to claim', () => {});
   });
 
-  test('should be able to claim', () => {});
+  test('should be able to claim', async () => {
+    const { getByTestId } = renderWithRedux(
+      <ClaimProvider>
+        <ClaimForm auction={data} />
+      </ClaimProvider>,
+      {
+        blockchain: {
+          currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+        },
+      },
+    );
+
+    fireEvent.click(getByTestId('claim-button'));
+
+    const confirmButton = await waitForElement(() => getByTestId('confirm-claim-button'));
+
+    expect(dx.postClaim).not.toHaveBeenCalled();
+
+    fireEvent.click(confirmButton);
+
+    expect(dx.postClaim).toHaveBeenCalledWith(
+      data.sellTokenAddress,
+      data.buyTokenAddress,
+      data.auctionIndex,
+      '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+    );
+  });
 });
 
 describe('in scheduled auctions', () => {
@@ -180,6 +222,45 @@ describe('in ended auctions', () => {
       await waitForElement(() => getByTestId('unclaimed-balance'));
 
       expect(queryByText('You can claim')).toBeDefined();
+    });
+
+    test('should display confirm button', async () => {
+      const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      const confirmButton = await waitForElement(() => getByTestId('confirm-claim-button'));
+
+      expect(confirmButton).toBeVisible();
+      expect(confirmButton).not.toBeDisabled();
+    });
+
+    test('should be able to claim', async () => {
+      const { getByTestId } = renderWithRedux(
+        <ClaimProvider>
+          <ClaimForm auction={data} />
+        </ClaimProvider>,
+        {
+          blockchain: {
+            currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          },
+        },
+      );
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      const confirmButton = await waitForElement(() => getByTestId('confirm-claim-button'));
+
+      expect(dx.postClaim).not.toHaveBeenCalled();
+
+      fireEvent.click(confirmButton);
+
+      expect(dx.postClaim).toHaveBeenCalledWith(
+        data.sellTokenAddress,
+        data.buyTokenAddress,
+        data.auctionIndex,
+        '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+      );
     });
   });
 });

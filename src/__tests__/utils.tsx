@@ -2,13 +2,14 @@ import React from 'react';
 
 import { Provider } from 'react-redux';
 import { render } from 'react-testing-library';
-import { createStore, Store } from 'redux';
+import { createStore } from 'redux';
 
 import reducer from '../store/reducer';
 
-interface RenderOptions {
-  initialState?: AppState;
-  store?: Store<AppState>;
+interface StateOptions {
+  blockchain?: Partial<BlockchainState>;
+  filters?: Partial<FiltersState>;
+  ui?: Partial<UiState>;
 }
 
 const initialState: AppState = {
@@ -35,8 +36,8 @@ const initialState: AppState = {
   },
 };
 
-export function renderWithRedux(ui: React.ReactElement<any>, options: RenderOptions = {}) {
-  const store = options.store || createStore(reducer, options.initialState || initialState);
+export function renderWithRedux(ui: React.ReactElement<any>, state: StateOptions = {}) {
+  const store = createStore(reducer, { ...initialState, ...state });
 
   return {
     ...render(<Provider store={store}>{ui}</Provider>),

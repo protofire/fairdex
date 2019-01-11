@@ -129,7 +129,7 @@ const ClaimForm = React.memo(
                 <DecimalValue value={auction.buyerBalance} decimals={4} postfix={auction.sellToken} />
               </UnclaimedBalance>
 
-              <Button type='submit' disabled={claiming} autoFocus>
+              <Button type='submit' disabled={claiming} autoFocus data-testid='confirm-claim-button'>
                 {claiming ? 'Claim in progress...' : 'Confirm'}
               </Button>
             </form>
