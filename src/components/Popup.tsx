@@ -1,89 +1,31 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import Icon from './icons';
+import Box from './Box';
+import Panel from './Panel';
 
-interface DialogProps {
-  animate?: boolean;
-  children: React.ReactNode;
-  onBack?: (...args: any) => void | null;
-  title?: string | null;
-  theme?: 'accent' | null;
-}
+export const Content = styled(Box)`
+  width: 100%;
 
-const Dialog = ({ children, onBack, title, ...props }: DialogProps) => (
-  <Popup {...props}>
-    {title && (
-      <Title>
-        <BackButton onClick={onBack} />
-        <h4>{title}</h4>
-      </Title>
-    )}
-    <Content>{children}</Content>
-  </Popup>
-);
-
-const Popup = styled.div`
-  position: absolute;
-  font-size: 0.875rem;
-  line-height: 1rem;
-  background-color: var(--color-main-bg);
-  border-radius: 8px;
-  box-shadow: 0 4px 40px 4px rgba(48, 59, 62, 0.3);
-
-  &:after {
-    position: absolute;
-    display: block;
-    content: '';
-    width: 0;
-    bottom: -7.5px;
-    left: 45%;
-    border-style: solid;
-    border-width: 7.5px 10px 0;
-    border-color: var(--color-main-bg) transparent;
+  p {
+    margin: var(--spacing-text) 0 0;
+    font-size: 0.8rem;
+    letter-spacing: -0.3px;
+    text-align: center;
+    color: var(--color-text-secondary);
   }
-
-  ${({ theme }: DialogProps) => {
-    switch (theme) {
-      case 'accent':
-        return css`
-          background-color: #fff0e2;
-
-          &:after {
-            border-color: #fff0e2 transparent;
-          }
-        `;
-
-      default:
-        return null;
-    }
-  }};
 `;
 
-const BackButton = styled(Icon.Back)`
-  cursor: pointer;
-`;
-
-const Container = styled.div`
+export const Container = styled(Panel)`
   position: relative;
 
-  ${Popup} {
+  ${Content} {
     position: absolute;
-    bottom: calc(100% + 15px);
-    width: 100%;
+    bottom: calc(100% + var(--box-arrow-height) * 1.1);
   }
 `;
 
-const Content = styled.div`
-  p {
-    margin: 0 0 var(--spacing-normal);
-    padding: 0 var(--spacing-narrow);
-    line-height: 1.14;
-    letter-spacing: -0.4px;
-  }
-`;
-
-const Title = styled.header`
+const Header = styled.header`
   height: var(--header-height);
   display: flex;
   align-items: center;
@@ -100,4 +42,8 @@ const Title = styled.header`
   }
 `;
 
-export default { Container, Dialog };
+export default {
+  Content,
+  Container,
+  Header,
+};

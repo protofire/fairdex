@@ -25,6 +25,10 @@ class DutchExchange extends BaseContract<Event> {
     return this.contract.methods.postBuyOrder(sellToken, buyToken, auctionIndex, amount.toString(10));
   }
 
+  postClaim(sellToken: Address, buyToken: Address, auctionIndex: string, accountAddress: Address) {
+    return this.contract.methods.claimBuyerFunds(sellToken, buyToken, accountAddress, auctionIndex);
+  }
+
   async getAvailableMarkets(fromBlock = 0) {
     const markets = await this.contract.getPastEvents('NewTokenPair', { fromBlock });
 
@@ -95,12 +99,12 @@ class DutchExchange extends BaseContract<Event> {
   }
 
   @timeout()
-  async getBuyerBalances(sellToken: Token, buyToken: Token, auctionIndex: string, accountAddress: Address) {
-    const buyerBalance = await this.contract.methods
-      .buyerBalances(sellToken.address, buyToken.address, auctionIndex, accountAddress)
+  async getUnclaimedFunds(sellToken: Token, buyToken: Token, auctionIndex: string, accountAddress: Address) {
+    const { unclaimedBuyerFunds } = await this.contract.methods
+      .getUnclaimedBuyerFunds(sellToken.address, buyToken.address, accountAddress, auctionIndex)
       .call();
 
-    return toDecimal(buyerBalance, buyToken.decimals) || ZERO;
+    return toDecimal(unclaimedBuyerFunds, sellToken.decimals) || ZERO;
   }
 
   @timeout()

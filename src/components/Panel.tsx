@@ -1,61 +1,75 @@
-import React from 'react';
+import React, { HTMLAttributes, useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-interface Props {
+export interface PanelProps extends HTMLAttributes<HTMLDivElement> {
   onClickOutside?: (() => void) | null;
   onBackspacePress?: (() => void) | null;
   onEscPress?: (() => void) | null;
 }
 
-class Panel extends React.PureComponent<Props> {
-  private node = React.createRef<HTMLDivElement>();
+const Panel = React.memo(({ onClickOutside, onBackspacePress, onEscPress, ...props }: PanelProps) => {
+  const root = useRef<HTMLDivElement>(null);
 
-  componentDidMount() {
-    if (this.props.onBackspacePress || this.props.onEscPress) {
-      document.addEventListener('keydown', this.handleKeyPress, false);
-    }
+  const handleClick = useCallback(
+    (event: MouseEvent) => {
+      if (event) {
+        if (onClickOutside && root.current) {
+          const target = event.target as Node;
 
-    if (this.props.onClickOutside) {
-      document.addEventListener('mousedown', this.handleClick, false);
-    }
-  }
-
-  componentWillUnmount() {
-    if (this.props.onEscPress) {
-      document.removeEventListener('keydown', this.handleKeyPress, false);
-    }
-
-    if (this.props.onClickOutside) {
-      document.removeEventListener('mousedown', this.handleClick, false);
-    }
-  }
-
-  handleClick = (event: MouseEvent) => {
-    if (event && this.props.onClickOutside && this.node.current) {
-      if (!this.node.current.contains(event.target as Node)) {
-        event.preventDefault();
-        this.props.onClickOutside();
+          if (!root.current.contains(target)) {
+            event.preventDefault();
+            onClickOutside();
+          }
+        }
       }
-    }
-  };
+    },
+    [onClickOutside],
+  );
 
-  handleKeyPress = (event: KeyboardEvent) => {
-    if (event) {
-      if (this.props.onBackspacePress && event.key === 'Backspace') {
-        event.preventDefault();
-        this.props.onBackspacePress();
+  useEffect(
+    () => {
+      if (onClickOutside) {
+        document.addEventListener('mousedown', handleClick, false);
+
+        return () => {
+          document.removeEventListener('mousedown', handleClick, false);
+        };
       }
+    },
+    [onClickOutside],
+  );
 
-      if (this.props.onEscPress && event.key === 'Escape') {
-        event.preventDefault();
-        this.props.onEscPress();
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      if (event) {
+        if (onBackspacePress && event.key === 'Backspace') {
+          event.preventDefault();
+          onBackspacePress();
+        }
+
+        if (onEscPress && event.key === 'Escape') {
+          event.preventDefault();
+          onEscPress();
+        }
       }
-    }
-  };
+    },
+    [onBackspacePress, onEscPress],
+  );
 
-  render() {
-    return <div ref={this.node}>{this.props.children}</div>;
-  }
-}
+  useEffect(
+    () => {
+      if (onBackspacePress || onEscPress) {
+        document.addEventListener('keydown', handleKeyPress, false);
+
+        return () => {
+          document.removeEventListener('keydown', handleKeyPress, false);
+        };
+      }
+    },
+    [onBackspacePress, onEscPress],
+  );
+
+  return <div ref={root} {...props} />;
+});
 
 export default styled(Panel)``;

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import Card from '../../../components/Card';
 import Spinner from '../../../components/Spinner';
 import * as images from '../../../images';
 import AuctionView from './AuctionView';
@@ -40,6 +41,15 @@ const Container = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
   grid-gap: var(--spacing-normal);
+
+  ${Card} {
+    display: flex;
+    flex-direction: column;
+
+    & > *:last-child {
+      flex: 1;
+    }
+  }
 `;
 
 const EmptyList = styled.div`

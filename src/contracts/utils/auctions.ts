@@ -88,7 +88,7 @@ export async function getBuyerBalance(
   auctionIndex: string,
   currentAccount: Address,
 ) {
-  const buyerBalance = dx.getBuyerBalances(sellToken, buyToken, auctionIndex, currentAccount);
+  const buyerBalance = dx.getUnclaimedFunds(sellToken, buyToken, auctionIndex, currentAccount);
 
   return buyerBalance;
 }

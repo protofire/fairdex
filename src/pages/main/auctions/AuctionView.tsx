@@ -2,16 +2,21 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { DecimalValue, Duration, Timestamp } from '../../../components/formatters';
+import { ZERO } from '../../../contracts/utils';
 import { getAvailableVolume, getEstimatedEndTime } from '../../../contracts/utils/auctions';
-import BidForm from './BidForm';
 
-interface Props {
+import Card from '../../../components/Card';
+import Popup from '../../../components/Popup';
+import BidForm from './BidForm';
+import ClaimForm from './claim/ClaimForm';
+
+interface AuctionViewProps {
   data: Auction;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const AuctionView = React.memo(({ data: auction }: Props) => (
+const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
   <Card id={`${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}>
     <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`}>
       <span>{auction.buyToken}</span>
@@ -78,7 +83,13 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
             </Value>
           </Row>
         </Table>
-        <BidForm auction={auction} />
+
+        <ButtonGroup>
+          <BidForm auction={auction} />
+          {auction.buyerBalance && auction.buyerBalance.isGreaterThan(ZERO) && (
+            <ClaimForm auction={auction} />
+          )}
+        </ButtonGroup>
       </>
     )}
 
@@ -176,18 +187,16 @@ const AuctionView = React.memo(({ data: auction }: Props) => (
             </Value>
           </Row>
         </Table>
+
+        <ButtonGroup>
+          {auction.buyerBalance && auction.buyerBalance.isGreaterThan(ZERO) && (
+            <ClaimForm auction={auction} />
+          )}
+        </ButtonGroup>
       </>
     )}
   </Card>
 ));
-
-const Card = styled.div`
-  padding: var(--spacing-normal);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.05);
-  background-color: var(--color-main-bg);
-  transition: all 2s ease;
-`;
 
 const Label = styled.dt`
   position: relative;
@@ -249,6 +258,46 @@ const Separator = styled.span`
   font-size: 40%;
   color: var(--color-grey);
   margin: 0 var(--spacing-text);
+`;
+
+const ButtonGroup = styled.div`
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: var(--spacing-narrow);
+
+  & > * {
+    width: 100%;
+
+    &:nth-child(n + 2) {
+      margin-left: var(--spacing-narrow);
+    }
+  }
+
+  & ${Popup.Container}:not(:only-child) {
+    position: unset;
+
+    &:nth-child(-n + 1) {
+      ${Popup.Content} {
+        left: 0;
+
+        &:after {
+          left: calc(25% - var(--box-arrow-height) / 2);
+        }
+      }
+    }
+
+    &:nth-child(n + 2) {
+      ${Popup.Content} {
+        right: 0;
+
+        &:after {
+          left: calc(75% - var(--box-arrow-height) / 2);
+        }
+      }
+    }
+  }
 `;
 
 export default AuctionView;

@@ -7,6 +7,7 @@ import Spinner from '../../components/Spinner';
 import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 
 import logo from '../../images/protofire.svg';
+import { ClaimProvider } from './auctions/claim/ClaimContext';
 
 const EndedAuctions = Loadable({
   loader: () => import('./auctions/containers/EndedAuctions'),
@@ -51,15 +52,17 @@ class MainPage extends React.Component {
           <MessageHandler />
           <Filters />
           <Content>
-            <NavBar />
-            <Section>
-              <Switch>
-                <Route path='/running' component={RunningAuctions} />
-                <Route path='/scheduled' component={ScheduledAuctions} />
-                <Route path='/ended' component={EndedAuctions} />
-                <Redirect to='/running' />
-              </Switch>
-            </Section>
+            <ClaimProvider>
+              <NavBar />
+              <Section>
+                <Switch>
+                  <Route path='/running' component={RunningAuctions} />
+                  <Route path='/scheduled' component={ScheduledAuctions} />
+                  <Route path='/ended' component={EndedAuctions} />
+                  <Redirect to='/running' />
+                </Switch>
+              </Section>
+            </ClaimProvider>
           </Content>
         </Layout>
       </Router>
