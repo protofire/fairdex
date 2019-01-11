@@ -1,0 +1,185 @@
+import 'jest-dom/extend-expect';
+
+import React from 'react';
+import { cleanup, fireEvent, waitForElement } from 'react-testing-library';
+
+import { renderWithRedux } from './utils';
+import { toBigNumber } from '../contracts/utils';
+
+import ClaimForm from '../pages/main/auctions/claim/ClaimForm';
+
+afterEach(cleanup);
+
+describe('in running auctions', () => {
+  const data: RunningAuction = {
+    auctionIndex: '111',
+    state: 'running',
+    auctionStart: Date.now(),
+    sellToken: 'OMG',
+    sellTokenAddress: '0x00df91984582e6e96288307e9c2f20b38c8fece9',
+    sellVolume: toBigNumber(100),
+    buyToken: 'WETH',
+    buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
+    buyVolume: toBigNumber(0),
+    currentPrice: toBigNumber(0.0123456789),
+    closingPrice: toBigNumber(0.0123456789 * 2),
+    buyerBalance: toBigNumber(1234),
+  };
+
+  describe('claim button', () => {
+    test('should be visible if there is unclaimed balance', () => {
+      const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      const claimButton = getByTestId('claim-button');
+
+      expect(claimButton).toBeVisible();
+      expect(claimButton).not.toBeDisabled();
+    });
+
+    test('should not be visible if there is no unclaimed balance', () => {
+      const { queryByTestId } = renderWithRedux(
+        <ClaimForm
+          auction={{
+            ...data,
+            buyerBalance: undefined,
+          }}
+        />,
+      );
+
+      expect(queryByTestId('claim-button')).toBeNull();
+    });
+  });
+
+  describe('claim dialog', () => {
+    test('should display cancel button', async () => {
+      const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      const cancelButton = await waitForElement(() => getByTestId('cancel-claim-button'));
+
+      expect(cancelButton).toBeVisible();
+      expect(cancelButton).not.toBeDisabled();
+    });
+
+    test('should display unclaimed balance', async () => {
+      const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      const unclaimed = await waitForElement(() => getByTestId('unclaimed-balance'));
+
+      expect(unclaimed).toBeVisible();
+      expect(unclaimed).toHaveTextContent('1234 OMG');
+    });
+
+    test('should display a message', async () => {
+      const { getByTestId, queryByText } = renderWithRedux(<ClaimForm auction={data} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      await waitForElement(() => getByTestId('unclaimed-balance'));
+
+      expect(queryByText('You can claim')).toBeDefined();
+    });
+  });
+
+  test('should be able to claim', () => {});
+});
+
+describe('in scheduled auctions', () => {
+  const data: ScheduledAuction = {
+    auctionIndex: '111',
+    state: 'scheduled',
+    auctionStart: Date.now(),
+    sellToken: 'OMG',
+    sellTokenAddress: '0x00df91984582e6e96288307e9c2f20b38c8fece9',
+    sellVolume: toBigNumber(100),
+    buyToken: 'WETH',
+    buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
+    buyVolume: toBigNumber(0),
+    closingPrice: toBigNumber(0.0123456789),
+  };
+
+  describe('claim button', () => {
+    test('should never be visible', () => {
+      const { queryByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      expect(queryByTestId('claim-button')).toBeNull();
+    });
+  });
+});
+
+describe('in ended auctions', () => {
+  const data: EndedAuction = {
+    auctionIndex: '111',
+    state: 'ended',
+    auctionEnd: Date.now(),
+    sellToken: 'OMG',
+    sellTokenAddress: '0x00df91984582e6e96288307e9c2f20b38c8fece9',
+    sellVolume: toBigNumber(100),
+    buyToken: 'WETH',
+    buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
+    buyVolume: toBigNumber(0),
+    closingPrice: toBigNumber(0.0123456789),
+    buyerBalance: toBigNumber(1234),
+  };
+
+  describe('claim button', () => {
+    test('should be visible if there is unclaimed balance', () => {
+      const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      const claimButton = getByTestId('claim-button');
+
+      expect(claimButton).toBeVisible();
+      expect(claimButton).not.toBeDisabled();
+    });
+
+    test('should not be visible if there is no unclaimed balance', () => {
+      const { queryByTestId } = renderWithRedux(
+        <ClaimForm
+          auction={{
+            ...data,
+            buyerBalance: undefined,
+          }}
+        />,
+      );
+
+      expect(queryByTestId('claim-button')).toBeNull();
+    });
+  });
+
+  describe('claim dialog', () => {
+    test('should display cancel button', async () => {
+      const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      const cancelButton = await waitForElement(() => getByTestId('cancel-claim-button'));
+
+      expect(cancelButton).toBeVisible();
+      expect(cancelButton).not.toBeDisabled();
+    });
+
+    test('should display unclaimed balance', async () => {
+      const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      const unclaimed = await waitForElement(() => getByTestId('unclaimed-balance'));
+
+      expect(unclaimed).toBeVisible();
+      expect(unclaimed).toHaveTextContent('1234 OMG');
+    });
+
+    test('should display a message', async () => {
+      const { getByTestId, queryByText } = renderWithRedux(<ClaimForm auction={data} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      await waitForElement(() => getByTestId('unclaimed-balance'));
+
+      expect(queryByText('You can claim')).toBeDefined();
+    });
+  });
+});
