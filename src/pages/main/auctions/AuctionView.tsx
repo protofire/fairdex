@@ -10,8 +10,8 @@ import {
   getEstimatedEndTime,
 } from '../../../contracts/utils/auctions';
 
+import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
-import Popup from '../../../components/Popup';
 import BidForm from './BidForm';
 import ClaimForm from './claim/ClaimForm';
 
@@ -288,46 +288,6 @@ const Separator = styled.div`
   margin: 0 var(--spacing-text);
   padding-top: var(--spacing-title);
   user-select: none;
-`;
-
-const ButtonGroup = styled.div`
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  margin-top: var(--spacing-narrow);
-
-  & > * {
-    width: 100%;
-
-    &:nth-child(n + 2) {
-      margin-left: var(--spacing-narrow);
-    }
-  }
-
-  & ${Popup.Container}:not(:only-child) {
-    position: unset;
-
-    &:nth-child(-n + 1) {
-      ${Popup.Content} {
-        left: 0;
-
-        &:after {
-          left: calc(25% - var(--box-arrow-height) / 2);
-        }
-      }
-    }
-
-    &:nth-child(n + 2) {
-      ${Popup.Content} {
-        right: 0;
-
-        &:after {
-          left: calc(75% - var(--box-arrow-height) / 2);
-        }
-      }
-    }
-  }
 `;
 
 export default AuctionView;

@@ -2,9 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { DecimalValue } from '../../../components/formatters';
-import Toggle from '../../../components/Toggle';
 import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contracts/utils/tokens';
-import TokenForm from './TokenForm';
+
+import ButtonGroup from '../../../components/ButtonGroup';
+import Card from '../../../components/Card';
+import Toggle from '../../../components/Toggle';
+import DepositForm from './DepositForm';
+import WithdrawForm from './WithdrawForm';
 
 interface Props {
   data: Token;
@@ -68,19 +72,14 @@ class TokenView extends React.PureComponent<Props> {
             </dd>
           </Row>
         </Table>
-        <TokenForm token={token} />
+        <ButtonGroup>
+          <DepositForm token={token} /> {/* TODO: hide if no token in wallet */}
+          <WithdrawForm token={token} /> {/* TODO: hide if no token in DX */}
+        </ButtonGroup>
       </Card>
     );
   }
 }
-
-const Card = styled.div`
-  padding: var(--spacing-normal);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.05);
-  background-color: var(--color-main-bg);
-  transition: all 2s ease;
-`;
 
 const Label = styled.dt`
   position: relative;

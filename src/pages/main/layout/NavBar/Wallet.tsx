@@ -24,16 +24,16 @@ const NavBar = ({ actions }: NavBarProps) => (
   <Container>
     <LeftAction>
       <ToggleSidebar onClick={actions.toggleSidebar} />
-      <ActionSearch searchText={''} onSearch={} />
+      <ActionSearch searchText={''} onSearch={/*() => {}*/} />
     </LeftAction>
     <RightAction>
       <Sorting>
         <div>SORTING</div>
       </Sorting>
-      <ActionSearch searchText={''} onSearch={} />
+      <ActionSearch searchText={''} onSearch={/*() => {}*/} />
     </RightAction>
     <HideWrapper>
-      <HideZeroBalance onChange={} />
+      <HideZeroBalance onChange={/*() => {}*/} />
     </HideWrapper>
   </Container>
 );
