@@ -1,42 +1,73 @@
 import { rem } from 'polished';
 import React from 'react';
 import { connect } from 'react-redux';
-import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
 import Icon from '../../../../components/icons';
+
+import { applyFilters } from '../../../../store/filters/actions';
 import { toggleFilters, toggleSidebar } from '../../../../store/ui/actions';
+
 import ActionBar from '../ActionBar';
 import HideZeroBalance from './HideZeroBalance';
 import WalletSearch from './WalletSearch';
 
-type NavBarProps = DispatchProps & RouteComponentProps;
+type NavBarProps = StateProps & DispatchProps;
+
+interface StateProps {
+  filters: FiltersState;
+}
 
 interface DispatchProps {
   actions: {
     toggleSidebar: typeof toggleSidebar;
-    toggleFilters: typeof toggleFilters;
+    applyFilters: typeof applyFilters;
   };
 }
 
-const NavBar = ({ actions }: NavBarProps) => (
-  <Container>
-    <LeftAction>
-      <ToggleSidebar onClick={actions.toggleSidebar} />
-      <ActionSearch searchText={''} onSearch={/*() => {}*/} />
-    </LeftAction>
-    <RightAction>
-      <Sorting>
-        <div>SORTING</div>
-      </Sorting>
-      <ActionSearch searchText={''} onSearch={/*() => {}*/} />
-    </RightAction>
-    <HideWrapper>
-      <HideZeroBalance onChange={/*() => {}*/} />
-    </HideWrapper>
-  </Container>
-);
+interface State {
+  tokenSearchQuery: string;
+}
+
+class NavBar extends React.PureComponent<NavBarProps, State> {
+  state = {
+    tokenSearchQuery: '',
+  };
+
+  toggleZeroBalance = (option: string, checked: boolean) => {
+    this.props.actions.applyFilters({
+      ...this.props.filters,
+      [option]: checked,
+    });
+  };
+
+  render() {
+    const { tokenSearchQuery } = this.state;
+    const {
+      actions,
+      filters: { hideZeroBalance },
+    } = this.props;
+
+    return (
+      <Container>
+        <LeftAction>
+          <ToggleSidebar onClick={actions.toggleSidebar} />
+          <ActionSearch searchText={tokenSearchQuery} onSearch={/*() => {}*/} />
+        </LeftAction>
+        <RightAction>
+          <Sorting>
+            <div>SORTING</div>
+          </Sorting>
+          <ActionSearch searchText={tokenSearchQuery} onSearch={/*() => {}*/} />
+        </RightAction>
+        <HideWrapper>
+          <HideZeroBalance checked={hideZeroBalance} onChange={this.toggleZeroBalance} />
+        </HideWrapper>
+      </Container>
+    );
+  }
+}
 
 const Container = styled.nav`
   padding: 0 var(--spacing-normal);
@@ -53,7 +84,7 @@ const Container = styled.nav`
     padding: 0;
     background-color: var(--color-main-bg);
     grid-template-columns: 1fr 8fr;
-    grid-template-rows: var(--header-height) var(--header-height);
+    grid-template-rows: var(--header-height) calc(var(--header-height) - var(--spacing-normal));
   }
 `;
 
@@ -71,10 +102,15 @@ const Sorting = styled.div`
 `;
 
 const HideWrapper = styled(ActionBar)`
+  justify-content: flex-end;
+
   @media (max-width: 800px) {
+    height: calc(var(--header-height) - var(--spacing-normal));
     background-color: var(--color-content-bg);
     grid-column: 1 / 3;
     padding-left: var(--spacing-normal);
+    justify-content: flex-start;
+    align-items: flex-end;
   }
 `;
 
@@ -124,18 +160,22 @@ const RightAction = styled(ActionBar)`
   }
 `;
 
+function mapStateToProps(state: AppState): StateProps {
+  return {
+    filters: state.filters,
+  };
+}
+
 function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
       toggleSidebar: () => dispatch(toggleSidebar()),
-      toggleFilters: () => dispatch(toggleFilters()),
+      applyFilters: (filters: FiltersState) => dispatch(applyFilters(filters)),
     },
   };
 }
 
-export default withRouter(
-  connect(
-    null,
-    mapDispatchToProps,
-  )(NavBar),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(NavBar);

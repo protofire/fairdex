@@ -50,3 +50,18 @@ export const getTopBalances = createSelector(
       });
   },
 );
+
+export const getFilteredTokens = createSelector(
+  getAllTokens,
+  (state: AppState) => state.filters,
+  filterTokens,
+);
+
+function filterTokens(tokens: Map<Address, Token>, filters: FiltersState) {
+  let out = Array.from(tokens).map(([_, token]: [Address, Token]) => token);
+  if (filters.hideZeroBalance) {
+    out = out.filter((token: Token) => getTotalBalance(token).gt(0));
+  }
+
+  return out;
+}

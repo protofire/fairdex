@@ -8,6 +8,7 @@ interface FiltersState {
   sortDir: SortDir;
   onlyMyTokens: boolean;
   claimableAuctions: boolean;
+  hideZeroBalance: boolean;
 }
 
 interface FiltersAction {
