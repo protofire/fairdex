@@ -25,8 +25,8 @@ const initialState: AppState = {
   filters: {
     sellTokens: [],
     buyTokens: [],
-    sortBy: 'start-time',
-    sortDir: 'asc',
+    auctionSortBy: 'start-time',
+    auctionSortDir: 'asc',
     onlyMyTokens: false,
     claimableAuctions: false,
   },

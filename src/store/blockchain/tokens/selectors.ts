@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { ZERO } from '../../../contracts/utils';
-import { getTotalBalance } from '../../../contracts/utils/tokens';
+import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contracts/utils/tokens';
 import { getFrt } from '../frt';
 
 export const getToken = (state: AppState, address: Address) => state.blockchain.tokens.get(address);
@@ -59,6 +59,28 @@ export const getFilteredTokens = createSelector(
 
 function filterTokens(tokens: Map<Address, Token>, filters: FiltersState) {
   let out = Array.from(tokens).map(([_, token]: [Address, Token]) => token);
+
+  const sortMap: { [filter in TokenSortField]: (a: Token, b: Token) => boolean } = {
+    'token-name': (a: Token, b: Token) => a.symbol > b.symbol,
+    'w-balance': (a: Token, b: Token) => getWalletBalance(a).gt(getWalletBalance(b)),
+    'dx-balance': (a: Token, b: Token) => getDxBalance(a).gt(getDxBalance(b)),
+    'total-balance': (a: Token, b: Token) => getTotalBalance(a).gt(getTotalBalance(b)),
+  };
+
+  const sortFunc = sortMap[filters.tokenSortBy] as (a: Token, b: Token) => boolean;
+
+  if (sortFunc) {
+    out.sort((a: Token, b: Token) => {
+      if (sortFunc(a, b)) {
+        return filters.tokenSortDir === 'asc' ? 1 : -1;
+      } else if (sortFunc(b, a)) {
+        return filters.tokenSortDir === 'asc' ? -1 : 1;
+      }
+
+      return 0;
+    });
+  }
+
   if (filters.hideZeroBalance) {
     out = out.filter((token: Token) => getTotalBalance(token).gt(0));
   }

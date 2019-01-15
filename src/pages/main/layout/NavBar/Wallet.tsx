@@ -12,6 +12,7 @@ import { toggleFilters, toggleSidebar } from '../../../../store/ui/actions';
 import ActionBar from '../ActionBar';
 import HideZeroBalance from './HideZeroBalance';
 import WalletSearch from './WalletSearch';
+import WalletSort from './WalletSort';
 
 type NavBarProps = StateProps & DispatchProps;
 
@@ -42,11 +43,19 @@ class NavBar extends React.PureComponent<NavBarProps, State> {
     });
   };
 
+  sortHandler = (tokenSortBy: TokenSortField, tokenSortDir: SortDir) => {
+    this.props.actions.applyFilters({
+      ...this.props.filters,
+      tokenSortBy,
+      tokenSortDir,
+    });
+  };
+
   render() {
     const { tokenSearchQuery } = this.state;
     const {
       actions,
-      filters: { hideZeroBalance },
+      filters: { hideZeroBalance, tokenSortDir, tokenSortBy },
     } = this.props;
 
     return (
@@ -56,9 +65,7 @@ class NavBar extends React.PureComponent<NavBarProps, State> {
           <ActionSearch searchText={tokenSearchQuery} onSearch={/*() => {}*/} />
         </LeftAction>
         <RightAction>
-          <Sorting>
-            <div>SORTING</div>
-          </Sorting>
+          <Sort onSelectedItem={this.sortHandler} sortBy={tokenSortBy} sortDir={tokenSortDir} />
           <ActionSearch searchText={tokenSearchQuery} onSearch={/*() => {}*/} />
         </RightAction>
         <HideWrapper>
@@ -96,11 +103,6 @@ const ActionSearch = styled(WalletSearch)`
   align-items: center;
 `;
 
-const Sorting = styled.div`
-  display: flex;
-  justify-content: space-around;
-`;
-
 const HideWrapper = styled(ActionBar)`
   justify-content: flex-end;
 
@@ -136,6 +138,10 @@ const LeftAction = styled(ActionBar)`
   }
 `;
 
+const Sort = styled(WalletSort)`
+  padding-right: var(--spacing-normal);
+`;
+
 const RightAction = styled(ActionBar)`
   justify-content: flex-end;
   position: relative;
@@ -144,7 +150,8 @@ const RightAction = styled(ActionBar)`
     padding-right: var(--spacing-normal);
     border-bottom: 1px solid var(--color-border);
 
-    ${Sorting} {
+    ${Sort} {
+      padding-right: 0;
       position: absolute;
       left: 50%;
       transform: translateX(calc(-50% - var(--spacing-normal)));

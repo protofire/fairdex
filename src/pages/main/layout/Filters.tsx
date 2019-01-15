@@ -7,6 +7,7 @@ import Button from '../../../components/Button';
 import Checkbox from '../../../components/Checkbox';
 import Icon from '../../../components/icons';
 import Overlay from '../../../components/Overlay';
+import SortIcon from '../../../components/SortIcon';
 import sortDownImage from '../../../images/sorting_arrow_down.svg';
 import sortUpImage from '../../../images/sorting_arrow_up.svg';
 import sortNoneImage from '../../../images/sorting_inactive.svg';
@@ -100,7 +101,7 @@ class Filters extends React.PureComponent<Props, State> {
       this.filterTokens(buyTokens, this.state.buyTokenSearchQuery),
       'buyTokens',
     );
-    const nextSort = filters.sortDir === 'asc' ? 'desc' : 'asc';
+    const nextSort = filters.auctionSortDir === 'asc' ? 'desc' : 'asc';
 
     return (
       <>
@@ -114,15 +115,15 @@ class Filters extends React.PureComponent<Props, State> {
               <SubTitle>Sort By</SubTitle>
               <List>
                 <Item onClick={this.createSorter('buy-token', nextSort)}>
-                  <SortButton dir={filters.sortBy === 'buy-token' ? filters.sortDir : 'none'} />
+                  <SortIcon dir={filters.auctionSortBy === 'buy-token' ? filters.auctionSortDir : 'none'} />
                   <Label>Token</Label>
                 </Item>
                 <Item onClick={this.createSorter('sell-volume', nextSort)}>
-                  <SortButton dir={filters.sortBy === 'sell-volume' ? filters.sortDir : 'none'} />
+                  <SortIcon dir={filters.auctionSortBy === 'sell-volume' ? filters.auctionSortDir : 'none'} />
                   <Label>Sell volume</Label>
                 </Item>
                 <Item onClick={this.createSorter('start-time', nextSort)}>
-                  <SortButton dir={filters.sortBy === 'start-time' ? filters.sortDir : 'none'} />
+                  <SortIcon dir={filters.auctionSortBy === 'start-time' ? filters.auctionSortDir : 'none'} />
                   <Label>Estimated end time</Label>
                 </Item>
               </List>
@@ -183,8 +184,8 @@ class Filters extends React.PureComponent<Props, State> {
     );
   }
 
-  private createSorter(sortBy: SortField, sortDir: SortDir) {
-    return () => this.props.actions.applyFilters({ sortBy, sortDir });
+  private createSorter(auctionSortBy: AuctionSortField, auctionSortDir: SortDir) {
+    return () => this.props.actions.applyFilters({ auctionSortBy, auctionSortDir });
   }
 
   private buildTokenList(list: TokenInfo[], tokenType: 'sellTokens' | 'buyTokens') {
@@ -335,25 +336,6 @@ const Label = styled.label`
 
 const ItemCount = styled.span`
   color: var(--color-greyish);
-`;
-
-const SortButton = styled.span`
-  width: 14px;
-  height: 14px;
-  display: inline-block;
-  margin-right: var(--spacing-text);
-  object-fit: contain;
-  cursor: pointer;
-
-  ${({ dir }: SortButtonProps) => {
-    let src = sortNoneImage;
-    if (dir === 'asc') {
-      src = sortUpImage;
-    } else if (dir === 'desc') {
-      src = sortDownImage;
-    }
-    return `background-image: url(${src})`;
-  }}
 `;
 
 function mapStateToProps(state: AppState): StateProps {

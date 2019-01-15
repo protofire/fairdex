@@ -85,21 +85,21 @@ function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
 function filterAuctions(list: Auction[], filters: FiltersState, tokens: Map<Address, Token>) {
   let out = Array.from(list);
 
-  const sortMap: { [filter in SortField]: (a: Auction, b: Auction) => boolean } = {
+  const sortMap: { [filter in AuctionSortField]: (a: Auction, b: Auction) => boolean } = {
     'buy-token': (a: Auction, b: Auction) => a.buyToken > b.buyToken,
     'sell-volume': (a: Auction, b: Auction) =>
       getSellVolumeInEth(a, tokens).gt(getSellVolumeInEth(b, tokens)),
     'start-time': (a: Auction, b: Auction) => a.auctionStart > b.auctionStart,
   };
 
-  const sortFunc = sortMap[filters.sortBy] as (a: Auction, b: Auction) => boolean;
+  const sortFunc = sortMap[filters.auctionSortBy] as (a: Auction, b: Auction) => boolean;
 
   if (sortFunc) {
     out.sort((a: Auction, b: Auction) => {
       if (sortFunc(a, b)) {
-        return filters.sortDir === 'asc' ? -1 : 1;
+        return filters.auctionSortDir === 'asc' ? -1 : 1;
       } else if (sortFunc(b, a)) {
-        return filters.sortDir === 'asc' ? 1 : -1;
+        return filters.auctionSortDir === 'asc' ? 1 : -1;
       }
 
       return 0;
