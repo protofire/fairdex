@@ -14,6 +14,7 @@ const initialState: FiltersState = {
   hideZeroBalance: false,
   tokenSortBy: 'token-name',
   tokenSortDir: 'asc',
+  tokenSearchQuery: '',
 };
 
 const reducer: Reducer<FiltersState, FiltersAction> = (state = initialState, action) => {

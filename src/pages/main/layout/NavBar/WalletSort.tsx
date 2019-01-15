@@ -28,9 +28,35 @@ class WalletSort extends React.Component<Props, State> {
     'total-balance': 'Total holdings',
   };
 
+  listRef = React.createRef<HTMLInputElement>();
+
   toggle = () => {
     this.setState({ open: !this.state.open });
   };
+
+  handleKeyPress = (event: KeyboardEvent) => {
+    if (event && event.key && event.key === 'Escape') {
+      event.preventDefault();
+      this.setState({ open: false });
+    }
+  };
+
+  handleClickOutside = (event: MouseEvent) => {
+    if (event && this.listRef.current && !this.listRef.current.contains(event.target)) {
+      event.preventDefault();
+      this.setState({ open: false });
+    }
+  };
+
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyPress, false);
+    document.addEventListener('mousedown', this.handleClickOutside, false);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyPress, false);
+    document.removeEventListener('mousedown', this.handleClickOutside, false);
+  }
 
   render() {
     const { sortBy, onSelectedItem, ...props } = this.props;
@@ -43,7 +69,11 @@ class WalletSort extends React.Component<Props, State> {
           <SelectedItem>{this.items[sortBy]}</SelectedItem>
           <Arrow />
         </Label>
-        {open && <List open={open}>{this.buildItemList()}</List>}
+        {open && (
+          <List ref={this.listRef} open={open}>
+            {this.buildItemList()}
+          </List>
+        )}
       </Container>
     );
   }

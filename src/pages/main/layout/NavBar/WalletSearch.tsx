@@ -7,31 +7,19 @@ import searchIcon from '../../../../images/search.svg';
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   searchText: string;
+  searchMode: boolean;
+  onToggle: (searchMode: boolean) => void;
   onSearch: (value: string) => void;
 }
 
-interface State {
-  collapsed: boolean;
-  searchMode: boolean;
-}
-
-class WalletSearch extends React.Component<Props, State> {
-  state = {
-    collapsed: true,
-    searchMode: false,
-  };
-
+class WalletSearch extends React.Component<Props> {
   toggle = () => {
-    this.setState({ collapsed: !this.state.collapsed });
-  };
-
-  startSearch = () => {
-    this.setState({ searchMode: true });
+    this.props.onToggle(!this.props.searchMode);
   };
 
   endSearch = () => {
     this.props.onSearch('');
-    this.setState({ searchMode: false });
+    this.props.onToggle(false);
   };
 
   search = (e: any) => {
@@ -39,12 +27,13 @@ class WalletSearch extends React.Component<Props, State> {
   };
 
   render() {
-    const { searchText, onSearch, ...props } = this.props;
+    const { searchText, onSearch, searchMode, ...props } = this.props;
 
     return (
       <Container {...props}>
-        {this.state.searchMode ? (
+        {searchMode ? (
           <SearchInput
+            ref={this.inputRef}
             autoFocus
             placeholder='Enter token name'
             value={searchText}
@@ -52,7 +41,7 @@ class WalletSearch extends React.Component<Props, State> {
             onClose={this.endSearch}
           />
         ) : (
-          <SearchIcon onClick={this.startSearch}>
+          <SearchIcon onClick={this.toggle}>
             <span>Search</span>
           </SearchIcon>
         )}

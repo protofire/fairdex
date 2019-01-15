@@ -28,12 +28,12 @@ interface DispatchProps {
 }
 
 interface State {
-  tokenSearchQuery: string;
+  searchMode: boolean;
 }
 
 class NavBar extends React.PureComponent<NavBarProps, State> {
   state = {
-    tokenSearchQuery: '',
+    searchMode: false,
   };
 
   toggleZeroBalance = (option: string, checked: boolean) => {
@@ -51,22 +51,43 @@ class NavBar extends React.PureComponent<NavBarProps, State> {
     });
   };
 
+  searchHandler = (tokenSearchQuery: string) => {
+    this.props.actions.applyFilters({
+      ...this.props.filters,
+      tokenSearchQuery,
+    });
+  };
+
+  searchToggleHandler = searchMode => {
+    this.setState({ searchMode });
+  };
+
   render() {
-    const { tokenSearchQuery } = this.state;
     const {
       actions,
-      filters: { hideZeroBalance, tokenSortDir, tokenSortBy },
+      filters: { hideZeroBalance, tokenSortDir, tokenSortBy, tokenSearchQuery },
     } = this.props;
+
+    const { searchMode } = this.state;
+
+    const SearchComponent = (
+      <Search
+        searchText={tokenSearchQuery}
+        onSearch={this.searchHandler}
+        onToggle={this.searchToggleHandler}
+        searchMode={searchMode}
+      />
+    );
 
     return (
       <Container>
         <LeftAction>
           <ToggleSidebar onClick={actions.toggleSidebar} />
-          <ActionSearch searchText={tokenSearchQuery} onSearch={/*() => {}*/} />
+          {SearchComponent}
         </LeftAction>
         <RightAction>
           <Sort onSelectedItem={this.sortHandler} sortBy={tokenSortBy} sortDir={tokenSortDir} />
-          <ActionSearch searchText={tokenSearchQuery} onSearch={/*() => {}*/} />
+          {SearchComponent}
         </RightAction>
         <HideWrapper>
           <HideZeroBalance checked={hideZeroBalance} onChange={this.toggleZeroBalance} />
@@ -97,7 +118,7 @@ const Container = styled.nav`
 
 const ToggleSidebar = styled(Icon.Menu)``;
 
-const ActionSearch = styled(WalletSearch)`
+const Search = styled(WalletSearch)`
   display: flex;
   height: var(--header-height);
   align-items: center;
@@ -131,7 +152,7 @@ const LeftAction = styled(ActionBar)`
     }
   }
 
-  ${ActionSearch} {
+  ${Search} {
     @media (max-width: 800px) {
       display: none;
     }
@@ -158,7 +179,7 @@ const RightAction = styled(ActionBar)`
     }
   }
 
-  ${ActionSearch} {
+  ${Search} {
     position: absolute;
     right: var(--spacing-normal);
     @media (min-width: 801px) {

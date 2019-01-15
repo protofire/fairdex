@@ -12,6 +12,7 @@ interface FiltersState {
   hideZeroBalance: boolean;
   tokenSortBy: TokenSortField;
   tokenSortDir: SortDir;
+  tokenSearchQuery: string;
 }
 
 interface FiltersAction {

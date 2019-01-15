@@ -57,15 +57,25 @@ export const getFilteredTokens = createSelector(
   filterTokens,
 );
 
+const sortMap: { [filter in TokenSortField]: (a: Token, b: Token) => boolean } = {
+  'token-name': (a: Token, b: Token) => a.symbol > b.symbol,
+  'w-balance': (a: Token, b: Token) => getWalletBalance(a).gt(getWalletBalance(b)),
+  'dx-balance': (a: Token, b: Token) => getDxBalance(a).gt(getDxBalance(b)),
+  'total-balance': (a: Token, b: Token) => getTotalBalance(a).gt(getTotalBalance(b)),
+};
+
 function filterTokens(tokens: Map<Address, Token>, filters: FiltersState) {
   let out = Array.from(tokens).map(([_, token]: [Address, Token]) => token);
 
-  const sortMap: { [filter in TokenSortField]: (a: Token, b: Token) => boolean } = {
-    'token-name': (a: Token, b: Token) => a.symbol > b.symbol,
-    'w-balance': (a: Token, b: Token) => getWalletBalance(a).gt(getWalletBalance(b)),
-    'dx-balance': (a: Token, b: Token) => getDxBalance(a).gt(getDxBalance(b)),
-    'total-balance': (a: Token, b: Token) => getTotalBalance(a).gt(getTotalBalance(b)),
-  };
+  if (filters.hideZeroBalance) {
+    out = out.filter((token: Token) => getTotalBalance(token).gt(0));
+  }
+
+  if (filters.tokenSearchQuery) {
+    out = out.filter((token: Token) =>
+      token.symbol.toLowerCase().startsWith(filters.tokenSearchQuery.toLowerCase()),
+    );
+  }
 
   const sortFunc = sortMap[filters.tokenSortBy] as (a: Token, b: Token) => boolean;
 
@@ -79,10 +89,6 @@ function filterTokens(tokens: Map<Address, Token>, filters: FiltersState) {
 
       return 0;
     });
-  }
-
-  if (filters.hideZeroBalance) {
-    out = out.filter((token: Token) => getTotalBalance(token).gt(0));
   }
 
   return out;
