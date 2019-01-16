@@ -64,9 +64,9 @@ class WalletSort extends React.Component<Props, State> {
 
     return (
       <Container {...props}>
-        <Label onClick={this.toggle}>
+        <Label onClick={this.toggle} data-testid={'wallet-overview-sort'}>
           {'Sort by: '}
-          <SelectedItem>{this.items[sortBy]}</SelectedItem>
+          <SelectedItem data-testid={'wallet-overview-sort-selected'}>{this.items[sortBy]}</SelectedItem>
           <Arrow />
         </Label>
         {open && (
@@ -83,7 +83,11 @@ class WalletSort extends React.Component<Props, State> {
     const nextSort = sortDir === 'asc' ? 'desc' : 'asc';
 
     return Object.keys(this.items).map(key => (
-      <Item key={key} onClick={this.createSorter(key, nextSort)}>
+      <Item
+        key={key}
+        onClick={this.createSorter(key, nextSort)}
+        data-testid={`wallet-overview-sort-item-${key}`}
+      >
         <SortIcon dir={sortBy === key ? sortDir : 'none'} />
         {this.items[key]}
       </Item>

@@ -33,15 +33,15 @@ class WalletSearch extends React.Component<Props> {
       <Container {...props}>
         {searchMode ? (
           <SearchInput
-            ref={this.inputRef}
             autoFocus
             placeholder='Enter token name'
             value={searchText}
             onChange={this.search}
             onClose={this.endSearch}
+            data-testid={'wallet-overview-search-input'}
           />
         ) : (
-          <SearchIcon onClick={this.toggle}>
+          <SearchIcon onClick={this.toggle} data-testid={'wallet-overview-search-icon'}>
             <span>Search</span>
           </SearchIcon>
         )}

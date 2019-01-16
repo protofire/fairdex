@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import Icon from '../../../../components/icons';
 
 import { applyFilters } from '../../../../store/filters/actions';
-import { toggleFilters, toggleSidebar } from '../../../../store/ui/actions';
+import { toggleSidebar } from '../../../../store/ui/actions';
 
 import ActionBar from '../ActionBar';
 import HideZeroBalance from './HideZeroBalance';
@@ -58,7 +58,7 @@ class NavBar extends React.PureComponent<NavBarProps, State> {
     });
   };
 
-  searchToggleHandler = searchMode => {
+  searchToggleHandler = (searchMode: boolean) => {
     this.setState({ searchMode });
   };
 

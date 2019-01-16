@@ -5,11 +5,11 @@ import Checkbox from '../../../../components/Checkbox';
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   checked: boolean;
-  onChange: () => void;
+  onChange: (_: any, searchMode: boolean) => void;
 }
 
 const HideZeroBalance = ({ checked, onChange, ...props }: Props) => (
-  <Label {...props}>
+  <Label {...props} data-testid={'hide-zero-balance'}>
     <Checkbox name='hideZeroBalance' checked={checked} onChange={onChange} />
     Hide zero balances
   </Label>

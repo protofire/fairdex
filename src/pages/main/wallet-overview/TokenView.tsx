@@ -31,8 +31,8 @@ class TokenView extends React.PureComponent<Props> {
     const { enableForTrading } = this.state;
 
     return (
-      <Card id={token.address}>
-        <Title title={token.symbol}>
+      <Card>
+        <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
           <span>{token.symbol}</span>
         </Title>
         <Table>
