@@ -24,9 +24,15 @@ const DEFAULT_DECIMALS = 3;
 const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
   <Card id={`${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}>
     <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`}>
-      <span>{auction.buyToken}</span>
+      <div>
+        <small>bid with</small>
+        <h3>{auction.buyToken}</h3>
+      </div>
       <Separator>▶</Separator>
-      <span>{auction.sellToken}</span>
+      <div>
+        <small>to buy</small>
+        <h3>{auction.sellToken}</h3>
+      </div>
     </Title>
 
     {auction.state === 'running' && (
@@ -254,18 +260,32 @@ const Table = styled.dl`
   letter-spacing: -0.4px;
 `;
 
-const Title = styled.h3`
+const Title = styled.div`
   display: inline-flex;
   align-items: center;
-  font-size: 2em;
-  font-weight: 900;
-  color: var(--color-light-grey-blue);
+
+  & > div {
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  h3 {
+    font-size: 2em;
+    font-weight: 900;
+    color: var(--color-light-grey-blue);
+  }
+
+  small {
+    font-size: 70%;
+    color: var(--color-grey);
+  }
 `;
 
-const Separator = styled.span`
-  font-size: 40%;
+const Separator = styled.div`
+  font-size: 80%;
   color: var(--color-grey);
   margin: 0 var(--spacing-text);
+  padding-top: var(--spacing-title);
 `;
 
 const ButtonGroup = styled.div`
