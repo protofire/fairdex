@@ -7,6 +7,7 @@ import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contra
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
 import Toggle from '../../../components/Toggle';
+import { ZERO } from '../../../contracts/utils';
 import DepositForm from './DepositForm';
 import WithdrawForm from './WithdrawForm';
 
@@ -73,8 +74,8 @@ class TokenView extends React.PureComponent<Props> {
           </Row>
         </Table>
         <ButtonGroup>
-          <DepositForm token={token} /> {/* TODO: hide if no token in wallet */}
-          <WithdrawForm token={token} /> {/* TODO: hide if no token in DX */}
+          {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
+          {getDxBalance(token).gt(ZERO) && <WithdrawForm token={token} />}
         </ButtonGroup>
       </Card>
     );
