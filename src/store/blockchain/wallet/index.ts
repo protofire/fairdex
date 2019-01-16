@@ -9,6 +9,8 @@ import { loadAvailableTokens, updateFeeRatio, updateTokenBalancesAndPrice } from
 
 export * from './selectors';
 
+const WALLET_STORAGE_KEY = 'wallet';
+
 // Actions
 const INIT_WALLET = 'INIT_WALLET';
 const CHANGE_ACCOUNT = 'CHANGE_ACCOUNT';
@@ -59,6 +61,9 @@ export function initWallet(wallet: Wallet) {
 
       dispatch(selectWallet(wallet, networkId, accountAddress));
 
+      // Save selected wallet
+      localStorage.setItem(WALLET_STORAGE_KEY, wallet);
+
       // Load list of available tokens
       dispatch(loadAvailableTokens());
 
@@ -79,6 +84,10 @@ export function initWallet(wallet: Wallet) {
       });
     }
   };
+}
+
+export function getPreviouslyUsedWallet() {
+  return localStorage.getItem(WALLET_STORAGE_KEY) as Wallet;
 }
 
 async function accountChangeHandler(dispatch: any, account: Address) {
