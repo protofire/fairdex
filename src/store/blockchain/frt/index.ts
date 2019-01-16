@@ -1,6 +1,7 @@
 import { ActionCreator, AnyAction, Reducer } from 'redux';
 
 import FeeReductionToken from '../../../contracts/FeeReductionToken';
+import { Decimal } from '../../../contracts/utils';
 import { periodicAction } from '../../utils';
 
 export * from './selectors';
@@ -9,9 +10,9 @@ export * from './selectors';
 const INIT_FEE_REDUCTION_TOKEN = 'INIT_FEE_REDUCTION_TOKEN';
 const UPDATE_FRT_BALANCE = 'UPDATE_FRT_BALANCE';
 
-let contract;
+let contract: FeeReductionToken;
 
-const reducer: Reducer<AuctionsState> = (state = {}, action) => {
+const reducer: Reducer<FrtState> = (state = {}, action) => {
   switch (action.type) {
     case INIT_FEE_REDUCTION_TOKEN:
       return {
