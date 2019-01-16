@@ -20,6 +20,7 @@ interface OwnProps {
 
 interface AppStateProps {
   currentAccount: Address;
+  token: Token;
 }
 
 interface DispatchProps {

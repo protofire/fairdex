@@ -21,7 +21,7 @@ class TokenView extends React.PureComponent<Props> {
     enableForTrading: false,
   };
 
-  enableForTradingHandler = isOn => {
+  enableForTradingHandler = (isOn: boolean) => {
     this.setState({ enableForTrading: isOn });
   };
 

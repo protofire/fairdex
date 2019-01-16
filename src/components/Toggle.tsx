@@ -7,7 +7,7 @@ import checkboxUnchecked from '../images/checkbox_unchecked.svg';
 interface Props {
   isOn: boolean;
   className?: string;
-  onChange: (name: string, checked: boolean) => void;
+  onChange: (isOn: boolean) => void;
 }
 
 class Toggle extends React.PureComponent<Props> {
