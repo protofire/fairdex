@@ -113,7 +113,12 @@ class Withdraw extends React.PureComponent<Props, State> {
             Cancel
           </Button>
         ) : (
-          <Button mode='secondary' onClick={this.showDialog} disabled={true}>
+          <Button
+            mode='secondary'
+            onClick={this.showDialog}
+            data-testid={`${token.address}-withdraw-button`}
+            disabled={true}
+          >
             {' '}
             {/* FIXME: disabled until implement functionality */}
             Withdraw

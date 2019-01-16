@@ -29,6 +29,10 @@ const initialState: AppState = {
     auctionSortDir: 'asc',
     onlyMyTokens: false,
     claimableAuctions: false,
+    hideZeroBalance: false,
+    tokenSortBy: 'token-name',
+    tokenSortDir: 'asc',
+    tokenSearchQuery: '',
   },
   ui: {
     sidebarVisible: false,

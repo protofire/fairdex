@@ -109,7 +109,12 @@ class DepositForm extends React.PureComponent<Props, State> {
             Cancel
           </Button>
         ) : (
-          <Button mode='secondary' onClick={this.showDialog} disabled={true}>
+          <Button
+            mode='secondary'
+            onClick={this.showDialog}
+            data-testid={`${token.address}-deposit-button`}
+            disabled={true}
+          >
             {' '}
             {/* FIXME: disabled until implement functionality */}
             Deposit
