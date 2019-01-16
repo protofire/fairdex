@@ -71,8 +71,11 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
                 <Loading />
               ) : (
                 <>
-                  <DecimalValue value={getAvailableVolume(auction)} decimals={DEFAULT_DECIMALS} />
-                  <small> {auction.sellToken}</small>
+                  <DecimalValue
+                    value={getAvailableVolume(auction).times(auction.currentPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                  />
+                  <small> {auction.buyToken}</small>
                 </>
               )}
             </Value>
