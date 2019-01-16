@@ -17,7 +17,6 @@ const Panel = React.memo(({ onClickOutside, onBackspacePress, onEscPress, ...pro
           const target = event.target as Node;
 
           if (!root.current.contains(target)) {
-            event.preventDefault();
             onClickOutside();
           }
         }
