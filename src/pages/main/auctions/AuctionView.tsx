@@ -3,7 +3,12 @@ import styled from 'styled-components';
 
 import { DecimalValue, Duration, Timestamp } from '../../../components/formatters';
 import { ZERO } from '../../../contracts/utils';
-import { getAvailableVolume, getEstimatedEndTime } from '../../../contracts/utils/auctions';
+import {
+  getAvailableVolume,
+  getClosingPriceRate,
+  getCurrentPriceRate,
+  getEstimatedEndTime,
+} from '../../../contracts/utils/auctions';
 
 import Card from '../../../components/Card';
 import Popup from '../../../components/Popup';
@@ -33,13 +38,13 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
               {auction.currentPrice === undefined ? (
                 <Loading />
               ) : (
-                <>
-                  <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} />
+                <span title={getCurrentPriceRate(auction)}>
+                  <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
                   </small>
-                </>
+                </span>
               )}
             </Value>
           </Row>
@@ -49,13 +54,13 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
               {auction.closingPrice === undefined ? (
                 <Loading />
               ) : (
-                <>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+                <span title={getClosingPriceRate(auction)}>
+                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
                   </small>
-                </>
+                </span>
               )}
             </Value>
           </Row>
@@ -102,13 +107,13 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
               {auction.closingPrice === undefined ? (
                 <Loading />
               ) : (
-                <>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+                <span title={getClosingPriceRate(auction)}>
+                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
                   </small>
-                </>
+                </span>
               )}
             </Value>
           </Row>
@@ -144,13 +149,13 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
               {auction.closingPrice === undefined ? (
                 <Loading />
               ) : (
-                <>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} />
+                <span title={getClosingPriceRate(auction)}>
+                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
                   </small>
-                </>
+                </span>
               )}
             </Value>
           </Row>
