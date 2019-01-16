@@ -276,7 +276,8 @@ const Title = styled.div`
   }
 
   small {
-    font-size: 70%;
+    font-size: 80%;
+    text-transform: lowercase;
     color: var(--color-grey);
   }
 `;
@@ -286,6 +287,7 @@ const Separator = styled.div`
   color: var(--color-grey);
   margin: 0 var(--spacing-text);
   padding-top: var(--spacing-title);
+  user-select: none;
 `;
 
 const ButtonGroup = styled.div`
