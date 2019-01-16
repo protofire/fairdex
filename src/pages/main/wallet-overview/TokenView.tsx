@@ -66,12 +66,15 @@ class TokenView extends React.PureComponent<Props> {
               )}
             </Value>
           </Row>
-          <Row>
-            <Label className={'no-dots'}>Enable for trading</Label>
-            <dd>
-              <TradingToggle onChange={this.enableForTradingHandler} isOn={enableForTrading} />
-            </dd>
-          </Row>
+          {false && (
+            <Row>
+              <Label className={'no-dots'}>Enable for trading</Label>
+              <dd>
+                <TradingToggle onChange={this.enableForTradingHandler} isOn={enableForTrading} />
+              </dd>
+            </Row>
+          )}{' '}
+          {/* FIXME: hidden until implement functionality */}
         </Table>
         <ButtonGroup>
           {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
