@@ -1,6 +1,6 @@
 import { addHours } from 'date-fns';
 
-import { toBigNumber, ZERO } from './decimal';
+import { formatNumber, toBigNumber, ZERO } from './decimal';
 
 const AUCTION_DURATION = 6; // 6 hours
 const AUCTION_START_WAITING_FOR_FUNDING = 1;
@@ -129,4 +129,23 @@ export function getSellVolumeInEth(auction: Auction, tokens: Token[]) {
   }
 
   return ZERO;
+}
+
+export function getPriceRate(value: BigNumber, sellToken: string, buyToken: string, decimals = 6) {
+  if (!value || !value.isFinite() || value.lte(0)) {
+    return '';
+  }
+
+  const formatted = formatNumber(value, { decimals });
+  const formattedInverse = formatNumber(value.pow(-1), { decimals });
+
+  return `1 ${sellToken} = ${formatted} ${buyToken}\n` + `1 ${buyToken} = ${formattedInverse} ${sellToken}`;
+}
+
+export function getCurrentPriceRate(auction: RunningAuction, decimals?: number) {
+  return getPriceRate(auction.currentPrice, auction.sellToken, auction.buyToken, decimals);
+}
+
+export function getClosingPriceRate(auction: Auction, decimals?: number) {
+  return getPriceRate(auction.closingPrice, auction.sellToken, auction.buyToken, decimals);
 }
