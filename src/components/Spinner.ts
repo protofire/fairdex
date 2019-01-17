@@ -56,7 +56,9 @@ const Spinner = styled.div`
     height: 100%;
 
     animation: ${spin} 1s linear;
+    animation-fill-mode: forwards;
     animation-iteration-count: infinite;
+    will-change: transform;
 
     border: ${(props: SpinnerProps) => (0.2 * SPINNER_SIZES[props.size]) / SPINNER_SIZES.small}em solid;
     border-color: var(--color-accent-shadow) transparent transparent;
