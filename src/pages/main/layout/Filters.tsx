@@ -8,9 +8,7 @@ import Checkbox from '../../../components/Checkbox';
 import Icon from '../../../components/icons';
 import Overlay from '../../../components/Overlay';
 import SortIcon from '../../../components/SortIcon';
-import sortDownImage from '../../../images/sorting_arrow_down.svg';
-import sortUpImage from '../../../images/sorting_arrow_up.svg';
-import sortNoneImage from '../../../images/sorting_inactive.svg';
+
 import {
   getBuyTokens,
   getFilteredClaimableAuctions,
@@ -34,6 +32,8 @@ interface StateProps {
   sellTokens: TokenInfo[];
   buyTokens: TokenInfo[];
   filters: FiltersState;
+  myTokensAuctionsCount: number;
+  claimableCount: number;
 }
 
 interface DispatchProps {
@@ -42,10 +42,6 @@ interface DispatchProps {
     applyFilters: typeof applyFilters;
     clearFilters: typeof clearFilters;
   };
-}
-
-interface SortButtonProps {
-  dir: SortDir;
 }
 
 class Filters extends React.PureComponent<Props, State> {
