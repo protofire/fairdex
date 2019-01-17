@@ -42,6 +42,8 @@ const GlobalStyles = createGlobalStyle`
   ${variables}
   
   #root {
+    min-width: 100vw;
+    min-height: 100vh;
     background-color: var(--color-content-bg);
   }
 

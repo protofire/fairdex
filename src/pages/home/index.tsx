@@ -40,7 +40,7 @@ const HomePage = React.memo(({ network, wallet }: Props) => {
 
   return (
     <Container>
-      {content}
+      <Content>{content}</Content>
       <Footer>
         <img src={images.logo} />
       </Footer>
@@ -56,10 +56,6 @@ const Container = styled.section`
   text-align: center;
   width: 100%;
   min-height: 100vh;
-
-  @media (min-height: 768px) {
-    padding-bottom: calc(var(--spacing-wide) * 2);
-  }
 
   h2 {
     text-transform: uppercase;
@@ -81,14 +77,18 @@ const Container = styled.section`
   }
 `;
 
+const Content = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+`;
+
 const Footer = styled.footer`
   margin: var(--spacing-wide) 0;
   user-select: none;
-
-  @media (min-height: 768px) {
-    position: absolute;
-    bottom: 0;
-  }
 
   img {
     width: 144px;
