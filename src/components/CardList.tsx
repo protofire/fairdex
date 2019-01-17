@@ -10,6 +10,7 @@ export const ListContainer = styled.div`
   ${Card} {
     display: flex;
     flex-direction: column;
+    height: 100%;
 
     & > *:last-child {
       flex: 1;

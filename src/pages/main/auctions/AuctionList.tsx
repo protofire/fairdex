@@ -1,8 +1,6 @@
 import React from 'react';
 import { Flipped, Flipper } from 'react-flip-toolkit';
-import styled from 'styled-components';
 
-import Card from '../../../components/Card';
 import { EmptyList, ListContainer } from '../../../components/CardList';
 
 import Spinner from '../../../components/Spinner';
@@ -27,9 +25,9 @@ const AuctionList = ({ auctions, isLoading }: AuctionListProps) => (
 
           return (
             <Flipped key={key} flipId={key}>
-              <Item>
+              <div>
                 <AuctionView data={auction} />
-              </Item>
+              </div>
             </Flipped>
           );
         })}
@@ -47,11 +45,5 @@ AuctionList.defaultProps = {
   auctions: [],
   loading: false,
 };
-
-const Item = styled.div`
-  ${Card} {
-    height: 100%;
-  }
-`;
 
 export default React.memo(AuctionList);
