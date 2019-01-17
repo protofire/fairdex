@@ -40,12 +40,6 @@ const variables = css`
 
 const GlobalStyles = createGlobalStyle`
   ${variables}
-  
-  #root {
-    min-width: 100vw;
-    min-height: 100vh;
-    background-color: var(--color-content-bg);
-  }
 
   html {
     box-sizing: border-box;
@@ -56,6 +50,7 @@ const GlobalStyles = createGlobalStyle`
   body {
     font-family: 'Open Sans', sans-serif;
     font-size: 16px;
+    background-color: var(--color-content-bg);
   }
 
   *, *:before, *:after {
