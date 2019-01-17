@@ -1,22 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { DecimalValue } from '../../../components/formatters';
+import { toDecimal, ZERO } from '../../../contracts/utils';
 import { getTokensWithBalance, getTopBalances } from '../../../store/blockchain';
 import WalletCard, { Content, Header, Item } from './wallet-card';
 
 interface StateProps {
   tokens: Token[];
   topBalances: TokenWithBalance[];
+  currentAccount?: Address;
 }
 
 type WalletProps = StateProps & RouteComponentProps;
 
 const DEFAULT_DECIMALS = 3;
 
-const Account = ({ tokens, topBalances }: WalletProps) => {
+const Wallet = ({ tokens, topBalances, currentAccount }: WalletProps) => {
+  const [ethBalance, setEthBalance] = useState(ZERO);
+
+  useEffect(() => {
+    if (currentAccount) {
+      window.web3.eth.getBalance(currentAccount).then(balance => {
+        setEthBalance(toDecimal(balance.toString(), 18) || ZERO);
+      });
+    }
+  });
+
   return (
     <Container>
       <WalletHeader>
@@ -24,6 +36,10 @@ const Account = ({ tokens, topBalances }: WalletProps) => {
         <ViewAllTokens to='/wallet'>VIEW ALL {tokens.length} TOKENS &#x279C;</ViewAllTokens>
       </WalletHeader>
       <Content>
+        <Item>
+          <DecimalValue value={ethBalance} decimals={DEFAULT_DECIMALS} />
+          <small>ETH</small>
+        </Item>
         <Item>
           <DecimalValue value={topBalances[0].totalBalance} decimals={DEFAULT_DECIMALS} />
           <small>{topBalances[0].symbol}</small>
@@ -35,10 +51,6 @@ const Account = ({ tokens, topBalances }: WalletProps) => {
         <Item>
           <DecimalValue value={topBalances[2].totalBalance} decimals={DEFAULT_DECIMALS} />
           <small>{topBalances[2].symbol}</small>
-        </Item>
-        <Item>
-          <DecimalValue value={topBalances[3].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <small>{topBalances[3].symbol}</small>
         </Item>
       </Content>
     </Container>
@@ -76,7 +88,8 @@ function mapStateToProps(state: AppState): StateProps {
   return {
     tokens: getTokensWithBalance(state),
     topBalances: getTopBalances(state),
+    currentAccount: state.blockchain.currentAccount,
   };
 }
 
-export default withRouter(connect(mapStateToProps)(Account));
+export default withRouter(connect(mapStateToProps)(Wallet));
