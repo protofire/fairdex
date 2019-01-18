@@ -10,7 +10,7 @@ export const TokenContextProvider: FunctionComponent = ({ children }) => {
     setApproving(true);
 
     const tokenContract = getTokenContract(token);
-    const approveValue = token.allowance && token.allowance.gt(0) ? 0 : -1;
+    const approveValue = token.allowance && token.allowance.gt(0) ? 0 : -1; // -1 will set the max uint in the contract
 
     return tokenContract
       .approve(window.dx.address, approveValue)

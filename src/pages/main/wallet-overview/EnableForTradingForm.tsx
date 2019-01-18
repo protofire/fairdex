@@ -95,7 +95,11 @@ class EnableForTradingForm extends React.PureComponent<Props> {
       <Container>
         <Label>Enable for trading</Label>
         <dd>
-          <TradingToggle onToggle={this.onChangeHandler} checked={enabled} />
+          <TradingToggle
+            onToggle={this.onChangeHandler}
+            checked={enabled}
+            data-testid={`trading-toggle-${token.address}`}
+          />
         </dd>
       </Container>
     );
