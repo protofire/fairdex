@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 
 import SortIcon from '../../../../components/SortIcon';
-import SearchInput from '../SearchInput';
 
 import ic_arrow_up from '../../../../images/ic_arrow_up.svg';
 
@@ -59,7 +58,7 @@ class WalletSort extends React.Component<Props, State> {
   }
 
   render() {
-    const { sortBy, onSelectedItem, ...props } = this.props;
+    const { sortBy, ...props } = this.props;
     const { open } = this.state;
 
     return (
@@ -108,7 +107,10 @@ const Container = styled.div`
   position: relative;
 `;
 
-const SelectedItem = styled.span``;
+const SelectedItem = styled.span`
+  padding-left: calc(var(--spacing-text) / 2);
+`;
+
 const Arrow = styled.span``;
 
 const Label = styled.label`

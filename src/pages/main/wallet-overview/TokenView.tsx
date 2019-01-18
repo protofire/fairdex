@@ -6,7 +6,7 @@ import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contra
 
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
-import Toggle from '../../../components/Toggle';
+import CheckboxToggle from '../../../components/CheckboxToggle';
 import { ZERO } from '../../../contracts/utils';
 import DepositForm from './DepositForm';
 import WithdrawForm from './WithdrawForm';
@@ -70,7 +70,7 @@ class TokenView extends React.PureComponent<Props> {
             <Row>
               <Label className={'no-dots'}>Enable for trading</Label>
               <dd>
-                <TradingToggle onChange={this.enableForTradingHandler} isOn={enableForTrading} />
+                <TradingToggle checked={enableForTrading} onToggle={this.enableForTradingHandler} />
               </dd>
             </Row>
           )}{' '}
@@ -131,7 +131,7 @@ const Row = styled.div`
   }
 `;
 
-const TradingToggle = styled(Toggle)`
+const TradingToggle = styled(CheckboxToggle)`
   margin-top: 4px;
 `;
 

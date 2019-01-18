@@ -27,7 +27,7 @@ class WalletSearch extends React.Component<Props> {
   };
 
   render() {
-    const { searchText, onSearch, searchMode, ...props } = this.props;
+    const { searchText, searchMode, ...props } = this.props;
 
     return (
       <Container {...props}>
@@ -61,7 +61,7 @@ const SearchIcon = styled.span`
   display: inline-block;
   width: 24px;
   height: 24px;
-  cursor: pointer;
+  cursor: text;
   background: url(${searchIcon}) no-repeat center;
 
   span {

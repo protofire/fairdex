@@ -90,7 +90,7 @@ class NavBar extends React.PureComponent<NavBarProps, State> {
           {SearchComponent}
         </RightAction>
         <HideWrapper>
-          <HideZeroBalance checked={hideZeroBalance} onChange={this.toggleZeroBalance} />
+          <HideZeroBalance checked={hideZeroBalance} onToggle={this.toggleZeroBalance} />
         </HideWrapper>
       </Container>
     );
@@ -161,6 +161,10 @@ const LeftAction = styled(ActionBar)`
 
 const Sort = styled(WalletSort)`
   padding-right: var(--spacing-normal);
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
 `;
 
 const RightAction = styled(ActionBar)`
