@@ -1,4 +1,5 @@
 import React from 'react';
+import { Flipped, Flipper } from 'react-flip-toolkit';
 
 import { EmptyList, ListContainer } from '../../../components/CardList';
 
@@ -11,23 +12,30 @@ export interface TokenListProps {
   isLoading?: boolean;
 }
 
-const TokenList = ({ tokens, isLoading }: TokenListProps) =>
-  isLoading ? (
-    <EmptyList>
-      <Spinner size='large' />
-    </EmptyList>
-  ) : tokens.length > 0 ? (
-    <ListContainer>
-      {tokens.map(token => (
-        <TokenView key={token.address} data={token} />
-      ))}
-    </ListContainer>
-  ) : (
-    <EmptyList>
-      <img src={images.auctions.EmptyList} />
-      <h3>No tokens with balance found</h3>
-    </EmptyList>
-  );
+const TokenList = ({ tokens, isLoading }: TokenListProps) => (
+  <Flipper flipKey={tokens.map(({ address }) => address.substr(address.length - 8)).join('-')}>
+    {isLoading ? (
+      <EmptyList>
+        <Spinner size='large' />
+      </EmptyList>
+    ) : tokens.length > 0 ? (
+      <ListContainer>
+        {tokens.map(token => (
+          <Flipped key={token.address} flipId={token.address}>
+            <div>
+              <TokenView data={token} />
+            </div>
+          </Flipped>
+        ))}
+      </ListContainer>
+    ) : (
+      <EmptyList>
+        <img src={images.auctions.EmptyList} />
+        <h3>No tokens with balance found</h3>
+      </EmptyList>
+    )}
+  </Flipper>
+);
 
 TokenList.defaultProps = {
   tokens: [],
