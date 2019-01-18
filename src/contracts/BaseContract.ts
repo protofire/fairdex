@@ -16,6 +16,8 @@ export interface SubscriptionOptions<EventType> {
 }
 
 abstract class BaseContract<EventType extends string = string> {
+  address: Address;
+
   protected contract: Contract;
   private subscriptions = new Map<EventType, any>();
 
@@ -24,6 +26,7 @@ abstract class BaseContract<EventType extends string = string> {
     const { jsonInterface, address } = options;
 
     this.contract = new web3.eth.Contract(jsonInterface, address);
+    this.address = address;
   }
 
   subscribe<T = any>(

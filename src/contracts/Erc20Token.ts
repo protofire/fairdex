@@ -11,11 +11,22 @@ class Erc20Token extends BaseContract {
     });
   }
 
+  approve(spender: Address, value: number) {
+    return this.contract.methods.approve(spender, value);
+  }
+
   @timeout()
   async getBalance(account: Address) {
     const balance = await this.contract.methods.balanceOf(account).call();
 
     return toDecimal(balance, this.token.decimals) || ZERO;
+  }
+
+  @timeout()
+  async allowance(owner: Address, spender: Address) {
+    const allowed = await this.contract.methods.allowance(owner, spender).call();
+
+    return toDecimal(allowed, this.token.decimals) || ZERO;
   }
 }
 

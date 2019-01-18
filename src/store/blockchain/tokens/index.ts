@@ -12,6 +12,7 @@ export * from './selectors';
 const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
 const SET_FEE_RATIO = 'SET_FEE_RATIO';
 const SET_TOKEN_BALANCES_AND_PRICE = 'SET_TOKEN_BALANCES_AND_PRICE';
+const SET_TOKEN_ALLOWANCE = 'SET_TOKEN_ALLOWANCE';
 
 const initialState: TokensState = {
   tokens: new Map<Address, Token>(),
@@ -45,7 +46,23 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
         tokens: new Map<Address, Token>(
           Array.from(state.tokens).map(
             ([_, token]): [Address, Token] => {
-              [token.balance, token.priceEth] = action.payload.get(token.address);
+              [token.balance, token.priceEth, token.allowance] = action.payload.get(token.address);
+
+              return [token.address, token];
+            },
+          ),
+        ),
+      };
+
+    case SET_TOKEN_ALLOWANCE:
+      return {
+        ...state,
+        tokens: new Map<Address, Token>(
+          Array.from(state.tokens).map(
+            ([_, token]): [Address, Token] => {
+              if (token.address === action.payload.address) {
+                token.allowance = action.payload.allowance;
+              }
 
               return [token.address, token];
             },
@@ -115,13 +132,14 @@ export function updateTokenBalancesAndPrice() {
         Array.from(tokens).map(async ([_, token]) => {
           const tokenContract = getTokenContract(token);
 
-          const [contractBalance, walletBalance, priceEth] = await Promise.all([
+          const [contractBalance, walletBalance, priceEth, allowance] = await Promise.all([
             dx.getBalance(token, accountAddress),
             tokenContract.getBalance(accountAddress),
             dx.getPriceOfTokenInLastAuction(token),
+            tokenContract.allowance(accountAddress, dx.address),
           ]);
 
-          return [token.address, [[contractBalance, walletBalance], priceEth.value]];
+          return [token.address, [[contractBalance, walletBalance], priceEth.value, allowance]];
         }),
       );
 
@@ -150,6 +168,25 @@ const setTokenBalances: ActionCreator<Action> = (
   return {
     type: SET_TOKEN_BALANCES_AND_PRICE,
     payload: new Map(balances),
+  };
+};
+
+const setTokenAllowance: ActionCreator<Action> = (address: Address, allowance: BigNumber) => {
+  return {
+    type: SET_TOKEN_ALLOWANCE,
+    payload: { address, allowance },
+  };
+};
+
+export const updateTokenAllowance = (token: Token) => {
+  return async (dispatch: any, getState: () => AppState) => {
+    const {
+      blockchain: { currentAccount },
+    } = getState();
+    const tokenContract = getTokenContract(token);
+    const allowance = await tokenContract.allowance(currentAccount, window.dx.address);
+
+    dispatch(setTokenAllowance(token.address, allowance));
   };
 };
 
