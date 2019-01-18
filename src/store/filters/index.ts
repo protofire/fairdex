@@ -7,8 +7,8 @@ export * from './selectors';
 const initialState: FiltersState = {
   sellTokens: [],
   buyTokens: [],
-  auctionSortDirortBy: 'start-time',
-  auctionSortDirortDir: 'asc',
+  auctionSortBy: 'start-time',
+  auctionSortDir: 'asc',
   onlyMyTokens: false,
   claimableAuctions: false,
   hideZeroBalance: false,
