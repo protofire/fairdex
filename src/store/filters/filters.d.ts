@@ -1,5 +1,5 @@
 type SortDir = 'asc' | 'desc' | 'none';
-type AuctionSortField = 'buy-token' | 'sell-volume' | 'start-time';
+type AuctionSortField = 'bid-token' | 'sell-volume' | 'end-time';
 type TokenSortField = 'token-name' | 'w-balance' | 'dx-balance' | 'total-balance';
 
 interface FiltersState {

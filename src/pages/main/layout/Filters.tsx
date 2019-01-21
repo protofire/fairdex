@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
@@ -19,7 +20,7 @@ import { applyFilters, clearFilters } from '../../../store/filters/actions';
 import { toggleFilters } from '../../../store/ui/actions';
 import DynamicList from './DynamicList';
 
-type Props = StateProps & DispatchProps;
+type Props = StateProps & DispatchProps & RouteComponentProps;
 
 interface State {
   sellTokenSearchQuery: string;
@@ -58,10 +59,6 @@ class Filters extends React.PureComponent<Props, State> {
     });
   };
 
-  applyFilters = (filters: FiltersState) => {
-    this.props.actions.applyFilters(filters);
-  };
-
   clearFilters = () => {
     this.setState({
       sellTokenSearchQuery: '',
@@ -97,7 +94,6 @@ class Filters extends React.PureComponent<Props, State> {
       this.filterTokens(buyTokens, this.state.buyTokenSearchQuery),
       'buyTokens',
     );
-    const nextSort = filters.auctionSortDir === 'asc' ? 'desc' : 'asc';
 
     return (
       <>
@@ -110,17 +106,21 @@ class Filters extends React.PureComponent<Props, State> {
             <Section>
               <SubTitle>Sort By</SubTitle>
               <List>
-                <Item onClick={this.createSorter('buy-token', nextSort)}>
-                  <SortIcon dir={filters.auctionSortBy === 'buy-token' ? filters.auctionSortDir : 'none'} />
+                <Item onClick={this.createSorter('bid-token')}>
+                  <SortIcon dir={filters.auctionSortBy === 'bid-token' ? filters.auctionSortDir : 'none'} />
                   <Label>Token</Label>
                 </Item>
-                <Item onClick={this.createSorter('sell-volume', nextSort)}>
+                <Item onClick={this.createSorter('sell-volume')}>
                   <SortIcon dir={filters.auctionSortBy === 'sell-volume' ? filters.auctionSortDir : 'none'} />
                   <Label>Sell volume</Label>
                 </Item>
-                <Item onClick={this.createSorter('start-time', nextSort)}>
-                  <SortIcon dir={filters.auctionSortBy === 'start-time' ? filters.auctionSortDir : 'none'} />
-                  <Label>Estimated end time</Label>
+                <Item onClick={this.createSorter('end-time')}>
+                  <SortIcon dir={filters.auctionSortBy === 'end-time' ? filters.auctionSortDir : 'none'} />
+                  <Label>
+                    {this.props.location.pathname.endsWith('running') && 'Estimated end time'}
+                    {this.props.location.pathname.endsWith('scheduled') && 'Start time'}
+                    {this.props.location.pathname.endsWith('ended') && 'End time'}
+                  </Label>
                 </Item>
               </List>
             </Section>
@@ -131,7 +131,7 @@ class Filters extends React.PureComponent<Props, State> {
                     <Checkbox
                       name='onlyMyTokens'
                       checked={this.props.filters.onlyMyTokens}
-                      onChange={this.toggleOption}
+                      onToggle={this.toggleOption}
                     />
                     Only tokens I hold
                   </Label>
@@ -142,7 +142,7 @@ class Filters extends React.PureComponent<Props, State> {
                     <Checkbox
                       name='claimableAuctions'
                       checked={this.props.filters.claimableAuctions}
-                      onChange={this.toggleOption}
+                      onToggle={this.toggleOption}
                     />
                     Only claimable auctions
                   </Label>
@@ -180,8 +180,16 @@ class Filters extends React.PureComponent<Props, State> {
     );
   }
 
-  private createSorter(auctionSortBy: AuctionSortField, auctionSortDir: SortDir) {
-    return () => this.props.actions.applyFilters({ auctionSortBy, auctionSortDir });
+  private createSorter(auctionSortBy: AuctionSortField) {
+    return () => {
+      const { actions, filters } = this.props;
+
+      actions.applyFilters({
+        auctionSortBy,
+        auctionSortDir:
+          auctionSortBy === filters.auctionSortBy && filters.auctionSortDir === 'asc' ? 'desc' : 'asc',
+      });
+    };
   }
 
   private buildTokenList(list: TokenInfo[], tokenType: 'sellTokens' | 'buyTokens') {
@@ -208,7 +216,7 @@ class Filters extends React.PureComponent<Props, State> {
       return (
         <Item key={token.id}>
           <Label>
-            <Checkbox checked={checked} name={token.id} onChange={applyTokenFilter} />
+            <Checkbox checked={checked} name={token.id} onToggle={applyTokenFilter} />
             <span className='text'>{token.name}</span>
           </Label>
           <ItemCount>{token.count}</ItemCount>
@@ -358,7 +366,9 @@ function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Filters);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(Filters),
+);
