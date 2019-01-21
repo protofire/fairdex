@@ -10,7 +10,7 @@ const NavBar = () => (
     <Route path='/running' component={Auctions} />
     <Route path='/scheduled' component={Auctions} />
     <Route path='/ended' component={Auctions} />
-    <Route path='/wallet' component={Wallet} />
+    {/* <Route path='/wallet' component={Wallet} /> */}
   </Switch>
 );
 
