@@ -4,7 +4,7 @@ import { getTokenContract } from '../../../contracts';
 import { Decimal } from '../../../contracts/utils';
 import { periodicAction } from '../../utils';
 import { loadAuctions } from '../auctions';
-import { getNetworkType } from '../wallet';
+import { getCurrentAccount, getNetworkType } from '../wallet';
 
 export * from './selectors';
 
@@ -46,9 +46,11 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
         tokens: new Map<Address, Token>(
           Array.from(state.tokens).map(
             ([_, token]): [Address, Token] => {
-              [token.balance, token.priceEth, token.allowance] = action.payload.get(token.address);
+              const newToken = { ...token };
 
-              return [token.address, token];
+              [newToken.balance, newToken.priceEth, newToken.allowance] = action.payload.get(token.address);
+
+              return [newToken.address, token];
             },
           ),
         ),
@@ -60,11 +62,13 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
         tokens: new Map<Address, Token>(
           Array.from(state.tokens).map(
             ([_, token]): [Address, Token] => {
+              const newToken = { ...token };
+
               if (token.address === action.payload.address) {
-                token.allowance = action.payload.allowance;
+                newToken.allowance = action.payload.allowance;
               }
 
-              return [token.address, token];
+              return [newToken.address, newToken];
             },
           ),
         ),
@@ -180,9 +184,7 @@ const setTokenAllowance: ActionCreator<Action> = (address: Address, allowance: B
 
 export const updateTokenAllowance = (token: Token) => {
   return async (dispatch: any, getState: () => AppState) => {
-    const {
-      blockchain: { currentAccount },
-    } = getState();
+    const currentAccount = getCurrentAccount(getState());
     const tokenContract = getTokenContract(token);
     const allowance = await tokenContract.allowance(currentAccount, window.dx.address);
 
