@@ -4,12 +4,7 @@ import { cleanup, waitForElement, fireEvent } from 'react-testing-library';
 
 import { renderWithRedux } from './utils';
 import { toBigNumber } from '../contracts/utils';
-import Erc20Token from '../contracts/Erc20Token';
-
 import EnableForTrading from '../pages/main/wallet-overview/EnableForTradingForm';
-import { TokenContextProvider } from '../pages/main/wallet-overview/TokenContext';
-
-// beforeEach(jest.resetAllMocks);
 
 afterEach(cleanup);
 
@@ -56,16 +51,11 @@ jest.mock('../contracts', () => {
 
 describe('Enable for trading form', () => {
   test('should disable a token for trading', async () => {
-    const { getByTestId } = renderWithRedux(
-      <TokenContextProvider>
-        <EnableForTrading token={tokenEnabled} enabled={true} />
-      </TokenContextProvider>,
-      {
-        blockchain: {
-          currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
-        },
+    const { getByTestId } = renderWithRedux(<EnableForTrading token={tokenEnabled} enabled={true} />, {
+      blockchain: {
+        currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
       },
-    );
+    });
 
     const spy = jest.spyOn(mockTokenContract, 'approve');
 
@@ -75,16 +65,11 @@ describe('Enable for trading form', () => {
   });
 
   test('should enable a token for trading', async () => {
-    const { getByTestId } = renderWithRedux(
-      <TokenContextProvider>
-        <EnableForTrading token={tokenDisabled} enabled={false} />
-      </TokenContextProvider>,
-      {
-        blockchain: {
-          currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
-        },
+    const { getByTestId } = renderWithRedux(<EnableForTrading token={tokenDisabled} enabled={false} />, {
+      blockchain: {
+        currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
       },
-    );
+    });
 
     const spy = jest.spyOn(mockTokenContract, 'approve');
 
