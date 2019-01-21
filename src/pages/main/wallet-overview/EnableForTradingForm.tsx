@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
@@ -26,85 +26,85 @@ interface DispatchProps {
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
-class EnableForTradingForm extends React.PureComponent<Props> {
-  onChangeHandler = () => {
-    const { token, enabled, currentAccount, dispatch } = this.props;
+const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Props) => {
+  const [toggling, setToggling] = useState(false);
 
-    if (getWalletBalance(token).lte(ZERO)) {
-      return;
-    }
+  const onChangeHandler = useCallback(
+    () => {
+      if (getWalletBalance(token).gt(ZERO)) {
+        const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for trading`;
 
-    const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for trading`;
+        dx.toggleAllowance(token)
+          .send({
+            from: currentAccount,
+            // TODO: estimated gas
+            // TODO: gas price from oracle
+          })
+          .once('transactionHash', (transactionHash: TransactionHash) => {
+            setToggling(true);
+            dispatch(
+              showNotification(
+                'info',
+                `${message} request sent`,
+                <p>
+                  {message} transaction has been sent.{' '}
+                  <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
+                    More info
+                  </a>
+                </p>,
+              ),
+            );
+          })
+          .once('confirmation', (confNumber: number, receipt: TransactionReceipt) => {
+            setToggling(false);
+            dispatch(
+              showNotification(
+                'success',
+                `${message} confirmed`,
+                <p>
+                  {message} has been confirmed.{' '}
+                  <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
+                    More info
+                  </a>
+                </p>,
+              ),
+            );
 
-    dx.toggleAllowance(token)
-      .send({
-        from: currentAccount,
-        // TODO: estimated gas
-        // TODO: gas price from oracle
-      })
-      .once('transactionHash', (transactionHash: TransactionHash) => {
-        dispatch(
-          showNotification(
-            'info',
-            `${message} request sent`,
-            <p>
-              {message} transaction has been sent.{' '}
-              <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                More info
-              </a>
-            </p>,
-          ),
-        );
-      })
-      .once('confirmation', (confNumber: number, receipt: TransactionReceipt) => {
-        dispatch(
-          showNotification(
-            'success',
-            `${message} confirmed`,
-            <p>
-              {message} has been confirmed.{' '}
-              <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                More info
-              </a>
-            </p>,
-          ),
-        );
+            // Reload token balances and allowance
+            dispatch(updateTokenAllowance(token));
+          })
+          .once('error', (err: Error) => {
+            setToggling(false);
+            dispatch(
+              showNotification(
+                'error',
+                `${message} failed`,
+                <p>
+                  {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
+                  <br />
+                  Please try again later.
+                </p>,
+              ),
+            );
+          });
+      }
+    },
+    [token, currentAccount, dispatch],
+  );
 
-        // Reload token balances and allowance
-        dispatch(updateTokenAllowance(token));
-      })
-      .once('error', (err: Error) => {
-        dispatch(
-          showNotification(
-            'error',
-            `${message} failed`,
-            <p>
-              {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
-              <br />
-              Please try again later.
-            </p>,
-          ),
-        );
-      });
-  };
-
-  render() {
-    const { enabled, token } = this.props;
-
-    return (
-      <Container>
-        <Label>Enable for trading</Label>
-        <dd>
-          <TradingToggle
-            onToggle={this.onChangeHandler}
-            checked={enabled}
-            data-testid={`trading-toggle-${token.address}`}
-          />
-        </dd>
-      </Container>
-    );
-  }
-}
+  return (
+    <Container>
+      <Label>Enable for trading</Label>
+      <dd>
+        <TradingToggle
+          onToggle={onChangeHandler}
+          checked={toggling ? null : enabled}
+          data-testid={`trading-toggle-${token.address}`}
+        />
+      </dd>
+    </Container>
+  );
+};
 
 const Label = styled.dt`
   position: relative;

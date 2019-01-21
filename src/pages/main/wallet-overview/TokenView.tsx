@@ -17,56 +17,50 @@ interface Props {
 
 const DEFAULT_DECIMALS = 3;
 
-class TokenView extends React.PureComponent<Props> {
-  render() {
-    const { data: token } = this.props;
-
-    return (
-      <Card>
-        <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
-          <span>{token.symbol}</span>
-        </Title>
-        <Table>
-          <Row>
-            <Label>Wallet balance</Label>
-            <Value>
-              {token.balance === undefined ? (
-                <Loading />
-              ) : (
-                <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
-              )}
-            </Value>
-          </Row>
-          <Row>
-            <Label>DX balance</Label>
-            <Value>
-              {token.balance === undefined ? (
-                <Loading />
-              ) : (
-                <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
-              )}
-            </Value>
-          </Row>
-          <Row>
-            <Label>Total holdings</Label>
-            <Value>
-              {token.balance === undefined ? (
-                <Loading />
-              ) : (
-                <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
-              )}
-            </Value>
-          </Row>
-          <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
-        </Table>
-        <ButtonGroup>
-          {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
-          {getDxBalance(token).gt(ZERO) && <WithdrawForm token={token} />}
-        </ButtonGroup>
-      </Card>
-    );
-  }
-}
+const TokenView = ({ data: token }: Props) => (
+  <Card>
+    <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
+      <span>{token.symbol}</span>
+    </Title>
+    <Table>
+      <Row>
+        <Label>Wallet balance</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <Row>
+        <Label>DX balance</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <Row>
+        <Label>Total holdings</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
+    </Table>
+    <ButtonGroup>
+      {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
+      {getDxBalance(token).gt(ZERO) && <WithdrawForm token={token} />}
+    </ButtonGroup>
+  </Card>
+);
 
 const Label = styled.dt`
   position: relative;
