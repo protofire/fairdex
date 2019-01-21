@@ -6,7 +6,19 @@ import { renderWithRedux } from './utils';
 import { toBigNumber } from '../contracts/utils';
 import EnableForTrading from '../pages/main/wallet-overview/EnableForTradingForm';
 
+beforeAll(jest.clearAllMocks);
 afterEach(cleanup);
+
+const spy = jest.spyOn(dx, 'toggleAllowance').mockImplementation(token => {
+  return {
+    send() {
+      return this;
+    },
+    once() {
+      return this;
+    },
+  };
+});
 
 const tokenEnabled: Token = {
   address: '0x1',
@@ -28,40 +40,17 @@ const tokenDisabled: Token = {
   allowance: toBigNumber(0),
 };
 
-const mockTokenContract = {
-  approve() {
-    return {
-      send() {
-        return this;
-      },
-      once() {
-        return this;
-      },
-    };
-  },
-};
-
-jest.mock('../contracts', () => {
-  return {
-    getTokenContract() {
-      return mockTokenContract;
-    },
-  };
-});
-
 describe('Enable for trading form', () => {
-  test('should disable a token for trading', async () => {
+  test('should disable a toke for trading', async () => {
     const { getByTestId } = renderWithRedux(<EnableForTrading token={tokenEnabled} enabled={true} />, {
       blockchain: {
         currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
       },
     });
 
-    const spy = jest.spyOn(mockTokenContract, 'approve');
-
     fireEvent.click(getByTestId('trading-toggle-0x1'));
 
-    expect(spy).toHaveBeenCalledWith(dx.address, 0);
+    expect(spy).toHaveBeenCalledWith(tokenEnabled);
   });
 
   test('should enable a token for trading', async () => {
@@ -71,10 +60,8 @@ describe('Enable for trading form', () => {
       },
     });
 
-    const spy = jest.spyOn(mockTokenContract, 'approve');
-
     fireEvent.click(getByTestId('trading-toggle-0x1'));
 
-    expect(spy).toHaveBeenCalledWith(dx.address, -1);
+    expect(spy).toHaveBeenCalledWith(tokenDisabled);
   });
 });
