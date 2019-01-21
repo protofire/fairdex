@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
@@ -10,8 +10,6 @@ import { showNotification } from '../../../store/ui/actions';
 import CheckboxToggle from '../../../components/CheckboxToggle';
 import { ZERO } from '../../../contracts/utils';
 import { getWalletBalance } from '../../../contracts/utils/tokens';
-
-import { TokenContext } from './TokenContext';
 
 interface OwnProps {
   token: Token;
@@ -29,19 +27,21 @@ interface DispatchProps {
 type Props = OwnProps & AppStateProps & DispatchProps;
 
 class EnableForTradingForm extends React.PureComponent<Props> {
-  static contextType = TokenContext;
-
   onChangeHandler = () => {
-    const { doApprove } = this.context;
     const { token, enabled, currentAccount, dispatch } = this.props;
 
     if (getWalletBalance(token).lte(ZERO)) {
       return;
     }
 
-    const message = `${enabled ? 'Disable' : 'Enable'} for trading`;
+    const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for trading`;
 
-    doApprove(token, currentAccount)
+    dx.toggleAllowance(token)
+      .send({
+        from: currentAccount,
+        // TODO: estimated gas
+        // TODO: gas price from oracle
+      })
       .once('transactionHash', (transactionHash: TransactionHash) => {
         dispatch(
           showNotification(
@@ -89,7 +89,7 @@ class EnableForTradingForm extends React.PureComponent<Props> {
   };
 
   render() {
-    const { token, enabled } = this.props;
+    const { enabled, token } = this.props;
 
     return (
       <Container>

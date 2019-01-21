@@ -50,7 +50,7 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
 
               [newToken.balance, newToken.priceEth, newToken.allowance] = action.payload.get(token.address);
 
-              return [newToken.address, token];
+              return [newToken.address, newToken];
             },
           ),
         ),
@@ -140,7 +140,7 @@ export function updateTokenBalancesAndPrice() {
             dx.getBalance(token, accountAddress),
             tokenContract.getBalance(accountAddress),
             dx.getPriceOfTokenInLastAuction(token),
-            tokenContract.allowance(accountAddress, dx.address),
+            tokenContract.getAllowance(accountAddress, dx.address),
           ]);
 
           return [token.address, [[contractBalance, walletBalance], priceEth.value, allowance]];
@@ -186,7 +186,8 @@ export const updateTokenAllowance = (token: Token) => {
   return async (dispatch: any, getState: () => AppState) => {
     const currentAccount = getCurrentAccount(getState());
     const tokenContract = getTokenContract(token);
-    const allowance = await tokenContract.allowance(currentAccount, window.dx.address);
+
+    const allowance = await tokenContract.getAllowance(currentAccount, window.dx.address);
 
     dispatch(setTokenAllowance(token.address, allowance));
   };

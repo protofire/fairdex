@@ -58,7 +58,7 @@ class WalletSort extends React.Component<Props, State> {
   }
 
   render() {
-    const { sortBy, ...props } = this.props;
+    const { sortBy, onSelectedItem, ...props } = this.props;
     const { open } = this.state;
 
     return (

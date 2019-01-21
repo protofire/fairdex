@@ -8,8 +8,7 @@ import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
 import { ZERO } from '../../../contracts/utils';
 import DepositForm from './DepositForm';
-import EnabelForTradingForm from './EnableForTradingForm';
-import { TokenContextProvider } from './TokenContext';
+import EnableForTradingForm from './EnableForTradingForm';
 import WithdrawForm from './WithdrawForm';
 
 interface Props {
@@ -23,50 +22,48 @@ class TokenView extends React.PureComponent<Props> {
     const { data: token } = this.props;
 
     return (
-      <TokenContextProvider>
-        <Card>
-          <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
-            <span>{token.symbol}</span>
-          </Title>
-          <Table>
-            <Row>
-              <Label>Wallet balance</Label>
-              <Value>
-                {token.balance === undefined ? (
-                  <Loading />
-                ) : (
-                  <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
-                )}
-              </Value>
-            </Row>
-            <Row>
-              <Label>DX balance</Label>
-              <Value>
-                {token.balance === undefined ? (
-                  <Loading />
-                ) : (
-                  <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
-                )}
-              </Value>
-            </Row>
-            <Row>
-              <Label>Total holdings</Label>
-              <Value>
-                {token.balance === undefined ? (
-                  <Loading />
-                ) : (
-                  <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
-                )}
-              </Value>
-            </Row>
-            <EnabelForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
-          </Table>
-          <ButtonGroup>
-            {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
-            {getDxBalance(token).gt(ZERO) && <WithdrawForm token={token} />}
-          </ButtonGroup>
-        </Card>
-      </TokenContextProvider>
+      <Card>
+        <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
+          <span>{token.symbol}</span>
+        </Title>
+        <Table>
+          <Row>
+            <Label>Wallet balance</Label>
+            <Value>
+              {token.balance === undefined ? (
+                <Loading />
+              ) : (
+                <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label>DX balance</Label>
+            <Value>
+              {token.balance === undefined ? (
+                <Loading />
+              ) : (
+                <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label>Total holdings</Label>
+            <Value>
+              {token.balance === undefined ? (
+                <Loading />
+              ) : (
+                <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
+              )}
+            </Value>
+          </Row>
+          <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
+        </Table>
+        <ButtonGroup>
+          {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
+          {getDxBalance(token).gt(ZERO) && <WithdrawForm token={token} />}
+        </ButtonGroup>
+      </Card>
     );
   }
 }
