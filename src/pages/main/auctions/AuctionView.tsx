@@ -21,7 +21,7 @@ interface AuctionViewProps {
 
 const DEFAULT_DECIMALS = 3;
 
-const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
+const AuctionView = ({ data: auction }: AuctionViewProps) => (
   <Card id={`${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}>
     <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`}>
       <div>
@@ -210,7 +210,7 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
       </>
     )}
   </Card>
-));
+);
 
 const Label = styled.dt`
   position: relative;

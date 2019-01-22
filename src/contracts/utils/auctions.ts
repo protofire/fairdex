@@ -1,4 +1,4 @@
-import { addHours } from 'date-fns';
+import { addHours, isAfter } from 'date-fns';
 
 import { formatNumber, toBigNumber, ZERO } from './decimal';
 
@@ -93,7 +93,7 @@ export async function getBuyerBalance(
   return buyerBalance;
 }
 
-export function getAvailableVolume(auction: Auction) {
+export function getAvailableVolume(auction: RunningAuction) {
   if (auction.sellVolume && auction.sellVolume.gt(0)) {
     if (auction.buyVolume && auction.buyVolume.gte(0)) {
       if (auction.currentPrice && auction.currentPrice.gte(0)) {
@@ -105,9 +105,13 @@ export function getAvailableVolume(auction: Auction) {
   return ZERO;
 }
 
-export function getEstimatedEndTime(auction: Auction) {
+export function getEstimatedEndTime(auction: RunningAuction) {
   if (auction.auctionStart) {
-    return addHours(auction.auctionStart, AUCTION_DURATION);
+    const estimatedEndTime = addHours(auction.auctionStart, AUCTION_DURATION);
+
+    if (isAfter(estimatedEndTime, Date.now())) {
+      return estimatedEndTime;
+    }
   }
 
   return undefined;

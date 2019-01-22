@@ -29,27 +29,22 @@ const Duration = ({ from, to, defaultValue }: Props) => {
 
 Duration.defaultProps = {
   defaultValue: '-',
-  from: Date.now(),
-  to: Date.now(),
 };
 
 function duration(from: Timestamp, to: Timestamp) {
   const result: string[] = [];
 
   if (from && to) {
-    const earlier = min([from, to]);
-    const later = max([from, to]);
+    const months = differenceInMonths(to, from);
+    const monthsAgo = subMonths(to, months);
 
-    const months = differenceInMonths(later, earlier);
-    const monthsAgo = subMonths(later, months);
-
-    const days = differenceInDays(monthsAgo, earlier);
+    const days = differenceInDays(monthsAgo, from);
     const daysAgo = subDays(monthsAgo, days);
 
-    const hours = differenceInHours(daysAgo, earlier);
+    const hours = differenceInHours(daysAgo, from);
     const hoursAgo = subHours(daysAgo, hours);
 
-    const minutes = differenceInMinutes(hoursAgo, earlier);
+    const minutes = differenceInMinutes(hoursAgo, from);
 
     if (months > 0) {
       result.push(`${months}mo`);
@@ -71,4 +66,4 @@ function duration(from: Timestamp, to: Timestamp) {
   return result.join(' ');
 }
 
-export default React.memo(Duration);
+export default Duration;
