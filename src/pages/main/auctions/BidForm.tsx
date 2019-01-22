@@ -178,7 +178,11 @@ class BidForm extends React.PureComponent<Props, State> {
 
     const { amount: bidAmount, currentStep = this.getInitialStep() } = this.state;
     const currentPrice = auction.currentPrice || ZERO;
-    const sellTokenAmount = currentPrice.isZero() ? ZERO : bidAmount.div(currentPrice);
+
+    const sellTokenAmount = currentPrice.isZero()
+      ? ZERO
+      : bidAmount.minus(bidAmount.times(feeRate).div(100)).div(currentPrice);
+
     const availableSellVolume = utils.auction.getAvailableVolume(auction);
     const availableBidVolume = availableSellVolume.times(auction.currentPrice || ZERO);
 
