@@ -35,16 +35,15 @@ describe('Wallet overview', () => {
     test('should be visible if there is balance in wallet', () => {
       const { getByTestId } = renderWithRedux(<TokenView data={tokenWithBalance} />);
 
-      const depositButton = getByTestId(`${tokenWithBalance.address}-deposit-button`);
+      const depositButton = getByTestId(`deposit-${tokenWithBalance.address}-button`);
 
       expect(depositButton).toBeVisible();
-      expect(depositButton).toBeDisabled(); // FIXME - disabled until implement functionality
     });
 
     test("should not be visible if there isn't balance in wallet", () => {
       const { queryByTestId } = renderWithRedux(<TokenView data={tokenWithOutBalance} />);
 
-      expect(queryByTestId(`${tokenWithOutBalance.address}-deposit-button`)).toBeNull();
+      expect(queryByTestId(`deposit-${tokenWithOutBalance.address}-button`)).toBeNull();
     });
   });
 
@@ -52,16 +51,15 @@ describe('Wallet overview', () => {
     test('should be visible if there is balance in wallet', () => {
       const { getByTestId } = renderWithRedux(<TokenView data={tokenWithBalance} />);
 
-      const withdrawButton = getByTestId(`${tokenWithBalance.address}-withdraw-button`);
+      const withdrawButton = getByTestId(`withdraw-${tokenWithBalance.address}-button`);
 
       expect(withdrawButton).toBeVisible();
-      expect(withdrawButton).toBeDisabled(); // FIXME - disabled until implement functionality
     });
 
     test("should not be visible if there isn't balance in wallet", () => {
       const { queryByTestId } = renderWithRedux(<TokenView data={tokenWithOutBalance} />);
 
-      expect(queryByTestId(`${tokenWithOutBalance.address}-withdraw-button`)).toBeNull();
+      expect(queryByTestId(`withdraw-${tokenWithOutBalance.address}-button`)).toBeNull();
     });
   });
 });

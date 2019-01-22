@@ -127,15 +127,20 @@ const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatc
   );
 
   const maxAllowed = action === DEPOSIT ? getWalletBalance(token) : getDxBalance(token);
+  const isActionDisabled = action === DEPOSIT && token.allowance && token.allowance.lte(ZERO);
 
   return (
-    <Container onClickOutside={handleClose} onEscPress={handleClose}>
+    <Container
+      onClickOutside={handleClose}
+      onEscPress={handleClose}
+      data-testid={`${action.toLocaleLowerCase()}-${token.address}-dialog`}
+    >
       {showDialog && (
         <Content>
           <Form onSubmit={handleSubmit}>
             <div>
               <h4>Volume</h4>
-              <p>
+              <p data-testid={`${action.toLocaleLowerCase()}-${token.address}-max-allowed`}>
                 {token.symbol} (max <DecimalValue value={maxAllowed} decimals={DEFAULT_DECIMALS} />)
               </p>
             </div>
@@ -146,22 +151,30 @@ const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatc
               onFocus={handleInputFocus}
               autoFocus={true}
             />
-            <Button type='submit' disabled={loading || amount.lte(ZERO) || amount.gt(maxAllowed)}>
+            <Button
+              type='submit'
+              disabled={loading || amount.lte(ZERO) || amount.gt(maxAllowed)}
+              data-testid={`confirm-${action.toLocaleLowerCase()}-${token.address}-button`}
+            >
               {loading ? `${action} in progress...` : 'Confirm'}
             </Button>
           </Form>
         </Content>
       )}
       {showDialog ? (
-        <Button mode='dark' onClick={handleClose}>
+        <Button
+          mode='dark'
+          onClick={handleClose}
+          data-testid={`cancel-${action.toLocaleLowerCase()}-${token.address}-button`}
+        >
           Cancel
         </Button>
       ) : (
         <Button
           mode='secondary'
           onClick={handleOpen}
-          data-testid={`${token.address}-${action.toLocaleLowerCase()}-button`}
-          disabled={token.allowance ? token.allowance.lte(ZERO) : true}
+          data-testid={`${action.toLocaleLowerCase()}-${token.address}-button`}
+          disabled={isActionDisabled}
         >
           {action}
         </Button>
