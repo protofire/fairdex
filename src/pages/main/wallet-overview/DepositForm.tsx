@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { FormEvent, useCallback, useState } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { TransactionReceipt } from 'web3/types';
 
 import * as utils from '../../../contracts/utils';
-import { getCurrentAccount, getToken } from '../../../store/blockchain';
+import { getCurrentAccount, loadTokens } from '../../../store/blockchain';
 import { showNotification } from '../../../store/ui/actions';
 
 import { DecimalValue } from '../../../components/formatters';
@@ -20,7 +21,6 @@ interface OwnProps {
 
 interface AppStateProps {
   currentAccount: Address;
-  token: Token;
 }
 
 interface DispatchProps {
@@ -29,101 +29,142 @@ interface DispatchProps {
 
 interface State {
   amount: BigNumber;
-  loading?: boolean;
-  showDialog?: boolean;
+  loading: boolean;
+  showDialog: boolean;
 }
 
 const { ZERO } = utils;
 const DEFAULT_DECIMALS = 3;
 
-class DepositForm extends React.PureComponent<Props, State> {
-  state: State = { amount: ZERO };
+const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
+  const [amount, setAmmount] = useState(ZERO);
+  const [loading, setLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
-  private inputRef = React.createRef<HTMLInputElement>();
-
-  handleAmountChange = (amount: BigNumber) => {
-    this.setState({ amount });
-  };
-
-  handleClose = () => {
-    if (!this.state.loading) {
-      this.setState({ showDialog: false, amount: ZERO });
-    }
-  };
-
-  handleInputFocus: React.FocusEventHandler<HTMLInputElement> = event => {
+  const inputRef = React.createRef<HTMLInputElement>();
+  const handleInputFocus: React.FocusEventHandler<HTMLInputElement> = event => {
     event.target.select();
   };
 
-  handleSubmit = (event: any) => {
-    const { amount } = this.state;
-
-    // TODO handle deposit
-
-    event.preventDefault();
+  const handleClose = () => {
+    if (!loading) {
+      setShowDialog(false);
+      setAmmount(ZERO);
+    }
   };
 
-  showDialog = () => {
-    this.setState({ showDialog: true });
+  const handleOpen = () => {
+    setShowDialog(true);
   };
 
-  render() {
-    const { token } = this.props;
-    const { amount } = this.state;
+  const handleSubmit = useCallback(
+    async (event: FormEvent) => {
+      if (event) {
+        event.preventDefault();
+      }
+      setLoading(true);
 
-    const tokenBalanceInWallet = utils.token.getWalletBalance(token);
-    const tokenBalanceInDx = utils.token.getDxBalance(token);
+      dx.depositToken(token, amount)
+        .send({
+          from: currentAccount,
+          // TODO: estimated gas
+          // TODO: gas price from oracle
+        })
+        .once('transactionHash', (transactionHash: TransactionHash) => {
+          dispatch(
+            showNotification(
+              'info',
+              'Deposit request sent',
+              <p>
+                Deposit transaction has been sent.{' '}
+                <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
+                  More info
+                </a>
+              </p>,
+            ),
+          );
+        })
+        .once('confirmation', (confNumber: number, receipt: TransactionReceipt) => {
+          dispatch(
+            showNotification(
+              'success',
+              'Deposit confirmed',
+              <p>
+                Deposit has been confirmed.{' '}
+                <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
+                  More info
+                </a>
+              </p>,
+            ),
+          );
 
-    return (
-      <Container onClickOutside={this.handleClose} onEscPress={this.handleClose}>
-        {this.state.showDialog && (
-          <Content>
-            <Form onSubmit={this.handleSubmit}>
-              <div>
-                <h4>Volume</h4>
-                <p>
-                  {token.symbol} (max{' '}
-                  <DecimalValue value={tokenBalanceInWallet} decimals={DEFAULT_DECIMALS} />)
-                </p>
-              </div>
-              <DecimalInput
-                value={amount.toString(10)}
-                ref={this.inputRef}
-                onValueChange={this.handleAmountChange}
-                onFocus={this.handleInputFocus}
-                autoFocus={true}
-              />
-              <Button
-                type='submit'
-                disabled={
-                  tokenBalanceInWallet.lte(ZERO) || amount.lte(ZERO) || amount.gt(tokenBalanceInWallet)
-                }
-              >
-                Confirm
-              </Button>
-            </Form>
-          </Content>
-        )}
-        {this.state.showDialog ? (
-          <Button mode='dark' onClick={this.handleClose}>
-            Cancel
-          </Button>
-        ) : (
-          <Button
-            mode='secondary'
-            onClick={this.showDialog}
-            data-testid={`${token.address}-deposit-button`}
-            disabled={true}
-          >
-            {' '}
-            {/* FIXME: disabled until implement functionality */}
-            Deposit
-          </Button>
-        )}
-      </Container>
-    );
-  }
-}
+          // Reload tokensbalances and allowance
+          dispatch(loadTokens());
+          setLoading(false);
+          handleClose();
+        })
+        .once('error', (err: Error) => {
+          dispatch(
+            showNotification(
+              'error',
+              'Deposit failed',
+              <p>
+                {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
+                <br />
+                Please try again later.
+              </p>,
+            ),
+          );
+
+          setLoading(false);
+        });
+    },
+    [token, currentAccount, amount, dispatch],
+  );
+
+  const tokenBalanceInWallet = utils.token.getWalletBalance(token);
+
+  return (
+    <Container onClickOutside={handleClose} onEscPress={handleClose}>
+      {showDialog && (
+        <Content>
+          <Form onSubmit={handleSubmit}>
+            <div>
+              <h4>Volume</h4>
+              <p>
+                {token.symbol} (max <DecimalValue value={tokenBalanceInWallet} decimals={DEFAULT_DECIMALS} />)
+              </p>
+            </div>
+            <DecimalInput
+              value={amount.toString(10)}
+              ref={inputRef}
+              onValueChange={setAmmount}
+              onFocus={handleInputFocus}
+              autoFocus={true}
+            />
+            <Button type='submit' disabled={loading || amount.lte(ZERO) || amount.gt(tokenBalanceInWallet)}>
+              {loading ? 'Bid in progress...' : 'Confirm'}
+            </Button>
+          </Form>
+        </Content>
+      )}
+      {showDialog ? (
+        <Button mode='dark' onClick={handleClose}>
+          Cancel
+        </Button>
+      ) : (
+        <Button
+          mode='secondary'
+          onClick={handleOpen}
+          data-testid={`${token.address}-deposit-button`}
+          disabled={token.allowance ? token.allowance.lte(ZERO) : true}
+        >
+          Deposit
+        </Button>
+      )}
+    </Container>
+  );
+});
 
 const Container = styled(Popup.Container)``;
 
@@ -167,7 +208,6 @@ const Form = styled.form`
 function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
   return {
     currentAccount: getCurrentAccount(state),
-    token: props.token,
   };
 }
 

@@ -3,7 +3,7 @@ import { DutchExchangeProxy as proxy } from '@gnosis.pm/dx-contracts/networks.js
 
 import BaseContract from './BaseContract';
 import { getTokenContract } from './index';
-import { Decimal, timeout, toBigNumber, toDecimal, toFractional, ZERO } from './utils';
+import { Decimal, fromDecimal, timeout, toBigNumber, toDecimal, toFractional, ZERO } from './utils';
 
 type Event = 'AuctionCleared' | 'NewBuyOrder' | 'NewTokenPair';
 
@@ -32,6 +32,10 @@ class DutchExchange extends BaseContract<Event> {
 
   toggleAllowance(token: Token) {
     return getTokenContract(token).approve(this.address, token.allowance && token.allowance.gt(0) ? 0 : -1);
+  }
+
+  depositToken(token: Token, amount: BigNumber) {
+    return this.contract.methods.deposit(token.address, fromDecimal(amount, token.decimals));
   }
 
   async getAvailableMarkets(fromBlock = 0) {
