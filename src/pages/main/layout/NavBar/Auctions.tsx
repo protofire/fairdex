@@ -4,10 +4,10 @@ import { NavLink, RouteComponentProps, withRouter } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import styled, { css } from 'styled-components';
 
-import Icon from '../../../components/icons';
-import { isFiltering } from '../../../store/filters';
-import { toggleFilters, toggleSidebar } from '../../../store/ui/actions';
-import ActionBar from './ActionBar';
+import Icon from '../../../../components/icons';
+import { isFiltering } from '../../../../store/filters';
+import { toggleFilters, toggleSidebar } from '../../../../store/ui/actions';
+import ActionBar from '../ActionBar';
 
 type NavBarProps = StateProps & DispatchProps & RouteComponentProps;
 

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">
+    <defs>
+        <style>
+            .cls-1{fill:#131f3e}.cls-2{fill:none}
+        </style>
+    </defs>
+    <g id="ic_arrow_up" transform="translate(-672 -32)">
+        <path id="Path_43" d="M-8914 2228h6l-3 3z" class="cls-1" data-name="Path 43" transform="rotate(180 -4117.5 1132.5)"/>
+        <path id="Rectangle_138" d="M0 0h8v8H0z" class="cls-2" data-name="Rectangle 138" transform="translate(672 32)"/>
+    </g>
+</svg>

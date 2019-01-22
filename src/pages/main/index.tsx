@@ -24,8 +24,13 @@ const ScheduledAuctions = Loadable({
   loading: () => <Spinner size='large' />,
 });
 
-const Wallet = Loadable({
-  loader: () => import('./wallet'),
+const WalletInfo = Loadable({
+  loader: () => import('./wallet-info'),
+  loading: () => <Spinner size='large' />,
+});
+
+const WalletOverview = Loadable({
+  loader: () => import('./wallet-overview'),
   loading: () => <Spinner size='large' />,
 });
 
@@ -47,7 +52,7 @@ class MainPage extends React.Component {
                 <img src={logo} height={40} />
               </NavLink>
             </Branding>
-            <Wallet />
+            <WalletInfo />
           </Sidebar>
           <MessageHandler />
           <Filters />
@@ -59,6 +64,7 @@ class MainPage extends React.Component {
                   <Route path='/running' component={RunningAuctions} />
                   <Route path='/scheduled' component={ScheduledAuctions} />
                   <Route path='/ended' component={EndedAuctions} />
+                  {/* {/* <Route path='/wallet' component={WalletOverview} /> */}
                   <Redirect to='/running' />
                 </Switch>
               </Section>
@@ -91,7 +97,6 @@ const Branding = styled.header`
 `;
 
 const Section = styled.section`
-  position: relative;
   height: 100%;
   min-height: calc(100vh - var(--header-height));
   padding: var(--spacing-normal);

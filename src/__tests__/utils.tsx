@@ -25,10 +25,14 @@ const initialState: AppState = {
   filters: {
     sellTokens: [],
     buyTokens: [],
-    sortBy: 'start-time',
-    sortDir: 'asc',
+    auctionSortBy: 'end-time',
+    auctionSortDir: 'asc',
     onlyMyTokens: false,
     claimableAuctions: false,
+    hideZeroBalance: false,
+    tokenSortBy: 'token-name',
+    tokenSortDir: 'asc',
+    tokenSearchQuery: '',
   },
   ui: {
     sidebarVisible: false,

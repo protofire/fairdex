@@ -16,7 +16,7 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
     case SET_AUCTION_LIST:
       return {
         ...state,
-        auctions: action.payload,
+        auctions: Array.from(action.payload),
       };
 
     default:

@@ -10,7 +10,7 @@ interface TokensState {
 }
 
 interface FrtState {
-  frt: Token;
+  frt?: Token;
 }
 
 interface WalletState {

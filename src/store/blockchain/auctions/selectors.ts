@@ -5,7 +5,9 @@ import { getSellVolumeInEth } from '../../../contracts/utils/auctions';
 import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
 import { getAllTokens } from '../tokens';
 
-const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
+export const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
+
+export const getAuctionFilters = (state: AppState) => state.filters;
 
 export const getSellTokens = createSelector(
   getAllAuctions,
@@ -17,31 +19,45 @@ export const getBuyTokens = createSelector(
   (auctions: Auction[]) => buildTokens(auctions, 'buyToken'),
 );
 
-export const getFilteredAuctions = createSelector(
+const selectRunningAuctions = createSelector(
   getAllAuctions,
-  (state: AppState) => state.filters,
+  auctions => auctions.filter(auction => auction.state === 'running'),
+);
+
+export const getRunningAuctions = createSelector(
+  selectRunningAuctions,
+  getAuctionFilters,
   getAllTokens,
   filterAuctions,
 );
 
-export const getRunningAuctions = createSelector(
-  getFilteredAuctions,
-  (auctions: Auction[]) => auctions.filter(auction => auction.state === 'running'),
-);
-
-export const getEndedAuctions = createSelector(
-  getFilteredAuctions,
-  (auctions: Auction[]) => auctions.filter(auction => auction.state === 'ended'),
+const selectScheduledAuctions = createSelector(
+  getAllAuctions,
+  auctions => auctions.filter(auction => auction.state === 'scheduled'),
 );
 
 export const getScheduledAuctions = createSelector(
-  getFilteredAuctions,
-  (auctions: Auction[]) => auctions.filter(auction => auction.state === 'scheduled'),
+  selectScheduledAuctions,
+  getAuctionFilters,
+  getAllTokens,
+  filterAuctions,
+);
+
+const selectEndedAuctions = createSelector(
+  getAllAuctions,
+  auctions => auctions.filter(auction => auction.state === 'ended'),
+);
+
+export const getEndedAuctions = createSelector(
+  selectEndedAuctions,
+  getAuctionFilters,
+  getAllTokens,
+  filterAuctions,
 );
 
 export const getFilteredMyTokensAuctions = createSelector(
   getAllAuctions,
-  (state: AppState) => state.blockchain.tokens,
+  getAllTokens,
   filterMyTokensAuctions,
 );
 
@@ -82,47 +98,85 @@ function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
   return outputList;
 }
 
-function filterAuctions(list: Auction[], filters: FiltersState, tokens: Map<Address, Token>) {
+export function filterAuctions(list: Auction[], filters: FiltersState, tokens: Map<Address, Token>) {
   let out = Array.from(list);
 
-  const sortMap: { [filter in SortField]: (a: Auction, b: Auction) => boolean } = {
-    'buy-token': (a: Auction, b: Auction) => a.buyToken > b.buyToken,
-    'sell-volume': (a: Auction, b: Auction) =>
-      getSellVolumeInEth(a, tokens).gt(getSellVolumeInEth(b, tokens)),
-    'start-time': (a: Auction, b: Auction) => a.auctionStart > b.auctionStart,
-  };
+  if (list.length) {
+    // Filtering
+    if (filters.claimableAuctions) {
+      out = filterClaimableAuctions(out);
+    }
 
-  const sortFunc = sortMap[filters.sortBy] as (a: Auction, b: Auction) => boolean;
+    if (filters.onlyMyTokens) {
+      out = filterMyTokensAuctions(out, tokens);
+    }
 
-  if (sortFunc) {
-    out.sort((a: Auction, b: Auction) => {
-      if (sortFunc(a, b)) {
-        return filters.sortDir === 'asc' ? -1 : 1;
-      } else if (sortFunc(b, a)) {
-        return filters.sortDir === 'asc' ? 1 : -1;
-      }
+    if (filters.sellTokens.length > 0) {
+      out = out.filter(item => filters.sellTokens.includes(item.sellToken));
+    }
 
-      return 0;
-    });
-  }
+    if (filters.buyTokens.length > 0) {
+      out = out.filter(item => filters.buyTokens.includes(item.buyToken));
+    }
 
-  if (filters.claimableAuctions) {
-    out = filterClaimableAuctions(out);
-  }
+    // Sorting
+    const sortMap: { [filter in AuctionSortField]: (a: Auction, b: Auction) => number } = {
+      'bid-token': (a: Auction, b: Auction) => {
+        if (a.buyToken === b.buyToken) {
+          return a.sellToken.localeCompare(b.sellToken);
+        }
 
-  if (filters.onlyMyTokens) {
-    out = filterMyTokensAuctions(out, tokens);
-  }
+        return a.buyToken.localeCompare(b.buyToken);
+      },
+      'sell-volume': (a: Auction, b: Auction) => {
+        const volumeA = getSellVolumeInEth(a, tokens);
+        const volumeB = getSellVolumeInEth(b, tokens);
 
-  if (filters.sellTokens.length > 0) {
-    out = out.filter(item => filters.sellTokens.includes(item.sellToken));
-  }
+        if (!volumeA.eq(volumeB)) {
+          return volumeA.comparedTo(volumeB);
+        }
 
-  if (filters.buyTokens.length > 0) {
-    out = out.filter(item => filters.buyTokens.includes(item.buyToken));
+        return sortMap['bid-token'](a, b);
+      },
+      'end-time': (a: Auction, b: Auction) => {
+        if (a.state === 'running' && b.state === 'running') {
+          if (a.auctionStart && a.auctionStart === b.auctionStart) {
+            return sortMap['bid-token'](a, b);
+          }
+
+          return a.auctionStart - b.auctionStart;
+        } else if (a.state === 'scheduled' && b.state === 'scheduled') {
+          if (a.auctionStart && a.auctionStart === b.auctionStart) {
+            return sortMap['bid-token'](a, b);
+          }
+
+          return a.auctionStart - b.auctionStart;
+        } else if (a.state === 'ended' && b.state === 'ended') {
+          if (a.auctionEnd && a.auctionEnd === b.auctionEnd) {
+            return sortMap['bid-token'](a, b);
+          }
+
+          return a.auctionEnd - b.auctionEnd;
+        }
+
+        return 0;
+      },
+    };
+
+    const sortFunc = sortMap[filters.auctionSortBy];
+
+    if (sortFunc) {
+      out.sort((a: Auction, b: Auction) =>
+        filters.auctionSortDir === 'asc' ? sortFunc(a, b) : sortFunc(b, a),
+      );
+    }
   }
 
   return out;
+}
+
+function filterClaimableAuctions(list: Auction[]) {
+  return list.filter(item => item.buyerBalance && item.buyerBalance.gt(ZERO));
 }
 
 function filterMyTokensAuctions(list: Auction[], tokens = new Map<Address, Token>()) {
@@ -136,8 +190,4 @@ function filterMyTokensAuctions(list: Auction[], tokens = new Map<Address, Token
 
     return myTokenAddresses.includes(item.buyTokenAddress);
   });
-}
-
-function filterClaimableAuctions(list: Auction[]) {
-  return list.filter(item => item.buyerBalance && item.buyerBalance.gt(ZERO));
 }

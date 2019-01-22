@@ -7,10 +7,14 @@ export * from './selectors';
 const initialState: FiltersState = {
   sellTokens: [],
   buyTokens: [],
-  sortBy: 'start-time',
-  sortDir: 'asc',
+  auctionSortBy: 'end-time',
+  auctionSortDir: 'asc',
   onlyMyTokens: false,
   claimableAuctions: false,
+  hideZeroBalance: false,
+  tokenSortBy: 'token-name',
+  tokenSortDir: 'asc',
+  tokenSearchQuery: '',
 };
 
 const reducer: Reducer<FiltersState, FiltersAction> = (state = initialState, action) => {
