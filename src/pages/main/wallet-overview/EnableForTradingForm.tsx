@@ -31,63 +31,61 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
 
   const onChangeHandler = useCallback(
     () => {
-      if (getWalletBalance(token).gt(ZERO)) {
-        const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for trading`;
+      const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for trading`;
 
-        dx.toggleAllowance(token)
-          .send({
-            from: currentAccount,
-            // TODO: estimated gas
-            // TODO: gas price from oracle
-          })
-          .once('transactionHash', (transactionHash: TransactionHash) => {
-            setToggling(true);
-            dispatch(
-              showNotification(
-                'info',
-                `${message} request sent`,
-                <p>
-                  {message} transaction has been sent.{' '}
-                  <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                    More info
-                  </a>
-                </p>,
-              ),
-            );
-          })
-          .once('confirmation', (confNumber: number, receipt: TransactionReceipt) => {
-            setToggling(false);
-            dispatch(
-              showNotification(
-                'success',
-                `${message} confirmed`,
-                <p>
-                  {message} has been confirmed.{' '}
-                  <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                    More info
-                  </a>
-                </p>,
-              ),
-            );
+      dx.toggleAllowance(token)
+        .send({
+          from: currentAccount,
+          // TODO: estimated gas
+          // TODO: gas price from oracle
+        })
+        .once('transactionHash', (transactionHash: TransactionHash) => {
+          setToggling(true);
+          dispatch(
+            showNotification(
+              'info',
+              `${message} request sent`,
+              <p>
+                {message} transaction has been sent.{' '}
+                <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
+                  More info
+                </a>
+              </p>,
+            ),
+          );
+        })
+        .once('confirmation', (confNumber: number, receipt: TransactionReceipt) => {
+          setToggling(false);
+          dispatch(
+            showNotification(
+              'success',
+              `${message} confirmed`,
+              <p>
+                {message} has been confirmed.{' '}
+                <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
+                  More info
+                </a>
+              </p>,
+            ),
+          );
 
-            // Reload token balances and allowance
-            dispatch(updateTokenAllowance(token));
-          })
-          .once('error', (err: Error) => {
-            setToggling(false);
-            dispatch(
-              showNotification(
-                'error',
-                `${message} failed`,
-                <p>
-                  {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
-                  <br />
-                  Please try again later.
-                </p>,
-              ),
-            );
-          });
-      }
+          // Reload token balances and allowance
+          dispatch(updateTokenAllowance(token));
+        })
+        .once('error', (err: Error) => {
+          setToggling(false);
+          dispatch(
+            showNotification(
+              'error',
+              `${message} failed`,
+              <p>
+                {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
+                <br />
+                Please try again later.
+              </p>,
+            ),
+          );
+        });
     },
     [token, currentAccount, dispatch],
   );
