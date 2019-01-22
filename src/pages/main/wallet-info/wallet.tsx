@@ -41,16 +41,34 @@ const Wallet = ({ tokens, topBalances, currentAccount }: WalletProps) => {
           <small>ETH</small>
         </Item>
         <Item>
-          <DecimalValue value={topBalances[0].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <small>{topBalances[0].symbol}</small>
+          {topBalances[0] ? (
+            <>
+              <DecimalValue value={topBalances[0].totalBalance} decimals={DEFAULT_DECIMALS} />
+              <small>{topBalances[0].symbol}</small>
+            </>
+          ) : (
+            '-'
+          )}
         </Item>
         <Item>
-          <DecimalValue value={topBalances[1].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <small>{topBalances[1].symbol}</small>
+          {topBalances[1] ? (
+            <>
+              <DecimalValue value={topBalances[1].totalBalance} decimals={DEFAULT_DECIMALS} />
+              <small>{topBalances[1].symbol}</small>
+            </>
+          ) : (
+            '-'
+          )}
         </Item>
         <Item>
-          <DecimalValue value={topBalances[2].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <small>{topBalances[2].symbol}</small>
+          {topBalances[2] ? (
+            <>
+              <DecimalValue value={topBalances[2].totalBalance} decimals={DEFAULT_DECIMALS} />
+              <small>{topBalances[2].symbol}</small>
+            </>
+          ) : (
+            '-'
+          )}
         </Item>
       </Content>
     </Container>
