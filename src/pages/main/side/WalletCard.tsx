@@ -14,7 +14,7 @@ export const Header = styled.div`
 
 export const Content = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   grid-gap: 0px;
   height: 100%;
 `;
@@ -30,6 +30,7 @@ export const Item = styled.div`
   border-left: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
   min-width: 0;
+  min-height: 80px;
 
   &:nth-child(odd) {
     border-left: none;

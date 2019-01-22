@@ -58,7 +58,6 @@ const AccountInfo = ({
 );
 
 const Container = styled(WalletCard)`
-  height: 336px;
   background-image: linear-gradient(37deg, #8bc6ec, #a8f6e4);
 `;
 

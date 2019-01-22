@@ -41,16 +41,28 @@ const WalletInfo = ({ tokens, topBalances, currentAccount }: WalletProps) => {
           <small>ETH</small>
         </Item>
         <Item>
-          <DecimalValue value={topBalances[0].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <small>{topBalances[0].symbol}</small>
+          {topBalances[0].totalBalance.gt(0) && (
+            <>
+              <DecimalValue value={topBalances[0].totalBalance} decimals={DEFAULT_DECIMALS} />
+              <small>{topBalances[0].symbol}</small>
+            </>
+          )}
         </Item>
         <Item>
-          <DecimalValue value={topBalances[1].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <small>{topBalances[1].symbol}</small>
+          {topBalances[1].totalBalance.gt(0) && (
+            <>
+              <DecimalValue value={topBalances[1].totalBalance} decimals={DEFAULT_DECIMALS} />
+              <small>{topBalances[1].symbol}</small>
+            </>
+          )}
         </Item>
         <Item>
-          <DecimalValue value={topBalances[2].totalBalance} decimals={DEFAULT_DECIMALS} />
-          <small>{topBalances[2].symbol}</small>
+          {topBalances[2].totalBalance.gt(0) && (
+            <>
+              <DecimalValue value={topBalances[2].totalBalance} decimals={DEFAULT_DECIMALS} />
+              <small>{topBalances[2].symbol}</small>
+            </>
+          )}
         </Item>
       </Content>
     </Container>
@@ -58,7 +70,6 @@ const WalletInfo = ({ tokens, topBalances, currentAccount }: WalletProps) => {
 };
 
 const Container = styled(WalletCard)`
-  height: 224px;
   background-image: linear-gradient(49deg, #e5c234, #ffd8be);
 `;
 
