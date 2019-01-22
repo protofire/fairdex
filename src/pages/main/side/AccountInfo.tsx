@@ -5,24 +5,30 @@ import styled from 'styled-components';
 import { Address, DecimalValue } from '../../../components/formatters';
 import { ZERO } from '../../../contracts/utils';
 import * as images from '../../../images';
-import { getClaimableAuctionsCount } from '../../../store/blockchain';
+import { getClaimableAuctionsCount, getCurrentAccount } from '../../../store/blockchain';
 import { getBidsCount } from '../../../store/blockchain/buy-orders';
 import { getFrt } from '../../../store/blockchain/frt';
-
 import { getLiqContribPercentage } from '../../../store/blockchain/tokens';
-import WalletCard, { Content, Header, Item } from './wallet-card';
+
+import WalletCard, { Content, Header, Item } from './WalletCard';
 
 export interface AccountProps {
-  bids: number;
   claimableCount?: number;
   currentAccount: Address;
   frt: Token;
-  lc?: BigNumber;
+  liquidityContribution?: BigNumber;
+  pastBids: number;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const Account = ({ currentAccount, frt, bids, lc, claimableCount }: AccountProps) => (
+const AccountInfo = ({
+  currentAccount,
+  frt,
+  pastBids,
+  liquidityContribution,
+  claimableCount,
+}: AccountProps) => (
   <Container>
     <Header>
       <Icon>
@@ -36,12 +42,12 @@ const Account = ({ currentAccount, frt, bids, lc, claimableCount }: AccountProps
         <small>{frt.symbol}</small>
       </Item>
       <Item>
-        <DecimalValue value={lc} decimals={DEFAULT_DECIMALS} postfix={'%'} />
+        <DecimalValue value={liquidityContribution} decimals={DEFAULT_DECIMALS} postfix={'%'} />
         <small>Liquidity Contribution</small>
       </Item>
       <Item>
-        <div>{bids}</div>
-        <small>Bids</small>
+        <div>{pastBids}</div>
+        <small>Past bids</small>
       </Item>
       <Item>
         <div>{claimableCount}</div>
@@ -79,12 +85,12 @@ const Icon = styled.div`
 
 function mapStateToProps(state: AppState): AccountProps {
   return {
-    currentAccount: state.blockchain.currentAccount,
-    bids: getBidsCount(state),
-    frt: getFrt(state),
-    lc: getLiqContribPercentage(state),
     claimableCount: getClaimableAuctionsCount(state),
+    currentAccount: getCurrentAccount(state),
+    frt: getFrt(state),
+    liquidityContribution: getLiqContribPercentage(state),
+    pastBids: getBidsCount(state),
   };
 }
 
-export default connect(mapStateToProps)(Account);
+export default connect(mapStateToProps)(AccountInfo);

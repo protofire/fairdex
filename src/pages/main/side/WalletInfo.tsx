@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { DecimalValue } from '../../../components/formatters';
 import { toDecimal, ZERO } from '../../../contracts/utils';
 import { getTokensWithBalance, getTopBalances } from '../../../store/blockchain';
-import WalletCard, { Content, Header, Item } from './wallet-card';
+import WalletCard, { Content, Header, Item } from './WalletCard';
 
 interface StateProps {
   tokens: Token[];
@@ -18,7 +18,7 @@ type WalletProps = StateProps & RouteComponentProps;
 
 const DEFAULT_DECIMALS = 3;
 
-const Wallet = ({ tokens, topBalances, currentAccount }: WalletProps) => {
+const WalletInfo = ({ tokens, topBalances, currentAccount }: WalletProps) => {
   const [ethBalance, setEthBalance] = useState(ZERO);
 
   useEffect(() => {
@@ -32,8 +32,8 @@ const Wallet = ({ tokens, topBalances, currentAccount }: WalletProps) => {
   return (
     <Container>
       <WalletHeader>
-        <div>Wallet</div>
-        <ViewAllTokens to='/wallet'>VIEW ALL {tokens.length} TOKENS &#x279C;</ViewAllTokens>
+        <div>Available balance</div>
+        <ViewAllTokens to='/wallet'>View all tokens &#x279C;</ViewAllTokens>
       </WalletHeader>
       <Content>
         <Item>
@@ -62,7 +62,9 @@ const Container = styled(WalletCard)`
   background-image: linear-gradient(49deg, #e5c234, #ffd8be);
 `;
 
-const ViewAllTokens = styled(NavLink)``;
+const ViewAllTokens = styled(NavLink)`
+  text-transform: uppercase;
+`;
 
 const WalletHeader = styled(Header)`
   height: 79px;
@@ -92,4 +94,4 @@ function mapStateToProps(state: AppState): StateProps {
   };
 }
 
-export default withRouter(connect(mapStateToProps)(Wallet));
+export default withRouter(connect(mapStateToProps)(WalletInfo));

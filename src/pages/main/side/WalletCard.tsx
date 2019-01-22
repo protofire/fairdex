@@ -1,15 +1,7 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
-import Card from '../../../components/Card';
-import { DecimalValue } from '../../../components/formatters';
+import styled from 'styled-components';
 
-const WalletCard = styled(Card)`
-  padding: 0;
-  box-shadow: 0 8px 24px 0 rgba(139, 198, 236, 0.5);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
+import Card from '../../../components/Card';
 
 export const Header = styled.div`
   display: flex;
@@ -56,6 +48,14 @@ export const Item = styled.div`
   & > *:nth-child(2) {
     color: var(--color-text-primary);
   }
+`;
+
+const WalletCard = styled(Card)`
+  padding: 0;
+  box-shadow: 0 8px 24px 0 rgba(139, 198, 236, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 export default WalletCard;
