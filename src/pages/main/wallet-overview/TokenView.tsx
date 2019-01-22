@@ -7,9 +7,8 @@ import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contra
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
 import { ZERO } from '../../../contracts/utils';
-import DepositForm from './DepositForm';
+import DepositWithdrawForm from './DepositWithdrawForm';
 import EnableForTradingForm from './EnableForTradingForm';
-import WithdrawForm from './WithdrawForm';
 
 interface Props {
   data: Token;
@@ -56,8 +55,8 @@ const TokenView = ({ data: token }: Props) => (
       <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
     </Table>
     <ButtonGroup>
-      {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
-      {getDxBalance(token).gt(ZERO) && <WithdrawForm token={token} />}
+      {getWalletBalance(token).gt(ZERO) && <DepositWithdrawForm action={'Deposit'} token={token} />}
+      {getDxBalance(token).gt(ZERO) && <DepositWithdrawForm action={'Withdraw'} token={token} />}
     </ButtonGroup>
   </Card>
 );

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
 
-import * as utils from '../../../contracts/utils';
+import { ZERO } from '../../../contracts/utils';
 import { getCurrentAccount, loadTokens } from '../../../store/blockchain';
 import { showNotification } from '../../../store/ui/actions';
 
@@ -12,11 +12,13 @@ import { DecimalValue } from '../../../components/formatters';
 import Button from '../../../components/Button';
 import DecimalInput from '../../../components/DecimalInput';
 import Popup from '../../../components/Popup';
+import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
 interface OwnProps {
   token: Token;
+  action: 'Deposit' | 'Withdraw';
 }
 
 interface AppStateProps {
@@ -33,13 +35,15 @@ interface State {
   showDialog: boolean;
 }
 
-const { ZERO } = utils;
 const DEFAULT_DECIMALS = 3;
+const DEPOSIT = 'Deposit';
 
-const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
+const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatch }: Props) => {
   const [amount, setAmmount] = useState(ZERO);
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+
+  const dxMethod = action === DEPOSIT ? 'depositToken' : 'withdrawToken';
 
   const inputRef = React.createRef<HTMLInputElement>();
   const handleInputFocus: React.FocusEventHandler<HTMLInputElement> = event => {
@@ -64,7 +68,7 @@ const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
       }
       setLoading(true);
 
-      dx.depositToken(token, amount)
+      dx[dxMethod](token, amount)
         .send({
           from: currentAccount,
           // TODO: estimated gas
@@ -74,9 +78,9 @@ const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
           dispatch(
             showNotification(
               'info',
-              'Deposit request sent',
+              `${action} request sent`,
               <p>
-                Deposit transaction has been sent.{' '}
+                {action} transaction has been sent.{' '}
                 <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
                   More info
                 </a>
@@ -88,9 +92,9 @@ const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
           dispatch(
             showNotification(
               'success',
-              'Deposit confirmed',
+              `${action} confirmed`,
               <p>
-                Deposit has been confirmed.{' '}
+                {action} has been confirmed.{' '}
                 <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
                   More info
                 </a>
@@ -107,7 +111,7 @@ const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
           dispatch(
             showNotification(
               'error',
-              'Deposit failed',
+              `${action} failed`,
               <p>
                 {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
                 <br />
@@ -119,10 +123,10 @@ const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
           setLoading(false);
         });
     },
-    [token, currentAccount, amount, dispatch],
+    [token, action, dxMethod, currentAccount, amount, dispatch],
   );
 
-  const tokenBalanceInWallet = utils.token.getWalletBalance(token);
+  const maxAllowed = action === DEPOSIT ? getWalletBalance(token) : getDxBalance(token);
 
   return (
     <Container onClickOutside={handleClose} onEscPress={handleClose}>
@@ -132,7 +136,7 @@ const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
             <div>
               <h4>Volume</h4>
               <p>
-                {token.symbol} (max <DecimalValue value={tokenBalanceInWallet} decimals={DEFAULT_DECIMALS} />)
+                {token.symbol} (max <DecimalValue value={maxAllowed} decimals={DEFAULT_DECIMALS} />)
               </p>
             </div>
             <DecimalInput
@@ -142,8 +146,8 @@ const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
               onFocus={handleInputFocus}
               autoFocus={true}
             />
-            <Button type='submit' disabled={loading || amount.lte(ZERO) || amount.gt(tokenBalanceInWallet)}>
-              {loading ? 'Bid in progress...' : 'Confirm'}
+            <Button type='submit' disabled={loading || amount.lte(ZERO) || amount.gt(maxAllowed)}>
+              {loading ? `${action} in progress...` : 'Confirm'}
             </Button>
           </Form>
         </Content>
@@ -156,10 +160,10 @@ const DepositForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
         <Button
           mode='secondary'
           onClick={handleOpen}
-          data-testid={`${token.address}-deposit-button`}
+          data-testid={`${token.address}-${action.toLocaleLowerCase()}-button`}
           disabled={token.allowance ? token.allowance.lte(ZERO) : true}
         >
-          Deposit
+          {action}
         </Button>
       )}
     </Container>
@@ -220,4 +224,4 @@ function mapDispatchToProps(dispatch: any): DispatchProps {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(DepositForm);
+)(DepositWithdrawForm);

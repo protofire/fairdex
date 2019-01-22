@@ -38,6 +38,10 @@ class DutchExchange extends BaseContract<Event> {
     return this.contract.methods.deposit(token.address, fromDecimal(amount, token.decimals));
   }
 
+  withdrawToken(token: Token, amount: BigNumber) {
+    return this.contract.methods.withdraw(token.address, fromDecimal(amount, token.decimals));
+  }
+
   async getAvailableMarkets(fromBlock = 0) {
     const markets = await this.contract.getPastEvents('NewTokenPair', { fromBlock });
 
