@@ -226,6 +226,8 @@ class BidForm extends React.PureComponent<Props, State> {
                 <Field>
                   <label>Bid volume</label>
                   <Tooltip
+                    theme='error'
+                    position='bottom right'
                     content={
                       bidAmount.gt(availableBidVolume) && (
                         <p>

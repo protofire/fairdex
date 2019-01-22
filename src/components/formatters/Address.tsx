@@ -1,6 +1,9 @@
-import React from 'react';
+import copyToClipboard from 'clipboard-copy';
+import React, { useCallback, useState } from 'react';
+import styled from 'styled-components';
 
 import { isAddress, shortenAddress } from '../../contracts/utils';
+import Tooltip from '../Tooltip';
 
 interface AddressProps {
   address: Address;
@@ -8,14 +11,28 @@ interface AddressProps {
   className?: string;
 }
 
-const Address = ({ className, address, shorten }: AddressProps) => (
-  <span className={className} title={address}>
-    {isAddress(address) && shorten ? shortenAddress(address) : address}
-  </span>
-);
+const Address = ({ className, address, shorten = true }: AddressProps) => {
+  const [message, setMessage] = useState('');
 
-Address.defaultProps = {
-  shorten: true,
+  const copyAddress = useCallback(
+    () => {
+      copyToClipboard(address);
+
+      setMessage('Copied!');
+      setTimeout(() => setMessage(''), 1_750);
+    },
+    [address],
+  );
+
+  return (
+    <Wrapper className={className} title={address} onClick={copyAddress}>
+      <Tooltip content={message}>{isAddress(address) && shorten ? shortenAddress(address) : address}</Tooltip>
+    </Wrapper>
+  );
 };
+
+const Wrapper = styled.span`
+  cursor: pointer;
+`;
 
 export default Address;
