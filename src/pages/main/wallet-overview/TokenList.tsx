@@ -42,4 +42,4 @@ TokenList.defaultProps = {
   loading: false,
 };
 
-export default React.memo(TokenList);
+export default TokenList;

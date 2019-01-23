@@ -27,7 +27,7 @@ class WalletSearch extends React.Component<Props> {
   };
 
   render() {
-    const { searchText, searchMode, ...props } = this.props;
+    const { searchText, searchMode, onSearch, ...props } = this.props;
 
     return (
       <Container {...props}>

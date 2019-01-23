@@ -6,9 +6,9 @@ import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contra
 
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
-import CheckboxToggle from '../../../components/CheckboxToggle';
 import { ZERO } from '../../../contracts/utils';
 import DepositForm from './DepositForm';
+import EnableForTradingForm from './EnableForTradingForm';
 import WithdrawForm from './WithdrawForm';
 
 interface Props {
@@ -17,73 +17,50 @@ interface Props {
 
 const DEFAULT_DECIMALS = 3;
 
-class TokenView extends React.PureComponent<Props> {
-  state = {
-    enableForTrading: false,
-  };
-
-  enableForTradingHandler = (isOn: boolean) => {
-    this.setState({ enableForTrading: isOn });
-  };
-
-  render() {
-    const { data: token } = this.props;
-    const { enableForTrading } = this.state;
-
-    return (
-      <Card>
-        <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
-          <span>{token.symbol}</span>
-        </Title>
-        <Table>
-          <Row>
-            <Label>Wallet balance</Label>
-            <Value>
-              {token.balance === undefined ? (
-                <Loading />
-              ) : (
-                <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
-              )}
-            </Value>
-          </Row>
-          <Row>
-            <Label>DX balance</Label>
-            <Value>
-              {token.balance === undefined ? (
-                <Loading />
-              ) : (
-                <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
-              )}
-            </Value>
-          </Row>
-          <Row>
-            <Label>Total holdings</Label>
-            <Value>
-              {token.balance === undefined ? (
-                <Loading />
-              ) : (
-                <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
-              )}
-            </Value>
-          </Row>
-          {false && (
-            <Row>
-              <Label className={'no-dots'}>Enable for trading</Label>
-              <dd>
-                <TradingToggle checked={enableForTrading} onToggle={this.enableForTradingHandler} />
-              </dd>
-            </Row>
-          )}{' '}
-          {/* FIXME: hidden until implement functionality */}
-        </Table>
-        <ButtonGroup>
-          {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
-          {getDxBalance(token).gt(ZERO) && <WithdrawForm token={token} />}
-        </ButtonGroup>
-      </Card>
-    );
-  }
-}
+const TokenView = ({ data: token }: Props) => (
+  <Card>
+    <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
+      <span>{token.symbol}</span>
+    </Title>
+    <Table>
+      <Row>
+        <Label>Wallet balance</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <Row>
+        <Label>DX balance</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <Row>
+        <Label>Total holdings</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
+    </Table>
+    <ButtonGroup>
+      {getWalletBalance(token).gt(ZERO) && <DepositForm token={token} />}
+      {getDxBalance(token).gt(ZERO) && <WithdrawForm token={token} />}
+    </ButtonGroup>
+  </Card>
+);
 
 const Label = styled.dt`
   position: relative;
@@ -96,10 +73,6 @@ const Label = styled.dt`
     content: '${'.'.repeat(200)}';
     color: var(--color-grey);
     margin-left: var(--spacing-text);
-  }
-
-  &.no-dots:after {
-    content: ' ';
   }
 `;
 
@@ -129,10 +102,6 @@ const Row = styled.div`
   ${Label}, ${Value} {
     line-height: 1.5rem;
   }
-`;
-
-const TradingToggle = styled(CheckboxToggle)`
-  margin-top: 4px;
 `;
 
 const Table = styled.dl`
