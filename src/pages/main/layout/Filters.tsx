@@ -238,27 +238,21 @@ const Root = styled.div`
   width: var(--sidebar-width);
   display: flex;
   flex-flow: column nowrap;
-  top: 0;
   right: 0;
-  bottom: 0;
   z-index: 101;
   transition: transform var(--animation-duration) ease-in-out;
   background: var(--color-main-bg);
   transform: translateX(${(props: StateProps) => (props.isOpen ? '0' : '100%')});
   color: var(--color-text-primary);
+  height: 100vh;
 `;
 
 const Content = styled.div`
   overflow: auto;
-  flex: 1 1 auto;
-  padding-bottom: calc(var(--spacing-normal) * 4);
+  flex: 1;
 `;
 
 const Footer = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
   background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 32%, #fff);
