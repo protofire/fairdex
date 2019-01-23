@@ -9,9 +9,22 @@ import { toBigNumber } from '../contracts/utils';
 import ClaimForm from '../pages/main/auctions/claim/ClaimForm';
 import { ClaimProvider } from '../pages/main/auctions/claim/ClaimContext';
 
-beforeEach(jest.resetAllMocks);
+beforeEach(jest.clearAllMocks);
 
 afterEach(cleanup);
+
+jest
+  .spyOn(dx, 'postClaim')
+  .mockImplementation((sellTokenAddress, buyTokenAddress, auctionIndex, currentAccount) => {
+    return {
+      send() {
+        return this;
+      },
+      once() {
+        return this;
+      },
+    };
+  });
 
 describe('in running auctions', () => {
   const data: RunningAuction = {
@@ -26,7 +39,7 @@ describe('in running auctions', () => {
     buyVolume: toBigNumber(0),
     currentPrice: toBigNumber(0.0123456789),
     closingPrice: toBigNumber(0.0123456789 * 2),
-    buyerBalance: toBigNumber(1234),
+    unclaimedFunds: toBigNumber(1234),
   };
 
   describe('claim button', () => {
@@ -44,7 +57,7 @@ describe('in running auctions', () => {
         <ClaimForm
           auction={{
             ...data,
-            buyerBalance: undefined,
+            unclaimedFunds: undefined,
           }}
         />,
       );
@@ -163,8 +176,9 @@ describe('in ended auctions', () => {
     buyToken: 'WETH',
     buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
     buyVolume: toBigNumber(0),
-    closingPrice: toBigNumber(0.0123456789),
-    buyerBalance: toBigNumber(1234),
+    closingPrice: toBigNumber(0.5),
+    unclaimedFunds: toBigNumber(1234),
+    buyerBalance: toBigNumber(700),
   };
 
   describe('claim button', () => {
@@ -182,7 +196,7 @@ describe('in ended auctions', () => {
         <ClaimForm
           auction={{
             ...data,
-            buyerBalance: undefined,
+            unclaimedFunds: undefined,
           }}
         />,
       );
@@ -221,6 +235,7 @@ describe('in ended auctions', () => {
 
       await waitForElement(() => getByTestId('unclaimed-balance'));
 
+      expect(queryByText('You bought 1400 OMG with 700 WETH')).toBeDefined();
       expect(queryByText('You can claim')).toBeDefined();
     });
 

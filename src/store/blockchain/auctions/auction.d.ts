@@ -9,6 +9,7 @@ interface AuctionData {
   buyToken: TokenSymbol;
   buyTokenAddress: Address;
   buyVolume: BigNumber;
+  unclaimedFunds?: BigNumber;
   buyerBalance?: BigNumber;
 }
 

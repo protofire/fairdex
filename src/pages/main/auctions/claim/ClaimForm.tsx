@@ -9,6 +9,7 @@ import { showNotification } from '../../../../store/ui/actions';
 import Button from '../../../../components/Button';
 import DecimalValue from '../../../../components/formatters/DecimalValue';
 import Popup from '../../../../components/Popup';
+import { getTotalClaimFound } from '../../../../contracts/utils/auctions';
 import { loadAvailableTokens } from '../../../../store/blockchain/tokens';
 import { ClaimContext } from './ClaimContext';
 
@@ -33,7 +34,7 @@ const ClaimForm = React.memo(
       return null;
     }
 
-    if (!auction.buyerBalance || auction.buyerBalance.lte(0)) {
+    if (!auction.unclaimedFunds || auction.unclaimedFunds.lte(0)) {
       return null;
     }
 
@@ -119,18 +120,26 @@ const ClaimForm = React.memo(
         {opened && (
           <Content>
             <form onSubmit={handleSubmit}>
-              <p>
-                {auction.state === 'ended'
-                  ? 'Congratulations! You won the auction and can claim'
-                  : 'You can claim'}
-              </p>
+              {auction.state === 'ended' && (
+                <p>
+                  {'You bought '}
+                  <DecimalValue
+                    value={getTotalClaimFound(auction)}
+                    decimals={4}
+                    postfix={auction.sellToken}
+                  />
+                  {' with '}
+                  <DecimalValue value={auction.buyerBalance} decimals={4} postfix={auction.buyToken} />
+                </p>
+              )}
+              <p>{'You can claim'}</p>
 
               <UnclaimedBalance data-testid='unclaimed-balance'>
-                <DecimalValue value={auction.buyerBalance} decimals={4} postfix={auction.sellToken} />
+                <DecimalValue value={auction.unclaimedFunds} decimals={4} postfix={auction.sellToken} />
               </UnclaimedBalance>
 
               <Button type='submit' disabled={claiming} autoFocus data-testid='confirm-claim-button'>
-                {claiming ? 'Claim in progress...' : 'Confirm'}
+                {claiming ? 'Claim in progress...' : 'Claim'}
               </Button>
             </form>
           </Content>

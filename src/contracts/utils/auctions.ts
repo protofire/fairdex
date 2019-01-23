@@ -82,15 +82,15 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
   }
 }
 
-export async function getBuyerBalance(
+export async function getUnclaimedFunds(
   sellToken: Token,
   buyToken: Token,
   auctionIndex: string,
   currentAccount: Address,
 ) {
-  const buyerBalance = dx.getUnclaimedFunds(sellToken, buyToken, auctionIndex, currentAccount);
+  const unclaimedFunds = dx.getUnclaimedFunds(sellToken, buyToken, auctionIndex, currentAccount);
 
-  return buyerBalance;
+  return unclaimedFunds;
 }
 
 export function getAvailableVolume(auction: RunningAuction) {
@@ -158,4 +158,23 @@ export function getCurrentPriceRate(auction: RunningAuction, decimals?: number) 
 
 export function getClosingPriceRate(auction: Auction, decimals?: number) {
   return getPriceRate(auction.closingPrice, auction.sellToken, auction.buyToken, decimals);
+}
+
+export async function getBuyerBalance(
+  sellToken: Token,
+  buyToken: Token,
+  auctionIndex: string,
+  currentAccount: Address,
+) {
+  const buyerBalance = dx.getBuyerBalance(sellToken, buyToken, auctionIndex, currentAccount);
+
+  return buyerBalance;
+}
+
+export function getTotalClaimFound(auction: Auction) {
+  if (auction.closingPrice == null || auction.buyerBalance == null) {
+    return ZERO;
+  }
+
+  return auction.buyerBalance.dividedBy(auction.closingPrice);
 }

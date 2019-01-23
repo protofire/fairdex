@@ -106,7 +106,7 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
 
         <ButtonGroup>
           <BidForm auction={auction} />
-          {auction.buyerBalance && auction.buyerBalance.isGreaterThan(ZERO) && (
+          {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
             <ClaimForm auction={auction} />
           )}
         </ButtonGroup>
@@ -209,7 +209,7 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
         </Table>
 
         <ButtonGroup>
-          {auction.buyerBalance && auction.buyerBalance.isGreaterThan(ZERO) && (
+          {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
             <ClaimForm auction={auction} />
           )}
         </ButtonGroup>

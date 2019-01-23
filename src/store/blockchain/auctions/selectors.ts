@@ -176,7 +176,7 @@ export function filterAuctions(list: Auction[], filters: FiltersState, tokens: M
 }
 
 function filterClaimableAuctions(list: Auction[]) {
-  return list.filter(item => item.buyerBalance && item.buyerBalance.gt(ZERO));
+  return list.filter(item => item.unclaimedFunds && item.unclaimedFunds.gt(ZERO));
 }
 
 function filterMyTokensAuctions(list: Auction[], tokens = new Map<Address, Token>()) {
