@@ -44,7 +44,7 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
           dispatch(
             showNotification(
               'info',
-              `${message} request sent`,
+              `${message}`,
               <p>
                 {message} transaction has been sent.{' '}
                 <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
@@ -59,9 +59,9 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
           dispatch(
             showNotification(
               'success',
-              `${message} confirmed`,
+              `${message}`,
               <p>
-                {message} has been confirmed.{' '}
+                {message} transaction has been confirmed.{' '}
                 <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
                   More info
                 </a>
@@ -77,7 +77,7 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
           dispatch(
             showNotification(
               'error',
-              `${message} failed`,
+              `${message}`,
               <p>
                 {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
                 <br />
