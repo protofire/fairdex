@@ -1,4 +1,4 @@
-import React, { FormEvent, useCallback, useState } from 'react';
+import React, { FormEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
@@ -45,21 +45,24 @@ const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatc
 
   const dxMethod = action === DEPOSIT ? 'depositToken' : 'withdrawToken';
 
-  const inputRef = React.createRef<HTMLInputElement>();
-  const handleInputFocus: React.FocusEventHandler<HTMLInputElement> = event => {
+  const inputRef = useRef(null);
+  const handleInputFocus = useCallback(event => {
     event.target.select();
-  };
+  }, []);
 
-  const handleClose = () => {
-    if (!loading) {
-      setShowDialog(false);
-      setAmmount(ZERO);
-    }
-  };
+  const handleClose = useCallback(
+    () => {
+      if (!loading) {
+        setShowDialog(false);
+        setAmmount(ZERO);
+      }
+    },
+    [loading],
+  );
 
-  const handleOpen = () => {
+  const handleOpen = useCallback(() => {
     setShowDialog(true);
-  };
+  }, []);
 
   const handleSubmit = useCallback(
     async (event: FormEvent) => {
@@ -126,8 +129,14 @@ const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatc
     [token, action, dxMethod, currentAccount, amount, dispatch],
   );
 
-  const maxAllowed = action === DEPOSIT ? getWalletBalance(token) : getDxBalance(token);
-  const isActionDisabled = action === DEPOSIT && token.allowance && token.allowance.lte(ZERO);
+  const maxAllowed = useMemo(() => (action === DEPOSIT ? getWalletBalance(token) : getDxBalance(token)), [
+    action,
+    token,
+  ]);
+  const isActionDisabled = useMemo(() => action === DEPOSIT && token.allowance && token.allowance.lte(ZERO), [
+    action,
+    token,
+  ]);
 
   return (
     <Container
