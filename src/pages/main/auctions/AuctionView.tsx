@@ -22,7 +22,7 @@ interface AuctionViewProps {
 const DEFAULT_DECIMALS = 3;
 
 const AuctionView = ({ data: auction }: AuctionViewProps) => (
-  <Card id={`${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}>
+  <Card data-testid={`auction-card-${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}>
     <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`}>
       <div>
         <small>bid with</small>

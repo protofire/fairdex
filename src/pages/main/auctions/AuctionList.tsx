@@ -16,7 +16,7 @@ const AuctionList = ({ auctions, isLoading }: AuctionListProps) => (
   <Flipper flipKey={auctions.map(({ auctionIndex }) => auctionIndex).join('-')}>
     {isLoading ? (
       <EmptyList>
-        <Spinner size='large' />
+        <Spinner size='large' data-testid={'auction-list-spinner'} />
       </EmptyList>
     ) : auctions.length > 0 ? (
       <ListContainer>
