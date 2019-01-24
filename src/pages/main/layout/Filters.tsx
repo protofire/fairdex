@@ -106,15 +106,15 @@ class Filters extends React.PureComponent<Props, State> {
             <Section>
               <SubTitle>Sort By</SubTitle>
               <List>
-                <Item onClick={this.createSorter('bid-token')}>
+                <Item onClick={this.createSorter('bid-token')} data-testid={'sortby-bid-token'}>
                   <SortIcon dir={filters.auctionSortBy === 'bid-token' ? filters.auctionSortDir : 'none'} />
                   <Label>Token</Label>
                 </Item>
-                <Item onClick={this.createSorter('sell-volume')}>
+                <Item onClick={this.createSorter('sell-volume')} data-testid={'sortby-sell-volume'}>
                   <SortIcon dir={filters.auctionSortBy === 'sell-volume' ? filters.auctionSortDir : 'none'} />
                   <Label>Sell volume</Label>
                 </Item>
-                <Item onClick={this.createSorter('end-time')}>
+                <Item onClick={this.createSorter('end-time')} data-testid={'sortby-end-time'}>
                   <SortIcon dir={filters.auctionSortBy === 'end-time' ? filters.auctionSortDir : 'none'} />
                   <Label>
                     {this.props.location.pathname.endsWith('running') && 'Estimated end time'}
@@ -127,7 +127,7 @@ class Filters extends React.PureComponent<Props, State> {
             <Section>
               <List>
                 <Item>
-                  <Label>
+                  <Label data-testid={'tokens-i-hold-filter'}>
                     <Checkbox
                       name='onlyMyTokens'
                       checked={this.props.filters.onlyMyTokens}
@@ -135,10 +135,10 @@ class Filters extends React.PureComponent<Props, State> {
                     />
                     Only tokens I hold
                   </Label>
-                  <ItemCount>{myTokensAuctionsCount}</ItemCount>
+                  <ItemCount data-testid={'tokens-i-hold-count'}>{myTokensAuctionsCount}</ItemCount>
                 </Item>
                 <Item>
-                  <Label>
+                  <Label data-testid={'claimable-auctions-filter'}>
                     <Checkbox
                       name='claimableAuctions'
                       checked={this.props.filters.claimableAuctions}
@@ -146,7 +146,7 @@ class Filters extends React.PureComponent<Props, State> {
                     />
                     Only claimable auctions
                   </Label>
-                  <ItemCount>{claimableCount}</ItemCount>
+                  <ItemCount data-testid={'claimable-auctions-count'}>{claimableCount}</ItemCount>
                 </Item>
               </List>
             </Section>
@@ -214,12 +214,14 @@ class Filters extends React.PureComponent<Props, State> {
       const checked = this.props.filters[tokenType].includes(token.id);
 
       return (
-        <Item key={token.id}>
-          <Label>
+        <Item key={token.id} data-testid={`auction-filter-${tokenType}-item-${token.name}`}>
+          <Label data-testid={`auction-filter-${tokenType}-label-${token.name}`}>
             <Checkbox checked={checked} name={token.id} onToggle={applyTokenFilter} />
-            <span className='text'>{token.name}</span>
+            <span className='text' data-testid={`auction-filter-${tokenType}-name-${token.name}`}>
+              {token.name}
+            </span>
           </Label>
-          <ItemCount>{token.count}</ItemCount>
+          <ItemCount data-testid={`auction-filter-${tokenType}-count-${token.name}`}>{token.count}</ItemCount>
         </Item>
       );
     });
