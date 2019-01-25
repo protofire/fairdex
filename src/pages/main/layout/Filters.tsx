@@ -10,12 +10,7 @@ import Icon from '../../../components/icons';
 import Overlay from '../../../components/Overlay';
 import SortIcon from '../../../components/SortIcon';
 
-import {
-  getBuyTokens,
-  getFilteredClaimableAuctions,
-  getFilteredMyTokensAuctions,
-  getSellTokens,
-} from '../../../store/blockchain';
+import { getBuyTokens, getSellTokens } from '../../../store/blockchain';
 import { applyFilters, clearFilters } from '../../../store/filters/actions';
 import { toggleFilters } from '../../../store/ui/actions';
 import DynamicList from './DynamicList';
@@ -33,8 +28,8 @@ interface StateProps {
   sellTokens: TokenInfo[];
   buyTokens: TokenInfo[];
   filters: FiltersState;
-  myTokensAuctionsCount: number;
-  claimableCount: number;
+  // myTokensAuctionsCount: number;
+  // claimableCount: number;
 }
 
 interface DispatchProps {
@@ -77,15 +72,8 @@ class Filters extends React.PureComponent<Props, State> {
   };
 
   render() {
-    const {
-      actions,
-      isOpen,
-      sellTokens,
-      buyTokens,
-      filters,
-      myTokensAuctionsCount,
-      claimableCount,
-    } = this.props;
+    const { actions, isOpen, sellTokens, buyTokens, filters } = this.props;
+
     const sellTokensList = this.buildTokenList(
       this.filterTokens(sellTokens, this.state.sellTokenSearchQuery),
       'sellTokens',
@@ -135,7 +123,7 @@ class Filters extends React.PureComponent<Props, State> {
                     />
                     Only tokens I hold
                   </Label>
-                  <ItemCount>{myTokensAuctionsCount}</ItemCount>
+                  {/* <ItemCount>{myTokensAuctionsCount}</ItemCount> */}
                 </Item>
                 <Item>
                   <Label>
@@ -146,7 +134,7 @@ class Filters extends React.PureComponent<Props, State> {
                     />
                     Only claimable auctions
                   </Label>
-                  <ItemCount>{claimableCount}</ItemCount>
+                  {/* <ItemCount>{claimableCount}</ItemCount> */}
                 </Item>
               </List>
             </Section>
@@ -219,7 +207,7 @@ class Filters extends React.PureComponent<Props, State> {
             <Checkbox checked={checked} name={token.id} onToggle={applyTokenFilter} />
             <span className='text'>{token.name}</span>
           </Label>
-          <ItemCount>{token.count}</ItemCount>
+          {/* <ItemCount>{token.count}</ItemCount> */}
         </Item>
       );
     });
@@ -347,16 +335,16 @@ const ItemCount = styled.span`
 `;
 
 function mapStateToProps(state: AppState): StateProps {
-  const myTokensAuctions = getFilteredMyTokensAuctions(state);
-  const claimableAuctions = getFilteredClaimableAuctions(state);
+  // const myTokensAuctions = getFilteredMyTokensAuctions(state);
+  // const claimableAuctions = getFilteredClaimableAuctions(state);
 
   return {
     isOpen: state.ui.filtersVisible,
     sellTokens: getSellTokens(state),
     buyTokens: getBuyTokens(state),
     filters: state.filters,
-    myTokensAuctionsCount: myTokensAuctions.length,
-    claimableCount: claimableAuctions.length,
+    // myTokensAuctionsCount: myTokensAuctions.length,
+    // claimableCount: claimableAuctions.length,
   };
 }
 
