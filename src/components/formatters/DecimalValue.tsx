@@ -9,26 +9,37 @@ interface Props extends DecimalFormat, HTMLAttributes<HTMLSpanElement> {
   hideTitle?: boolean;
 }
 
-const DecimalValue = ({ value, defaultValue, decimals, hideTitle, prefix, postfix, ...props }: Props) => {
-  let formatedValue = <>{value && formatNumber(value, { decimals, prefix, postfix })}</>;
-  if (value && toBigNumber(value).gt(0) && formatNumber(value, { decimals }) === '0') {
-    formatedValue = (
+const DecimalValue = ({
+  className,
+  value,
+  defaultValue,
+  decimals,
+  hideTitle,
+  prefix,
+  postfix,
+  roundingMode,
+  ...props,
+}: Props) => {
+  let formattedValue = <>{value && formatNumber(value, { decimals, prefix, postfix, roundingMode })}</>;
+
+  if (value && toBigNumber(value).gt(0) && formatNumber(value, { decimals, roundingMode }) === '0') {
+    formattedValue = (
       <>
         {`${prefix ? prefix + ' ' : ''}0.0`}
-        <Elipsis />
+        <Ellipsis />
         {`${postfix ? ' ' + postfix : ''}`}
       </>
     );
   }
 
   return (
-    <Wrapper {...props} title={!hideTitle && value ? formatNumber(value, { prefix, postfix }) : undefined}>
-      {value ? formatedValue || defaultValue : ''}
+    <Wrapper {...props} title={!hideTitle && value ? formatNumber(value, { prefix, postfix, roundingMode }) : undefined}>
+      {value ? formattedValue || defaultValue : ''}
     </Wrapper>
   );
 };
 
-const Elipsis = styled.span.attrs({
+const Ellipsis = styled.span.attrs({
   children: '…',
 })`
   font-size: 50%;

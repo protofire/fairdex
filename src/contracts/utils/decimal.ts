@@ -11,15 +11,21 @@ export interface DecimalFormat {
   decimals?: number;
   prefix?: string;
   postfix?: string;
+  roundingMode?: BigNumber.RoundingMode;
 }
 
-export function formatNumber(value: Decimal, options: DecimalFormat = {}): string {
-  const num = toBigNumber(value);
+BigNumber.set({ DECIMAL_PLACES: 18, ROUNDING_MODE: BigNumber.ROUND_DOWN });
 
-  if (num && num.isFinite()) {
+export function formatNumber(value: Decimal, options: DecimalFormat = {}): string {
+  const numericValue = toBigNumber(value);
+
+  if (numericValue && numericValue.isFinite()) {
     const prefix = options.prefix ? options.prefix + ' ' : '';
     const postfix = options.postfix ? ' ' + options.postfix : '';
-    const formatted = toBigNumber(options.decimals != null ? num.toFixed(options.decimals) : num);
+
+    const formatted = toBigNumber(
+      options.decimals != null ? numericValue.toFixed(options.decimals, options.roundingMode) : numericValue,
+    );
 
     return `${prefix}${formatted && formatted.isFinite() ? formatted.toString(10) : '∞'}${postfix}`;
   }

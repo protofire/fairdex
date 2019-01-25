@@ -8,33 +8,41 @@ interface DecimalInputProps extends InputProps {
   onValueChange?: (value: BigNumber) => void;
 }
 
-const DecimalInput = React.memo(({ inputRef, onValueChange, ...props }: DecimalInputProps) => {
-  const [value, setValue] = useState(props.value ? props.value.toString() : '');
+const DecimalInput = ({ inputRef, onValueChange, value, ...props }: DecimalInputProps) => {
+  const initialValue = value ? value.toString() : '';
+
+  const [inputValue, setInputValue] = useState(initialValue);
+  const [numericValue, setNumericValue] = useState(toBigNumber(initialValue));
 
   useEffect(() => {
-    if (value !== props.value) {
-      const num = toBigNumber(value);
-
-      if (onValueChange && num.toString(10) !== props.value) {
-        onValueChange(num);
-      }
+    if (initialValue !== numericValue.toString(10)) {
+      setInputValue(initialValue);
+      setNumericValue(toBigNumber(initialValue));
     }
   });
 
-  const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(event => {
-    const inputValue = event.target.value ? event.target.value.trim() : '';
+  const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    event => {
+      event.preventDefault();
 
-    if (typeof onValueChange !== 'function') {
-      return;
-    }
+      const newValue = event.target.value ? event.target.value.trim() : '';
 
-    if (inputValue === '' || event.target.value.match(/^(\d+\.?\d*|\.\d+)$/)) {
-      setValue(inputValue || '0');
-    }
-  }, []);
+      if (newValue === '' || newValue.match(/^(\d+\.?\d*|\.\d+)$/)) {
+        const newNumericValue = toBigNumber(newValue);
 
-  return <Input ref={inputRef} {...props} value={value} onChange={handleChange} />;
-});
+        setInputValue(newValue);
+        setNumericValue(newNumericValue);
+
+        if (onValueChange) {
+          onValueChange(newNumericValue);
+        }
+      }
+    },
+    [onValueChange],
+  );
+
+  return <Input ref={inputRef} {...props} value={inputValue} onChange={handleChange} />;
+};
 
 export default React.forwardRef<HTMLInputElement, Omit<DecimalInputProps, 'inputRef'>>((props, ref) => (
   <DecimalInput inputRef={ref} {...props} />
