@@ -5,7 +5,7 @@ import DutchExchange from '../../../contracts/DutchExchange';
 import { loadAuctions } from '../auctions';
 import { addBuyOrder, initBuyOrder } from '../buy-orders';
 import { updateFrt } from '../frt';
-import { loadAvailableTokens, updateFeeRatio, updateTokenBalancesAndPrice } from '../tokens';
+import { loadAvailableTokens, loadTokens, updateFeeRatio } from '../tokens';
 
 export * from './selectors';
 
@@ -113,14 +113,14 @@ async function accountChangeHandler(dispatch: any, account: Address) {
     },
   );
 
+  // Update tokens
+  dispatch(loadTokens());
+
   // Load auctions
   dispatch(loadAuctions());
 
   // Update fee ratio
   dispatch(updateFeeRatio());
-
-  // Update token balances
-  dispatch(updateTokenBalancesAndPrice());
 }
 
 const selectWallet: ActionCreator<Action> = (wallet: Wallet, network: number, account: Address) => {

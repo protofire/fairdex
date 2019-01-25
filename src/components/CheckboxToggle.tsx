@@ -1,8 +1,10 @@
 import React, { HTMLAttributes, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
+import Spinner from './Spinner';
+
 interface ToggleProps extends HTMLAttributes<HTMLSpanElement> {
-  checked: boolean;
+  checked: boolean | null;
   onToggle: (value: boolean) => void;
 }
 
@@ -11,7 +13,7 @@ const CheckboxToggle = ({ checked, onToggle, ...props }: ToggleProps) => {
 
   return (
     <Wrapper checked={checked} {...props} onClick={handleToggle}>
-      <Toggler />
+      {checked === null ? <Spinner size={'tiny'} /> : <Toggler />}
     </Wrapper>
   );
 };
@@ -40,7 +42,15 @@ const Wrapper = styled.span`
   will-change: background-color;
 
   ${(props: Pick<ToggleProps, 'checked'>) =>
-    props.checked
+    props.checked === null
+      ? css`
+          background-color: var(--color-main-bg);
+
+          ${Spinner} {
+            left: 1rem;
+          }
+        `
+      : props.checked
       ? css`
           background-color: var(--color-text-orange);
 

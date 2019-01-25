@@ -4,14 +4,14 @@ import { getTokenContract } from '../../../contracts';
 import { Decimal } from '../../../contracts/utils';
 import { periodicAction } from '../../utils';
 import { loadAuctions } from '../auctions';
-import { getNetworkType } from '../wallet';
+import { getCurrentAccount, getNetworkType } from '../wallet';
 
 export * from './selectors';
 
 // Actions
-const SET_AVAILABLE_TOKENS = 'SET_AVAILABLE_TOKENS';
+const SET_TOKENS = 'SET_TOKENS';
 const SET_FEE_RATIO = 'SET_FEE_RATIO';
-const SET_TOKEN_BALANCES_AND_PRICE = 'SET_TOKEN_BALANCES_AND_PRICE';
+const SET_TOKEN_ALLOWANCE = 'SET_TOKEN_ALLOWANCE';
 
 const initialState: TokensState = {
   tokens: new Map<Address, Token>(),
@@ -19,18 +19,10 @@ const initialState: TokensState = {
 
 const reducer: Reducer<TokensState> = (state = initialState, action) => {
   switch (action.type) {
-    case SET_AVAILABLE_TOKENS:
+    case SET_TOKENS:
       return {
         ...state,
-        tokens: new Map<Address, Token>(
-          action.payload.reduce((all: Array<[Address, Token]>, token: Token) => {
-            if (!token.symbol.startsWith('test')) {
-              all.push([token.address, token]);
-            }
-
-            return all;
-          }, []),
-        ),
+        tokens: new Map<Address, Token>(action.payload.map((token: Token) => [token.address, token])),
       };
 
     case SET_FEE_RATIO:
@@ -39,15 +31,19 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
         feeRatio: action.payload,
       };
 
-    case SET_TOKEN_BALANCES_AND_PRICE:
+    case SET_TOKEN_ALLOWANCE:
       return {
         ...state,
         tokens: new Map<Address, Token>(
           Array.from(state.tokens).map(
             ([_, token]): [Address, Token] => {
-              [token.balance, token.priceEth] = action.payload.get(token.address);
+              const newToken = { ...token };
 
-              return [token.address, token];
+              if (token.address === action.payload.address) {
+                newToken.allowance = action.payload.allowance;
+              }
+
+              return [newToken.address, newToken];
             },
           ),
         ),
@@ -69,13 +65,11 @@ export function loadAvailableTokens() {
       try {
         const { default: tokens } = await import(`./networks/${network}.json`);
 
-        dispatch(setAvailableTokens(tokens));
+        // Load tokens
+        dispatch(loadTokens());
 
         // Load auctions
         dispatch(loadAuctions());
-
-        // Load token balances
-        dispatch(updateTokenBalancesAndPrice());
       } catch (err) {
         // TODO: Handle error
       }
@@ -103,36 +97,41 @@ export function updateFeeRatio() {
   });
 }
 
-export function updateTokenBalancesAndPrice() {
+export function loadTokens() {
   return async (dispatch: any, getState: () => AppState) => {
     const { blockchain } = getState();
 
-    const tokens = blockchain.tokens;
+    const tokens: Token[] = await getAvailableTokens(getNetworkType(getState()));
     const accountAddress = blockchain.currentAccount;
 
-    if (accountAddress && tokens.size > 0) {
-      const tokensWithBalances = await Promise.all(
-        Array.from(tokens).map(async ([_, token]) => {
+    if (accountAddress && tokens.length > 0) {
+      const tokensWithData = await Promise.all(
+        Array.from(tokens).map(async token => {
           const tokenContract = getTokenContract(token);
 
-          const [contractBalance, walletBalance, priceEth] = await Promise.all([
+          const [contractBalance, walletBalance, priceEth, allowance] = await Promise.all([
             dx.getBalance(token, accountAddress),
             tokenContract.getBalance(accountAddress),
             dx.getPriceOfTokenInLastAuction(token),
+            tokenContract.getAllowance(accountAddress, dx.address),
           ]);
 
-          return [token.address, [[contractBalance, walletBalance], priceEth.value]];
+          token.balance = [contractBalance, walletBalance];
+          token.priceEth = priceEth.value;
+          token.allowance = allowance;
+
+          return token;
         }),
       );
 
-      dispatch(setTokenBalances(tokensWithBalances));
+      dispatch(setTokens(tokensWithData));
     }
   };
 }
 
-const setAvailableTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
+const setTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
   return {
-    type: SET_AVAILABLE_TOKENS,
+    type: SET_TOKENS,
     payload: tokens,
   };
 };
@@ -144,13 +143,32 @@ const setFeeRatio: ActionCreator<AnyAction> = (ratio: BigNumber) => {
   };
 };
 
-const setTokenBalances: ActionCreator<Action> = (
-  balances: Array<[Address, [[Decimal, Decimal], BigNumber]]>,
-) => {
+const setTokenAllowance: ActionCreator<Action> = (address: Address, allowance: BigNumber) => {
   return {
-    type: SET_TOKEN_BALANCES_AND_PRICE,
-    payload: new Map(balances),
+    type: SET_TOKEN_ALLOWANCE,
+    payload: { address, allowance },
   };
+};
+
+export const updateTokenAllowance = (token: Token) => {
+  return async (dispatch: any, getState: () => AppState) => {
+    const currentAccount = getCurrentAccount(getState());
+    const tokenContract = getTokenContract(token);
+
+    const allowance = await tokenContract.getAllowance(currentAccount, window.dx.address);
+
+    dispatch(setTokenAllowance(token.address, allowance));
+  };
+};
+
+const getAvailableTokens = async (network: Network | null) => {
+  if (!network) {
+    return [];
+  }
+
+  const { default: tokens } = await import(`./networks/${network}.json`);
+
+  return tokens.filter((token: Token) => !token.symbol.startsWith('test'));
 };
 
 export default reducer;

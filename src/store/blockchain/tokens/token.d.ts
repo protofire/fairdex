@@ -7,6 +7,7 @@ interface Token {
   name: string;
   symbol: TokenSymbol;
   priceEth?: BigNumber;
+  allowance?: BigNumber;
 }
 
 interface TokenWithBalance extends Token {

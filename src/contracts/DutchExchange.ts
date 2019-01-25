@@ -2,7 +2,8 @@ import { abi } from '@gnosis.pm/dx-contracts/build/contracts/DutchExchange.json'
 import { DutchExchangeProxy as proxy } from '@gnosis.pm/dx-contracts/networks.json';
 
 import BaseContract from './BaseContract';
-import { Decimal, timeout, toBigNumber, toDecimal, toFractional, ZERO } from './utils';
+import { getTokenContract } from './index';
+import { Decimal, fromDecimal, timeout, toBigNumber, toDecimal, toFractional, ZERO } from './utils';
 
 type Event = 'AuctionCleared' | 'NewBuyOrder' | 'NewTokenPair';
 
@@ -27,6 +28,18 @@ class DutchExchange extends BaseContract<Event> {
 
   postClaim(sellToken: Address, buyToken: Address, auctionIndex: string, accountAddress: Address) {
     return this.contract.methods.claimBuyerFunds(sellToken, buyToken, accountAddress, auctionIndex);
+  }
+
+  toggleAllowance(token: Token) {
+    return getTokenContract(token).approve(this.address, token.allowance && token.allowance.gt(0) ? 0 : -1);
+  }
+
+  depositToken(token: Token, amount: BigNumber) {
+    return this.contract.methods.deposit(token.address, fromDecimal(amount, token.decimals));
+  }
+
+  withdrawToken(token: Token, amount: BigNumber) {
+    return this.contract.methods.withdraw(token.address, fromDecimal(amount, token.decimals));
   }
 
   async getAvailableMarkets(fromBlock = 0) {
