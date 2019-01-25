@@ -17,14 +17,14 @@ beforeEach(jest.resetAllMocks);
 
 afterEach(cleanup);
 
-describe('Autions lists', () => {
-  describe('Running', () => {
-    test('should show No auction message', () => {
+describe('Auction lists', () => {
+  describe('Running auction list', () => {
+    test('should show no auction message', () => {
       const { queryByText } = renderEmptyList(<RunningAuctions />);
       expect(queryByText('No auctions found')).toBeDefined();
     });
 
-    test('should show loading list', () => {
+    test('should show loading spinner', () => {
       const { getByTestId } = renderLoadingList(<RunningAuctions />);
       expect(getByTestId('auction-list-spinner')).toBeDefined();
     });
@@ -39,13 +39,13 @@ describe('Autions lists', () => {
     });
   });
 
-  describe('Scheduled', () => {
-    test('should show No auction message', () => {
+  describe('Scheduled auction list', () => {
+    test('should show no auction message', () => {
       const { queryByText } = renderEmptyList(<ScheduledAuctions />);
       expect(queryByText('No auctions found')).toBeDefined();
     });
 
-    test('should show loading list', () => {
+    test('should show loading spinner', () => {
       const { getByTestId } = renderLoadingList(<ScheduledAuctions />);
       expect(getByTestId('auction-list-spinner')).toBeDefined();
     });
@@ -60,13 +60,13 @@ describe('Autions lists', () => {
     });
   });
 
-  describe('Ended', () => {
-    test('should show No auction message', () => {
+  describe('Ended auction list', () => {
+    test('should show no auction message', () => {
       const { queryByText } = renderEmptyList(<EndedAuctions />);
       expect(queryByText('No auctions found')).toBeDefined();
     });
 
-    test('should show loading list', () => {
+    test('should show loading spinner', () => {
       const { getByTestId } = renderLoadingList(<EndedAuctions />);
       expect(getByTestId('auction-list-spinner')).toBeDefined();
     });

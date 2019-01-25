@@ -1,7 +1,7 @@
 import 'jest-dom/extend-expect';
 
 import React, { ReactElement } from 'react';
-import { cleanup, fireEvent, getByTestId, queryByTestId, getByTitle } from 'react-testing-library';
+import { cleanup, fireEvent, getByTestId, getByTitle } from 'react-testing-library';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import { renderWithRedux } from './utils';
@@ -20,12 +20,13 @@ beforeEach(jest.resetAllMocks);
 
 afterEach(cleanup);
 
-describe('Autions filtering', () => {
-  describe('tokens I hold', () => {
+describe('Auction list filtering', () => {
+  describe('Filter by tokens I hold', () => {
     test('should show the right count', () => {
-      const { getByTestId, getAllByTestId } = renderPage(<EndedAuctions />);
+      const { getByTestId } = renderPage(<EndedAuctions />);
 
       const count = getByTestId('tokens-i-hold-count');
+
       expect(count).toHaveTextContent('22');
     });
 
@@ -40,7 +41,8 @@ describe('Autions filtering', () => {
       expect(cards.length).toEqual(16);
     });
   });
-  describe('claimable auctions', () => {
+
+  describe('Filter by claimable auctions', () => {
     test('should show the right count', () => {
       const { getByTestId } = renderPage();
 
@@ -59,7 +61,8 @@ describe('Autions filtering', () => {
       expect(cards.length).toEqual(3);
     });
   });
-  describe('sell tokens', () => {
+
+  describe('Filter by sell tokens', () => {
     const countByToken: any = {
       CWBR: '1',
       DAI: '2',
@@ -123,6 +126,7 @@ describe('Autions filtering', () => {
       viewAll.forEach((el: Element) => fireEvent.click(el));
 
       const tokens = getAllByTestId(/auction-filter-sellTokens-item*./);
+
       tokens.forEach(token => {
         const name = getByTestId(token, /auction-filter-sellTokens-name-*./).innerText;
         const count = getByTestId(token, /auction-filter-sellTokens-count-*./).innerText;
@@ -132,7 +136,7 @@ describe('Autions filtering', () => {
     });
   });
 
-  describe('bid tokens', () => {
+  describe('Filter by bid tokens', () => {
     const countByToken: any = {
       CWBR: '1',
       DAI: '3',
@@ -185,97 +189,101 @@ describe('Autions filtering', () => {
       });
     });
   });
-  describe('sorting actions', () => {
-    test('should be initially sorted by estimated end time asc', () => {
-      const { getAllByTestId } = renderPage(<RunningAuctions />);
-      const cards = getAllByTestId(/auction-card-*./);
+});
 
-      const orderedTitles = [
-        ['OMG', 'WETH'],
-        ['WETH', 'OMG'],
-        ['RDN', 'WETH'],
-        ['WETH', 'RDN'],
-        ['DAI', 'MKR'],
-        ['WETH', 'MKR'],
-      ]
-        .map(card => `Bid with ${card[0]} to buy ${card[1]}`)
-        .join(' ');
+describe('Auction list sorting', () => {
+  test('should be initially sorted by estimated end time asc', () => {
+    const { getAllByTestId } = renderPage(<RunningAuctions />);
+    const cards = getAllByTestId(/auction-card-*./);
 
-      const orderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
+    const orderedTitles = [
+      ['OMG', 'WETH'],
+      ['WETH', 'OMG'],
+      ['RDN', 'WETH'],
+      ['WETH', 'RDN'],
+      ['DAI', 'MKR'],
+      ['WETH', 'MKR'],
+    ]
+      .map(card => `Bid with ${card[0]} to buy ${card[1]}`)
+      .join(' ');
 
-      expect(orderedTitles).toEqual(orderedCards);
-    });
+    const orderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
 
-    test('should sort auctions by estimated end time', () => {
-      const { getAllByTestId, getByTestId } = renderPage(<RunningAuctions />);
-      const sort = getByTestId('sortby-end-time');
+    expect(orderedTitles).toEqual(orderedCards);
+  });
 
-      fireEvent.click(sort);
+  test('should sort auctions by estimated end time', () => {
+    const { getAllByTestId, getByTestId } = renderPage(<RunningAuctions />);
+    const sort = getByTestId('sortby-end-time');
 
-      const cards = getAllByTestId(/auction-card-*./);
+    fireEvent.click(sort);
 
-      const orderedTitles = [
-        ['OMG', 'WETH'],
-        ['WETH', 'OMG'],
-        ['RDN', 'WETH'],
-        ['WETH', 'RDN'],
-        ['DAI', 'MKR'],
-        ['WETH', 'MKR'],
-      ]
-        .reverse()
-        .map(card => `Bid with ${card[0]} to buy ${card[1]}`)
-        .join(' ');
+    const cards = getAllByTestId(/auction-card-*./);
 
-      const orderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
+    const orderedTitles = [
+      ['OMG', 'WETH'],
+      ['WETH', 'OMG'],
+      ['RDN', 'WETH'],
+      ['WETH', 'RDN'],
+      ['DAI', 'MKR'],
+      ['WETH', 'MKR'],
+    ]
+      .reverse()
+      .map(card => `Bid with ${card[0]} to buy ${card[1]}`)
+      .join(' ');
 
-      expect(orderedTitles).toEqual(orderedCards);
-    });
+    const orderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
 
-    test('should sort auctions by bid token', () => {
-      const { getAllByTestId, getByTestId } = renderPage(<RunningAuctions />);
-      const sort = getByTestId('sortby-bid-token');
-      const tokensTitles = [
-        ['DAI', 'MKR'],
-        ['OMG', 'WETH'],
-        ['RDN', 'WETH'],
-        ['WETH', 'MKR'],
-        ['WETH', 'OMG'],
-        ['WETH', 'RDN'],
-      ].map(card => `Bid with ${card[0]} to buy ${card[1]}`);
+    expect(orderedTitles).toEqual(orderedCards);
+  });
 
-      fireEvent.click(sort);
-      let cards = getAllByTestId(/auction-card-*./);
-      const orderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
-      expect(tokensTitles.join(' ')).toEqual(orderedCards);
+  test('should sort auctions by bid token', () => {
+    const { getAllByTestId, getByTestId } = renderPage(<RunningAuctions />);
+    const sort = getByTestId('sortby-bid-token');
+    const tokensTitles = [
+      ['DAI', 'MKR'],
+      ['OMG', 'WETH'],
+      ['RDN', 'WETH'],
+      ['WETH', 'MKR'],
+      ['WETH', 'OMG'],
+      ['WETH', 'RDN'],
+    ].map(card => `Bid with ${card[0]} to buy ${card[1]}`);
 
-      fireEvent.click(sort);
-      cards = getAllByTestId(/auction-card-*./);
-      const reverseOrderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
-      expect(tokensTitles.reverse().join(' ')).toEqual(reverseOrderedCards);
-    });
+    fireEvent.click(sort);
+    let cards = getAllByTestId(/auction-card-*./);
+    const orderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
+    expect(tokensTitles.join(' ')).toEqual(orderedCards);
 
-    test('should sort auctions by sell volume', () => {
-      const { getAllByTestId, getByTestId } = renderPage(<RunningAuctions />);
-      const sort = getByTestId('sortby-sell-volume');
-      const tokensTitles = [
-        ['WETH', 'OMG'],
-        ['OMG', 'WETH'],
-        ['RDN', 'WETH'],
-        ['WETH', 'MKR'],
-        ['DAI', 'MKR'],
-        ['WETH', 'RDN'],
-      ].map(card => `Bid with ${card[0]} to buy ${card[1]}`);
+    fireEvent.click(sort);
+    cards = getAllByTestId(/auction-card-*./);
 
-      fireEvent.click(sort);
-      let cards = getAllByTestId(/auction-card-*./);
-      const orderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
-      expect(tokensTitles.join(' ')).toEqual(orderedCards);
+    const reverseOrderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
+    expect(tokensTitles.reverse().join(' ')).toEqual(reverseOrderedCards);
+  });
 
-      fireEvent.click(sort);
-      cards = getAllByTestId(/auction-card-*./);
-      const reverseOrderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
-      expect(tokensTitles.reverse().join(' ')).toEqual(reverseOrderedCards);
-    });
+  test('should sort auctions by sell volume', () => {
+    const { getAllByTestId, getByTestId } = renderPage(<RunningAuctions />);
+    const sort = getByTestId('sortby-sell-volume');
+    const tokensTitles = [
+      ['WETH', 'OMG'],
+      ['OMG', 'WETH'],
+      ['RDN', 'WETH'],
+      ['WETH', 'MKR'],
+      ['DAI', 'MKR'],
+      ['WETH', 'RDN'],
+    ].map(card => `Bid with ${card[0]} to buy ${card[1]}`);
+
+    fireEvent.click(sort);
+
+    let cards = getAllByTestId(/auction-card-*./);
+    const orderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
+    expect(tokensTitles.join(' ')).toEqual(orderedCards);
+
+    fireEvent.click(sort);
+    cards = getAllByTestId(/auction-card-*./);
+
+    const reverseOrderedCards = cards.map(card => getByTitle(card, /Bid with*./).title).join(' ');
+    expect(tokensTitles.reverse().join(' ')).toEqual(reverseOrderedCards);
   });
 });
 
