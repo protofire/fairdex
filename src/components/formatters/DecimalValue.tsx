@@ -18,7 +18,7 @@ const DecimalValue = ({
   prefix,
   postfix,
   roundingMode,
-  ...props,
+  ...props
 }: Props) => {
   let formattedValue = <>{value && formatNumber(value, { decimals, prefix, postfix, roundingMode })}</>;
 
@@ -33,7 +33,10 @@ const DecimalValue = ({
   }
 
   return (
-    <Wrapper {...props} title={!hideTitle && value ? formatNumber(value, { prefix, postfix, roundingMode }) : undefined}>
+    <Wrapper
+      {...props}
+      title={!hideTitle && value ? formatNumber(value, { prefix, postfix, roundingMode }) : undefined}
+    >
       {value ? formattedValue || defaultValue : ''}
     </Wrapper>
   );

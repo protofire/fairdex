@@ -86,13 +86,19 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
               )}
             </Value>
           </Row>
-          <Row>
+          <Row helpText='Any auction reaches the last auction price of the previous auction after 6h'>
             <Label>Estimated time to end</Label>
             <Value>
-              {auction.auctionStart === undefined ? (
+              {getEstimatedEndTime(auction) ? (
+                auction.auctionStart === undefined ? (
+                  <Loading />
+                ) : (
+                  <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
+                )
+              ) : auction.auctionStart === undefined ? (
                 <Loading />
               ) : (
-                <Duration to={getEstimatedEndTime(auction)} />
+                <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
               )}
             </Value>
           </Row>
@@ -245,12 +251,22 @@ const Value = styled.dd`
   color: var(--color-text-primary);
 `;
 
-const Row = styled.div`
+interface RowProps {
+  helpText?: string;
+}
+
+const Row = styled.div.attrs<RowProps>({
+  title: (props: RowProps) => props.helpText || '',
+})`
   display: flex;
   overflow: hidden;
 
   ${Label}, ${Value} {
     line-height: 1.5rem;
+  }
+
+  ${Label} {
+    cursor: ${(props: any) => (props.helpText ? 'help' : null)};
   }
 `;
 
