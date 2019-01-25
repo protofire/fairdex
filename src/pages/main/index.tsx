@@ -4,10 +4,12 @@ import { BrowserRouter as Router, NavLink, Redirect, Route, Switch } from 'react
 import styled from 'styled-components';
 
 import Spinner from '../../components/Spinner';
-import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
-
 import logo from '../../images/protofire.svg';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
+import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
+
+import AccountInfo from './side/AccountInfo';
+import WalletInfo from './side/WalletInfo';
 
 const EndedAuctions = Loadable({
   loader: () => import('./auctions/containers/EndedAuctions'),
@@ -21,11 +23,6 @@ const RunningAuctions = Loadable({
 
 const ScheduledAuctions = Loadable({
   loader: () => import('./auctions/containers/ScheduledAuctions'),
-  loading: () => <Spinner size='large' />,
-});
-
-const WalletInfo = Loadable({
-  loader: () => import('./wallet-info'),
   loading: () => <Spinner size='large' />,
 });
 
@@ -52,7 +49,10 @@ class MainPage extends React.Component {
                 <img src={logo} height={40} />
               </NavLink>
             </Branding>
-            <WalletInfo />
+            <SideContent>
+              <AccountInfo />
+              <WalletInfo />
+            </SideContent>
           </Sidebar>
           <MessageHandler />
           <Filters />
@@ -100,6 +100,12 @@ const Section = styled.section`
   height: 100%;
   min-height: calc(100vh - var(--header-height));
   padding: var(--spacing-normal);
+`;
+
+const SideContent = styled.div`
+  display: grid;
+  padding: var(--spacing-normal);
+  gap: var(--spacing-normal);
 `;
 
 export default MainPage;

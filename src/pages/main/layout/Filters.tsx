@@ -10,12 +10,7 @@ import Icon from '../../../components/icons';
 import Overlay from '../../../components/Overlay';
 import SortIcon from '../../../components/SortIcon';
 
-import {
-  getBuyTokens,
-  getFilteredClaimableAuctions,
-  getFilteredMyTokensAuctions,
-  getSellTokens,
-} from '../../../store/blockchain';
+import { getBuyTokens, getSellTokens } from '../../../store/blockchain';
 import { applyFilters, clearFilters } from '../../../store/filters/actions';
 import { toggleFilters } from '../../../store/ui/actions';
 import DynamicList from './DynamicList';
@@ -33,8 +28,8 @@ interface StateProps {
   sellTokens: TokenInfo[];
   buyTokens: TokenInfo[];
   filters: FiltersState;
-  myTokensAuctionsCount: number;
-  claimableCount: number;
+  // myTokensAuctionsCount: number;
+  // claimableCount: number;
 }
 
 interface DispatchProps {
@@ -77,15 +72,8 @@ class Filters extends React.PureComponent<Props, State> {
   };
 
   render() {
-    const {
-      actions,
-      isOpen,
-      sellTokens,
-      buyTokens,
-      filters,
-      myTokensAuctionsCount,
-      claimableCount,
-    } = this.props;
+    const { actions, isOpen, sellTokens, buyTokens, filters } = this.props;
+
     const sellTokensList = this.buildTokenList(
       this.filterTokens(sellTokens, this.state.sellTokenSearchQuery),
       'sellTokens',
@@ -135,7 +123,7 @@ class Filters extends React.PureComponent<Props, State> {
                     />
                     Only tokens I hold
                   </Label>
-                  <ItemCount data-testid={'tokens-i-hold-count'}>{myTokensAuctionsCount}</ItemCount>
+                  {/* <ItemCount data-testid={'tokens-i-hold-count'}>{myTokensAuctionsCount}</ItemCount> */}
                 </Item>
                 <Item>
                   <Label data-testid={'claimable-auctions-filter'}>
@@ -146,7 +134,7 @@ class Filters extends React.PureComponent<Props, State> {
                     />
                     Only claimable auctions
                   </Label>
-                  <ItemCount data-testid={'claimable-auctions-count'}>{claimableCount}</ItemCount>
+                  {/* <ItemCount data-testid={'claimable-auctions-count'}>{claimableCount}</ItemCount> */}
                 </Item>
               </List>
             </Section>
@@ -221,7 +209,7 @@ class Filters extends React.PureComponent<Props, State> {
               {token.name}
             </span>
           </Label>
-          <ItemCount data-testid={`auction-filter-${tokenType}-count-${token.name}`}>{token.count}</ItemCount>
+          {/* <ItemCount data-testid={`auction-filter-${tokenType}-count-${token.name}`}>{token.count}</ItemCount> */}
         </Item>
       );
     });
@@ -240,33 +228,37 @@ const Root = styled.div`
   width: var(--sidebar-width);
   display: flex;
   flex-flow: column nowrap;
-  top: 0;
   right: 0;
-  bottom: 0;
   z-index: 101;
   transition: transform var(--animation-duration) ease-in-out;
   background: var(--color-main-bg);
   transform: translateX(${(props: StateProps) => (props.isOpen ? '0' : '100%')});
   color: var(--color-text-primary);
+  height: 100vh;
 `;
 
 const Content = styled.div`
   overflow: auto;
-  flex: 1 1 auto;
-  padding-bottom: calc(var(--spacing-normal) * 4);
+  flex: 1;
+  margin-bottom: calc(var(--spacing-normal) * 3);
 `;
 
 const Footer = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.9) 20%,
+    rgba(255, 255, 255, 1) 30%
+  );
+  padding: var(--spacing-normal);
+  padding-top: calc(var(--spacing-normal) * 2);
+  pointer-events: none;
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  display: flex;
-  flex-direction: column;
-  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 32%, #fff);
-  padding: var(--spacing-normal);
-  padding-top: calc(var(--spacing-normal) * 2);
-  pointer-events: none;
 
   ${Button} {
     pointer-events: auto;
@@ -345,16 +337,16 @@ const ItemCount = styled.span`
 `;
 
 function mapStateToProps(state: AppState): StateProps {
-  const myTokensAuctions = getFilteredMyTokensAuctions(state);
-  const claimableAuctions = getFilteredClaimableAuctions(state);
+  // const myTokensAuctions = getFilteredMyTokensAuctions(state);
+  // const claimableAuctions = getFilteredClaimableAuctions(state);
 
   return {
     isOpen: state.ui.filtersVisible,
     sellTokens: getSellTokens(state),
     buyTokens: getBuyTokens(state),
     filters: state.filters,
-    myTokensAuctionsCount: myTokensAuctions.length,
-    claimableCount: claimableAuctions.length,
+    // myTokensAuctionsCount: myTokensAuctions.length,
+    // claimableCount: claimableAuctions.length,
   };
 }
 

@@ -233,6 +233,15 @@ class DutchExchange extends BaseContract<Event> {
 
     return toFractional(price);
   }
+
+  @timeout()
+  async getBuyerBalance(sellToken: Token, buyToken: Token, auctionIndex: string, accountAddress: Address) {
+    const buyerBalance = await this.contract.methods
+      .buyerBalances(sellToken.address, buyToken.address, auctionIndex, accountAddress)
+      .call();
+
+    return toDecimal(buyerBalance, buyToken.decimals) || ZERO;
+  }
 }
 
 export default DutchExchange;

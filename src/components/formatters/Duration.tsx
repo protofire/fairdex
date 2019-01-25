@@ -5,8 +5,6 @@ import {
   differenceInHours,
   differenceInMinutes,
   differenceInMonths,
-  max,
-  min,
   subDays,
   subHours,
   subMonths,
@@ -18,17 +16,15 @@ interface Props {
   from?: Timestamp | null;
   to?: Timestamp | null;
   defaultValue?: string;
+  prefix?: string;
+  postfix?: string;
 }
 
-const Duration = ({ from, to, defaultValue }: Props) => {
+const Duration = ({ from, to, defaultValue = '-', prefix = '', postfix = '' }: Props) => {
   const now = Date.now();
   const formatted = duration(from || now, to || now);
 
-  return <span>{formatted || defaultValue}</span>;
-};
-
-Duration.defaultProps = {
-  defaultValue: '-',
+  return <span>{formatted ? `${prefix} ${formatted} ${postfix}`.trim() : defaultValue}</span>;
 };
 
 function duration(from: Timestamp, to: Timestamp) {

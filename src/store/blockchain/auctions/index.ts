@@ -1,7 +1,7 @@
 import { ActionCreator, AnyAction, Reducer } from 'redux';
 
 import { toBigNumber } from '../../../contracts/utils';
-import { getAuctionInfo, getBuyerBalance } from '../../../contracts/utils/auctions';
+import { getAuctionInfo, getBuyerBalance, getUnclaimedFunds } from '../../../contracts/utils/auctions';
 import { periodicAction } from '../../utils';
 import { getToken } from '../tokens';
 import { getCurrentAccount } from '../wallet';
@@ -58,12 +58,13 @@ export function loadAuctions() {
               if (auction) {
                 const currentAccount = getCurrentAccount(getState());
 
-                auction.buyerBalance = await getBuyerBalance(
-                  sellToken,
-                  buyToken,
-                  auctionIndex,
-                  currentAccount,
-                );
+                const [unclaimedFunds, buyerBalance] = await Promise.all([
+                  getUnclaimedFunds(sellToken, buyToken, auctionIndex, currentAccount),
+                  getBuyerBalance(sellToken, buyToken, auctionIndex, currentAccount),
+                ]);
+
+                auction.unclaimedFunds = unclaimedFunds;
+                auction.buyerBalance = buyerBalance;
 
                 auctions.push(auction);
 
@@ -99,14 +100,15 @@ export function loadAuctions() {
                   if (auction && auction.state === 'ended') {
                     const currentAccount = getCurrentAccount(getState());
 
-                    auction.buyerBalance = await getBuyerBalance(
-                      sellToken,
-                      buyToken,
-                      auctionIndex,
-                      currentAccount,
-                    );
+                    const [unclaimedFunds, buyerBalance] = await Promise.all([
+                      getUnclaimedFunds(sellToken, buyToken, auctionIndex, currentAccount),
+                      getBuyerBalance(sellToken, buyToken, auctionIndex, currentAccount),
+                    ]);
 
-                    if (auction.buyerBalance && auction.buyerBalance.gt(0)) {
+                    auction.unclaimedFunds = unclaimedFunds;
+                    auction.buyerBalance = buyerBalance;
+
+                    if (auction.unclaimedFunds && auction.unclaimedFunds.gt(0)) {
                       auctions.push(auction);
                     }
                   }

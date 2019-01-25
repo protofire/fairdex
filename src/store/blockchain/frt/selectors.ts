@@ -1,4 +1,11 @@
-import { BigNumber } from 'bignumber.js';
-import { createSelector } from 'reselect';
+import { ZERO } from '../../../contracts/utils';
 
-export const getFrt = (state: AppState) => state.blockchain.frt || { balance: [0], symbol: '' };
+const dummyToken: Token = {
+  address: '0x',
+  balance: [ZERO, ZERO],
+  symbol: '',
+  name: '',
+  decimals: 18,
+};
+
+export const getFrt = (state: AppState): Token => state.blockchain.frt || dummyToken;

@@ -21,7 +21,7 @@ interface AuctionViewProps {
 
 const DEFAULT_DECIMALS = 3;
 
-const AuctionView = ({ data: auction }: AuctionViewProps) => (
+const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
   <Card data-testid={`auction-card-${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}>
     <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`}>
       <div>
@@ -86,13 +86,19 @@ const AuctionView = ({ data: auction }: AuctionViewProps) => (
               )}
             </Value>
           </Row>
-          <Row>
+          <Row helpText='Any auction reaches the last auction price of the previous auction after 6h'>
             <Label>Estimated time to end</Label>
             <Value>
-              {auction.auctionStart === undefined ? (
+              {getEstimatedEndTime(auction) ? (
+                auction.auctionStart === undefined ? (
+                  <Loading />
+                ) : (
+                  <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
+                )
+              ) : auction.auctionStart === undefined ? (
                 <Loading />
               ) : (
-                <Duration to={getEstimatedEndTime(auction)} />
+                <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
               )}
             </Value>
           </Row>
@@ -100,7 +106,7 @@ const AuctionView = ({ data: auction }: AuctionViewProps) => (
 
         <ButtonGroup>
           <BidForm auction={auction} />
-          {auction.buyerBalance && auction.buyerBalance.isGreaterThan(ZERO) && (
+          {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
             <ClaimForm auction={auction} />
           )}
         </ButtonGroup>
@@ -203,14 +209,14 @@ const AuctionView = ({ data: auction }: AuctionViewProps) => (
         </Table>
 
         <ButtonGroup>
-          {auction.buyerBalance && auction.buyerBalance.isGreaterThan(ZERO) && (
+          {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
             <ClaimForm auction={auction} />
           )}
         </ButtonGroup>
       </>
     )}
   </Card>
-);
+));
 
 const Label = styled.dt`
   position: relative;
@@ -226,10 +232,10 @@ const Label = styled.dt`
   }
 `;
 
-const Loading = styled.span.attrs({
+const Loading = styled.span.attrs(props => ({
   children: '…',
   title: 'Calculating value',
-})`
+}))`
   color: var(--color-greyish);
   user-select: none;
   cursor: progress;
@@ -245,12 +251,22 @@ const Value = styled.dd`
   color: var(--color-text-primary);
 `;
 
-const Row = styled.div`
+interface RowProps {
+  helpText?: string;
+}
+
+const Row = styled.div.attrs((props: RowProps) => ({
+  title: props.helpText || '',
+}))`
   display: flex;
   overflow: hidden;
 
   ${Label}, ${Value} {
     line-height: 1.5rem;
+  }
+
+  ${Label} {
+    cursor: ${(props: any) => (props.helpText ? 'help' : null)};
   }
 `;
 

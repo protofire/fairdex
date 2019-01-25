@@ -1,53 +1,49 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { toBigNumber } from '../contracts/utils';
 import Input, { InputProps } from './Input';
 
-interface Props extends InputProps {
+interface DecimalInputProps extends InputProps {
   inputRef: React.Ref<HTMLInputElement>;
   onValueChange?: (value: BigNumber) => void;
 }
 
-interface State {
-  value: string;
-}
+const DecimalInput = ({ inputRef, onValueChange, value, ...props }: DecimalInputProps) => {
+  const initialValue = value ? value.toString() : '';
 
-class DecimalInput extends React.PureComponent<Props, State> {
-  state: State = { value: this.props.value ? this.props.value.toString() : '' };
+  const [inputValue, setInputValue] = useState(initialValue);
+  const [numericValue, setNumericValue] = useState(toBigNumber(initialValue));
 
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
-    const value = this.props.value ? this.props.value.toString() : '';
-
-    if (value !== prevState.value) {
-      this.setState({ value });
+  useEffect(() => {
+    if (initialValue !== numericValue.toString(10)) {
+      setInputValue(initialValue);
+      setNumericValue(toBigNumber(initialValue));
     }
-  }
+  });
 
-  handleChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-    const inputValue = event.target.value ? event.target.value.trim() : '';
+  const handleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    event => {
+      event.preventDefault();
 
-    if (typeof this.props.onValueChange !== 'function') {
-      return;
-    }
+      const newValue = event.target.value ? event.target.value.trim() : '';
 
-    if (inputValue === '' || event.target.value.match(/^(\d+\.?\d*|\.\d+)$/)) {
-      this.setState({ value: inputValue || '0' });
+      if (newValue === '' || newValue.match(/^(\d+\.?\d*|\.\d+)$/)) {
+        const newNumericValue = toBigNumber(newValue);
 
-      const value = toBigNumber(inputValue);
+        setInputValue(newValue);
+        setNumericValue(newNumericValue);
 
-      if (value) {
-        this.props.onValueChange(value);
+        if (onValueChange) {
+          onValueChange(newNumericValue);
+        }
       }
-    }
-  };
+    },
+    [onValueChange],
+  );
 
-  render() {
-    const { inputRef, onValueChange, ...props } = this.props;
+  return <Input ref={inputRef} {...props} value={inputValue} onChange={handleChange} />;
+};
 
-    return <Input ref={inputRef} {...props} value={this.state.value} onChange={this.handleChange} />;
-  }
-}
-
-export default React.forwardRef<HTMLInputElement, Omit<Props, 'inputRef'>>((props, ref) => (
+export default React.forwardRef<HTMLInputElement, Omit<DecimalInputProps, 'inputRef'>>((props, ref) => (
   <DecimalInput inputRef={ref} {...props} />
 ));
