@@ -13,7 +13,7 @@ const auctions: Auction[] = [
     auctionStart: 1548324298000,
     currentPrice: toBigNumber('711.10698944462495978373'),
     closingPrice: toBigNumber('497.85884857221086322521'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '395',
@@ -27,7 +27,7 @@ const auctions: Auction[] = [
     auctionStart: 1548317188000,
     currentPrice: toBigNumber('105.43641326989530401721'),
     closingPrice: toBigNumber('92.25686161115839101506'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '395',
@@ -41,7 +41,7 @@ const auctions: Auction[] = [
     auctionStart: 1548317188000,
     currentPrice: toBigNumber('0.01238777390536028414'),
     closingPrice: toBigNumber('0.01083930216719024862'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '529',
@@ -54,7 +54,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '496',
@@ -67,7 +67,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '53',
@@ -80,7 +80,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '135',
@@ -93,7 +93,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '496',
@@ -107,7 +107,7 @@ const auctions: Auction[] = [
     auctionStart: 1548330913000,
     currentPrice: toBigNumber('6.82120990806633375424'),
     closingPrice: toBigNumber('3.84966708010913675756'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '529',
@@ -121,7 +121,7 @@ const auctions: Auction[] = [
     auctionStart: 1548330553000,
     currentPrice: toBigNumber('729.25076987844504476732'),
     closingPrice: toBigNumber('416.54422043793342164287'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '135',
@@ -134,7 +134,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '27',
@@ -147,7 +147,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '1',
@@ -160,7 +160,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '53',
@@ -173,7 +173,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '691',
@@ -187,7 +187,7 @@ const auctions: Auction[] = [
     auctionStart: 1548324298000,
     currentPrice: toBigNumber('0.00286894674436710254'),
     closingPrice: toBigNumber('0.002008601439680864'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '1',
@@ -200,7 +200,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '27',
@@ -213,7 +213,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '1',
@@ -226,7 +226,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '1',
@@ -239,7 +239,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '1',
@@ -252,7 +252,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '394',
@@ -265,7 +265,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1548316528000,
     closingPrice: toBigNumber('88.52888854264847191241'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '394',
@@ -278,7 +278,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1548316408000,
     closingPrice: toBigNumber('0.01040209487379349715'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '495',
@@ -291,7 +291,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1548330208000,
     closingPrice: toBigNumber('3.84966708010913675756'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '528',
@@ -304,7 +304,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1548329908000,
     closingPrice: toBigNumber('416.54422043793342164287'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '690',
@@ -317,7 +317,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1548323683000,
     closingPrice: toBigNumber('0.00192676952917534731'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '1',
@@ -330,7 +330,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 0,
     closingPrice: toBigNumber('Infinity'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '690',
@@ -343,7 +343,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1548321043000,
     closingPrice: toBigNumber('478.36971215123463718401'),
-    buyerBalance: toBigNumber('0'),
+    unclaimedFunds: toBigNumber('0'),
   },
   {
     auctionIndex: '392',
@@ -356,7 +356,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1548268828000,
     closingPrice: toBigNumber('87.93900707458875628003'),
-    buyerBalance: toBigNumber('0.974210451812633917'),
+    unclaimedFunds: toBigNumber('0.974210451812633917'),
   },
   {
     auctionIndex: '688',
@@ -369,7 +369,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1548274618000,
     closingPrice: toBigNumber('453.45335937499676507069'),
-    buyerBalance: toBigNumber('2.1997852246e-8'),
+    unclaimedFunds: toBigNumber('2.1997852246e-8'),
   },
   {
     auctionIndex: '370',
@@ -382,7 +382,7 @@ const auctions: Auction[] = [
     state: 'ended',
     auctionEnd: 1547743546000,
     closingPrice: toBigNumber('0.01007126794028916316'),
-    buyerBalance: toBigNumber('1.335491738007611174'),
+    unclaimedFunds: toBigNumber('1.335491738007611174'),
   },
   {
     auctionIndex: '371',

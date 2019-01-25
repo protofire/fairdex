@@ -22,14 +22,6 @@ afterEach(cleanup);
 
 describe('Auction list filtering', () => {
   describe('Filter by tokens I hold', () => {
-    test('should show the right count', () => {
-      const { getByTestId } = renderPage(<EndedAuctions />);
-
-      const count = getByTestId('tokens-i-hold-count');
-
-      expect(count).toHaveTextContent('22');
-    });
-
     test('should show the right number of cards when filtering', () => {
       const { getByTestId, getAllByTestId } = renderPage(<EndedAuctions />);
 
@@ -43,13 +35,6 @@ describe('Auction list filtering', () => {
   });
 
   describe('Filter by claimable auctions', () => {
-    test('should show the right count', () => {
-      const { getByTestId } = renderPage();
-
-      const count = getByTestId('claimable-auctions-count');
-      expect(count).toHaveTextContent('3');
-    });
-
     test('should show the right number of cards when filtering', () => {
       const { getByTestId, getAllByTestId } = renderPage(<EndedAuctions />);
 
@@ -63,17 +48,6 @@ describe('Auction list filtering', () => {
   });
 
   describe('Filter by sell tokens', () => {
-    const countByToken: any = {
-      CWBR: '1',
-      DAI: '2',
-      GEN: '1',
-      MKR: '4',
-      OMG: '4',
-      PXT: '2',
-      RDN: '3',
-      WETH: '13',
-    };
-
     const cardsByToken: any = {
       CWBR: 1,
       DAI: 2,
@@ -95,10 +69,8 @@ describe('Auction list filtering', () => {
       expect(tokens.length).toEqual(8);
     });
 
-    test('should show the right count for each tokens', () => {
-      const { getByTestId: pageGetByTestId, getAllByTestId, queryAllByText, debug } = renderPage(
-        <EndedAuctions />,
-      );
+    test('should show the right number of cards for each tokens when filterng', () => {
+      const { getByTestId: pageGetByTestId, getAllByTestId, queryAllByText } = renderPage(<EndedAuctions />);
 
       const viewAll = queryAllByText('View all');
       viewAll.forEach((el: Element) => fireEvent.click(el));
@@ -106,7 +78,6 @@ describe('Auction list filtering', () => {
       const tokens = getAllByTestId(/auction-filter-sellTokens-item*./);
 
       tokens.forEach(token => {
-        debug(token);
         const name = getByTestId(token, /auction-filter-sellTokens-name-*./).innerHTML;
         const label = pageGetByTestId(`auction-filter-sellTokens-label-${name}`);
 
@@ -118,34 +89,18 @@ describe('Auction list filtering', () => {
         fireEvent.click(label);
       });
     });
-
-    test('should show the right number of cards for each tokens when filterng', () => {
-      const { getAllByTestId, queryAllByText } = renderPage();
-
-      const viewAll = queryAllByText('View all');
-      viewAll.forEach((el: Element) => fireEvent.click(el));
-
-      const tokens = getAllByTestId(/auction-filter-sellTokens-item*./);
-
-      tokens.forEach(token => {
-        const name = getByTestId(token, /auction-filter-sellTokens-name-*./).innerText;
-        const count = getByTestId(token, /auction-filter-sellTokens-count-*./).innerText;
-
-        expect(count).toEqual(countByToken[name]);
-      });
-    });
   });
 
   describe('Filter by bid tokens', () => {
-    const countByToken: any = {
-      CWBR: '1',
-      DAI: '3',
-      GEN: '1',
-      MKR: '2',
-      OMG: '3',
-      PXT: '2',
-      RDN: '4',
-      WETH: '13',
+    const cardsByToken: any = {
+      RDN: 3,
+      OMG: 2,
+      WETH: 10,
+      MKR: 2,
+      DAI: 2,
+      GEN: 1,
+      PXT: 2,
+      CWBR: 1,
     };
 
     test('should show the right number of tokens', () => {
@@ -159,33 +114,24 @@ describe('Auction list filtering', () => {
       expect(tokens.length).toEqual(8);
     });
 
-    test('should show the right count for each tokens', () => {
-      const { getAllByTestId, queryAllByText } = renderPage();
-
-      const viewAll = queryAllByText('View all');
-      viewAll.forEach((el: Element) => fireEvent.click(el));
-
-      const tokens = getAllByTestId(/auction-filter-buyTokens-item*./);
-      tokens.forEach(token => {
-        const name = getByTestId(token, /auction-filter-buyTokens-name-*./).innerText;
-        const count = getByTestId(token, /auction-filter-buyTokens-count-*./).innerText;
-
-        expect(count).toEqual(countByToken[name]);
-      });
-    });
-
     test('should show the right number of cards for each tokens when filterng', () => {
-      const { getAllByTestId, queryAllByText } = renderPage();
+      const { getByTestId: pageGetByTestId, getAllByTestId, queryAllByText } = renderPage(<EndedAuctions />);
 
       const viewAll = queryAllByText('View all');
       viewAll.forEach((el: Element) => fireEvent.click(el));
 
       const tokens = getAllByTestId(/auction-filter-buyTokens-item*./);
-      tokens.forEach(token => {
-        const name = getByTestId(token, /auction-filter-buyTokens-name-*./).innerText;
-        const count = getByTestId(token, /auction-filter-buyTokens-count-*./).innerText;
 
-        expect(count).toEqual(countByToken[name]);
+      tokens.forEach(token => {
+        const name = getByTestId(token, /auction-filter-buyTokens-name-*./).innerHTML;
+        const label = pageGetByTestId(`auction-filter-buyTokens-label-${name}`);
+
+        fireEvent.click(label);
+
+        const cards = getAllByTestId(/auction-card-*./);
+        expect(cards.length).toEqual(cardsByToken[name]);
+
+        fireEvent.click(label);
       });
     });
   });
