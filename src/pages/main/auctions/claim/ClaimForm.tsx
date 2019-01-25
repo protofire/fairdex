@@ -1,4 +1,4 @@
-import React, { FormEvent, useCallback, useContext, useState } from 'react';
+import React, { FormEvent, useCallback, useContext, useMemo, useState } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
@@ -9,6 +9,7 @@ import { showNotification } from '../../../../store/ui/actions';
 import Button from '../../../../components/Button';
 import DecimalValue from '../../../../components/formatters/DecimalValue';
 import Popup from '../../../../components/Popup';
+import { ZERO } from '../../../../contracts/utils';
 import { getTotalClaimFound } from '../../../../contracts/utils/auctions';
 import { loadAvailableTokens } from '../../../../store/blockchain/tokens';
 import { ClaimContext } from './ClaimContext';
@@ -120,18 +121,7 @@ const ClaimForm = React.memo(
         {opened && (
           <Content>
             <form onSubmit={handleSubmit}>
-              {auction.state === 'ended' && (
-                <p>
-                  {'You bought '}
-                  <DecimalValue
-                    value={getTotalClaimFound(auction)}
-                    decimals={4}
-                    postfix={auction.sellToken}
-                  />
-                  {' with '}
-                  <DecimalValue value={auction.buyerBalance} decimals={4} postfix={auction.buyToken} />
-                </p>
-              )}
+              {auction.state === 'ended' && <EndedMessage auction={auction} />}
               <p>{'You can claim'}</p>
 
               <UnclaimedBalance data-testid='unclaimed-balance'>
@@ -174,6 +164,29 @@ const UnclaimedBalance = styled.h4`
   letter-spacing: -0.6px;
   color: var(--color-text-primary);
 `;
+
+const EndedMessage = ({ auction }: OwnProps) => {
+  const totalBought = getTotalClaimFound(auction);
+  const alreadyClaimed =
+    totalBought && auction.unclaimedFunds && !totalBought.eq(auction.unclaimedFunds)
+      ? totalBought.minus(auction.unclaimedFunds)
+      : ZERO;
+
+  return (
+    <p>
+      {'You bought '}
+      <DecimalValue value={totalBought} decimals={4} postfix={auction.sellToken} />
+      {' with '}
+      <DecimalValue value={auction.buyerBalance} decimals={4} postfix={auction.buyToken} />
+      {alreadyClaimed.gt(ZERO) && (
+        <>
+          {' and you have already claimed '}
+          <DecimalValue value={alreadyClaimed} decimals={4} postfix={auction.sellToken} />
+        </>
+      )}
+    </p>
+  );
+};
 
 function mapStateToProps(state: AppState): AppStateProps {
   return {
