@@ -181,6 +181,21 @@ describe('in ended auctions', () => {
     buyerBalance: toBigNumber(700),
   };
 
+  const dataNoClaim: EndedAuction = {
+    auctionIndex: '111',
+    state: 'ended',
+    auctionEnd: Date.now(),
+    sellToken: 'OMG',
+    sellTokenAddress: '0x00df91984582e6e96288307e9c2f20b38c8fece9',
+    sellVolume: toBigNumber(100),
+    buyToken: 'WETH',
+    buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
+    buyVolume: toBigNumber(0),
+    closingPrice: toBigNumber(0.5),
+    unclaimedFunds: toBigNumber(1400),
+    buyerBalance: toBigNumber(700),
+  };
+
   describe('claim button', () => {
     test('should be visible if there is unclaimed balance', () => {
       const { getByTestId } = renderWithRedux(<ClaimForm auction={data} />);
@@ -228,8 +243,21 @@ describe('in ended auctions', () => {
       expect(unclaimed).toHaveTextContent('1234 OMG');
     });
 
-    test('should display a message', async () => {
-      const { getByTestId, queryByText } = renderWithRedux(<ClaimForm auction={data} />);
+    test('should display a message with claimed token', async () => {
+      const { getByTestId, queryByText } = renderWithRedux(<ClaimForm auction={dataNoClaim} />);
+
+      fireEvent.click(getByTestId('claim-button'));
+
+      await waitForElement(() => getByTestId('unclaimed-balance'));
+
+      expect(
+        queryByText('You bought 1400 OMG with 700 WETH and you have already claimed 166 OMG'),
+      ).toBeDefined();
+      expect(queryByText('You can claim')).toBeDefined();
+    });
+
+    test('should display a message with no claimed token', async () => {
+      const { getByTestId, queryByText } = renderWithRedux(<ClaimForm auction={dataNoClaim} />);
 
       fireEvent.click(getByTestId('claim-button'));
 
