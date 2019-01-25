@@ -1,5 +1,6 @@
+import BigNumber from 'bignumber.js';
 import { ellipsis } from 'polished';
-import React from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -28,7 +29,7 @@ interface OwnProps {
 
 interface AppStateProps {
   currentAccount: Address;
-  buyToken: Token;
+  bidToken: Token;
   feeRate: BigNumber;
 }
 
@@ -36,305 +37,379 @@ interface DispatchProps {
   dispatch: any;
 }
 
-interface State {
-  amount: BigNumber;
-  currentStep?: 1 | 2 | 3;
-  loading?: boolean;
-  showDialog?: boolean;
-}
-
 const { ZERO } = utils;
 
-class BidForm extends React.PureComponent<Props, State> {
-  state: State = { amount: ZERO };
+const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispatch }: Props) => {
+  if (auction.state !== 'running') {
+    return null;
+  }
 
-  private inputRef = React.createRef<HTMLInputElement>();
+  const { currentPrice = ZERO } = auction;
 
-  getInitialStep = () => {
-    return utils.auction.isAbovePriorClosingPrice(this.props.auction) ? 1 : 2;
-  };
+  const [bidAmount, setBidAmount] = useState(ZERO);
+  const [bidding, setBidding] = useState(false);
+  const [currentStep, setCurrentStep] = useState(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
+  const [dialogVisible, setDialogVisible] = useState(false);
 
-  handleAmountChange = (amount: BigNumber) => {
-    this.setState({ amount });
-  };
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  handleBack = () => {
-    if (this.state.currentStep === 3) {
-      this.showAmountForm();
-    }
-  };
+  const selectInput = useCallback(() => {
+    setImmediate(() => {
+      if (inputRef.current) {
+        inputRef.current.select();
+      }
+    });
+  }, []);
 
-  handleClose = () => {
-    if (!this.state.loading) {
-      this.setState({ showDialog: false, currentStep: undefined, amount: ZERO });
-    }
-  };
+  const sellTokenAmount = useMemo(
+    () => {
+      if (currentPrice.isPositive()) {
+        const liquidityContribution = bidAmount.times(feeRate).div(100);
 
-  handleInputFocus: React.FocusEventHandler<HTMLInputElement> = event => {
-    event.target.select();
-  };
+        return bidAmount.minus(liquidityContribution).div(currentPrice);
+      }
 
-  handleSubmit = (event?: any) => {
-    const { amount } = this.state;
+      return ZERO;
+    },
+    [bidAmount, currentAccount, feeRate],
+  );
 
-    if (amount && amount.isGreaterThan(ZERO)) {
-      const { auction, buyToken, currentAccount } = this.props;
+  const availableSellVolume = useMemo(
+    () => {
+      return utils.auction.getAvailableVolume(auction);
+    },
+    [auction],
+  );
 
-      this.setState({ loading: true });
+  const availableBidVolume = useMemo(
+    () => {
+      return availableSellVolume.times(currentPrice);
+    },
+    [availableSellVolume, currentPrice],
+  );
 
-      dx.postBid(
-        auction.sellTokenAddress,
-        auction.buyTokenAddress,
-        auction.auctionIndex,
-        utils.fromDecimal(amount, buyToken ? buyToken.decimals : 18),
-      )
-        .send({
-          from: currentAccount,
-          // TODO: gasPrice
-          // TODO: nonce
-        })
-        .once('transactionHash', transactionHash => {
-          this.props.dispatch(
-            showNotification(
-              'info',
-              'Bid request sent',
-              <p>
-                Bid transaction has been sent.{' '}
-                <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                  More info
-                </a>
-              </p>,
-            ),
-          );
-        })
-        .once('confirmation', (confNumber, receipt) => {
-          this.props.dispatch(
-            showNotification(
-              'success',
-              'Bid confirmed',
-              <p>
-                Bid transaction has been confirmed.{' '}
-                <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                  More info
-                </a>
-              </p>,
-            ),
-          );
+  const bidTokenBalance = useMemo(
+    () => {
+      return utils.token.getDxBalance(bidToken);
+    },
+    [bidToken],
+  );
 
-          // Reload token balances and auction list
-          this.props.dispatch(loadAvailableTokens());
+  const bidTokenTotalBalance = useMemo(
+    () => {
+      return utils.token.getTotalBalance(bidToken);
+    },
+    [bidToken],
+  );
 
-          this.setState({ loading: false });
-          this.handleClose();
-        })
-        .once('error', err => {
-          this.props.dispatch(
-            showNotification(
-              'error',
-              'Bid failed',
-              <p>
-                {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
-                <br />
-                Please try again later.
-              </p>,
-            ),
-          );
-
-          this.setState({ loading: false });
-        });
-    }
-
-    if (event) {
-      event.preventDefault();
-    }
-  };
-
-  showDialog = () => {
-    this.setState({ showDialog: true });
-  };
-
-  showAmountForm = (event?: any) => {
-    if (event) {
-      event.preventDefault();
-    }
-
-    this.setState({ currentStep: 2 });
-  };
-
-  showConfirmation = (event?: any) => {
-    if (event) {
-      event.preventDefault();
-    }
-
-    this.setState({ currentStep: 3 });
-  };
-
-  render() {
-    const { auction, buyToken, feeRate } = this.props;
-
-    if (auction.state !== 'running') {
-      return null;
-    }
-
-    const { amount: bidAmount, currentStep = this.getInitialStep() } = this.state;
-    const currentPrice = auction.currentPrice || ZERO;
-
-    const sellTokenAmount = currentPrice.isZero()
-      ? ZERO
-      : bidAmount.minus(bidAmount.times(feeRate).div(100)).div(currentPrice);
-
-    const availableSellVolume = utils.auction.getAvailableVolume(auction);
-    const availableBidVolume = availableSellVolume.times(auction.currentPrice || ZERO);
-
-    const bidTokenBalance = utils.token.getDxBalance(buyToken);
-
-    const setMaxVolume = (event?: any) => {
+  const setMaxAvailableVolume = useCallback(
+    (event?: any) => {
       if (event) {
         event.preventDefault();
       }
 
-      this.setState({ amount: availableBidVolume.decimalPlaces(4, 1) }, () =>
-        setImmediate(() => {
-          if (this.inputRef.current) {
-            this.inputRef.current.select();
-          }
-        }),
-      );
-    };
+      setBidAmount(availableBidVolume.decimalPlaces(4, BigNumber.ROUND_DOWN));
+      selectInput();
+    },
+    [availableBidVolume],
+  );
 
-    return (
-      <Popup.Container
-        onClickOutside={this.handleClose}
-        onEscPress={this.handleClose}
-        onBackspacePress={currentStep === 3 ? this.handleBack : null}
-      >
-        {this.state.showDialog && (
-          <Popup.Content theme={currentStep === 1 ? 'accent' : 'default'}>
-            {currentStep === 1 && (
-              <Step1 onSubmit={this.showAmountForm}>
+  const setMaxBidVolume = useCallback(
+    (event?: any) => {
+      if (event) {
+        event.preventDefault();
+      }
+
+      setBidAmount(BigNumber.min(bidTokenBalance, availableBidVolume).decimalPlaces(4, BigNumber.ROUND_DOWN));
+      selectInput();
+    },
+    [availableBidVolume, bidTokenBalance],
+  );
+
+  const showDialog = useCallback((event?: any) => {
+    if (event) {
+      event.preventDefault();
+    }
+
+    setDialogVisible(true);
+  }, []);
+
+  const goToStep2 = useCallback((event?: any) => {
+    if (event) {
+      event.preventDefault();
+    }
+
+    setCurrentStep(2);
+  }, []);
+
+  const goToStep3 = useCallback((event?: any) => {
+    if (event) {
+      event.preventDefault();
+    }
+
+    setCurrentStep(3);
+  }, []);
+
+  const handleBack = useCallback(
+    () => {
+      if (currentStep === 3) {
+        setCurrentStep(2);
+      }
+    },
+    [currentStep],
+  );
+
+  const handleClose = useCallback(
+    () => {
+      if (!bidding) {
+        setDialogVisible(false);
+        setBidAmount(ZERO);
+        setCurrentStep(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
+      }
+    },
+    [bidding],
+  );
+
+  const handleInputFocus = useCallback<React.FocusEventHandler<HTMLInputElement>>(
+    event => {
+      event.target.select();
+    },
+    [inputRef],
+  );
+
+  const handleSubmit = useCallback(
+    (event?: any) => {
+      if (bidAmount && bidAmount.isGreaterThan(ZERO)) {
+        setBidding(true);
+
+        dx.postBid(
+          auction.sellTokenAddress,
+          auction.buyTokenAddress,
+          auction.auctionIndex,
+          utils.fromDecimal(bidAmount, bidToken ? bidToken.decimals : 18),
+        )
+          .send({
+            from: currentAccount,
+            // TODO: gas
+            // TODO: gasPrice
+          })
+          .once('transactionHash', transactionHash => {
+            dispatch(
+              showNotification(
+                'info',
+                'Bid request sent',
                 <p>
-                  You are bidding above the previous <br /> closing price for {auction.sellToken}/
-                  {auction.buyToken}
-                </p>
-                <Text>
-                  <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
-                </Text>
-                <Button type='submit' autoFocus>
-                  Proceed
-                </Button>
-              </Step1>
-            )}
+                  Bid transaction has been sent.{' '}
+                  <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
+                    More info
+                  </a>
+                </p>,
+              ),
+            );
+          })
+          .once('confirmation', (confNumber, receipt) => {
+            dispatch(
+              showNotification(
+                'success',
+                'Bid confirmed',
+                <p>
+                  Bid transaction has been confirmed.{' '}
+                  <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
+                    More info
+                  </a>
+                </p>,
+              ),
+            );
 
-            {currentStep === 2 && (
-              <Step2 onSubmit={this.showConfirmation}>
-                <Field>
-                  <label>Bid volume</label>
-                  <Tooltip
-                    theme='error'
-                    position='bottom right'
-                    content={
-                      bidAmount.gt(availableBidVolume) && (
-                        <p>
-                          You will close this auction with <br />
-                          <DecimalValue value={availableBidVolume} decimals={4} postfix={buyToken.symbol} />
-                          <br />
-                          <a href='' onClick={setMaxVolume}>
-                            [set max]
-                          </a>
-                        </p>
-                      )
-                    }
-                  >
-                    <DecimalInput
-                      value={bidAmount.toString(10)}
-                      right={auction.buyToken}
-                      ref={this.inputRef}
-                      onValueChange={this.handleAmountChange}
-                      onFocus={this.handleInputFocus}
-                      autoFocus={true}
-                    />
-                  </Tooltip>
-                </Field>
+            // Reload token balances and auction list
+            dispatch(loadAvailableTokens());
 
-                <Field>
-                  <label>To buy at least:</label>
-                  <TextBox align='right'>
-                    <DecimalValue value={sellTokenAmount} decimals={4} postfix={auction.sellToken} />
-                  </TextBox>
-                </Field>
+            setBidding(false);
+            handleClose();
+          })
+          .once('error', err => {
+            dispatch(
+              showNotification(
+                'error',
+                'Bid failed',
+                <p>
+                  {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
+                  <br />
+                  Please try again later.
+                </p>,
+              ),
+            );
 
-                <Button
-                  type='submit'
-                  disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
+            setBidding(false);
+          });
+      }
+
+      if (event) {
+        event.preventDefault();
+      }
+    },
+    [auction, bidAmount, bidToken, currentAccount],
+  );
+
+  return (
+    <Popup.Container
+      onClickOutside={handleClose}
+      onEscPress={handleClose}
+      onBackspacePress={currentStep === 3 ? handleBack : null}
+    >
+      {dialogVisible && (
+        <Popup.Content theme={currentStep === 1 ? 'accent' : 'default'}>
+          {currentStep === 1 && (
+            <Step1 onSubmit={goToStep2}>
+              <p>
+                You are bidding above the previous <br /> closing price for {auction.sellToken}/
+                {auction.buyToken}
+              </p>
+              <Text>
+                <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
+              </Text>
+              <Button type='submit' autoFocus>
+                Proceed
+              </Button>
+            </Step1>
+          )}
+
+          {currentStep === 2 && (
+            <Step2 onSubmit={goToStep3}>
+              <Field>
+                <label>Bid volume</label>
+                <Tooltip
+                  theme='error'
+                  position='bottom right'
+                  content={
+                    bidAmount.gt(availableBidVolume) && (
+                      <p>
+                        You will close this auction with <br />
+                        <DecimalValue value={availableBidVolume} decimals={4} postfix={bidToken.symbol} />
+                        <br />
+                        <a href='' onClick={setMaxAvailableVolume}>
+                          [set max]
+                        </a>
+                      </p>
+                    )
+                  }
                 >
-                  Next
-                </Button>
-              </Step2>
-            )}
+                  <DecimalInput
+                    ref={inputRef}
+                    right={auction.buyToken}
+                    value={bidAmount.toString(10)}
+                    onValueChange={setBidAmount}
+                    onFocus={handleInputFocus}
+                    autoFocus={true}
+                  />
+                </Tooltip>
+              </Field>
 
-            {currentStep === 3 && (
-              <>
-                <Popup.Header>
-                  <BackButton onClick={currentStep === 3 ? this.showAmountForm : undefined} />
-                  <h4>Your bid</h4>
-                </Popup.Header>
-                <Step3 onSubmit={this.handleSubmit}>
+              <Field>
+                <label>To buy at least:</label>
+                <TextBox align='right'>
+                  <DecimalValue value={sellTokenAmount} decimals={4} postfix={auction.sellToken} />
+                </TextBox>
+              </Field>
+
+              <Button
+                type='submit'
+                disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
+              >
+                Next
+              </Button>
+            </Step2>
+          )}
+
+          {currentStep === 3 && (
+            <>
+              <Popup.Header>
+                <BackButton onClick={currentStep === 3 ? goToStep2 : undefined} />
+                <h4>Your bid</h4>
+              </Popup.Header>
+              <Step3 onSubmit={handleSubmit}>
+                <div>
                   <div>
-                    <div>
-                      <small>&nbsp;</small>
-                      <h4>
-                        <DecimalValue value={bidAmount} decimals={2} />
-                      </h4>
-                      <span>{auction.buyToken}</span>
-                    </div>
-                    <Separator>▶</Separator>
-                    <div>
-                      <small>min getting</small>
-                      <h4>
-                        <DecimalValue value={sellTokenAmount} decimals={2} />
-                      </h4>
-                      <span>{auction.sellToken}</span>
-                    </div>
+                    <small>&nbsp;</small>
+                    <h4>
+                      <DecimalValue value={bidAmount} decimals={2} />
+                    </h4>
+                    <span>{auction.buyToken}</span>
                   </div>
+                  <Separator>▶</Separator>
+                  <div>
+                    <small>min getting</small>
+                    <h4>
+                      <DecimalValue value={sellTokenAmount} decimals={2} />
+                    </h4>
+                    <span>{auction.sellToken}</span>
+                  </div>
+                </div>
 
-                  {bidTokenBalance.lt(bidAmount) ? (
+                {bidTokenBalance.lt(bidAmount) ? (
+                  bidTokenTotalBalance.gte(bidAmount) ? (
                     <ErrorMessage>
-                      You don't have enough {buyToken.symbol} available.{' '}
-                      <Link to='/wallet'>Deposit more</Link>
+                      Please <Link to='/wallet'>deposit</Link> at least{' '}
+                      <DecimalValue
+                        decimals={4}
+                        postfix={bidToken.symbol}
+                        roundingMode={BigNumber.ROUND_UP}
+                        value={bidAmount.minus(bidTokenBalance)}
+                      />{' '}
+                      in DX.
                     </ErrorMessage>
                   ) : (
-                    <p>
-                      liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' />)
-                      included
-                    </p>
-                  )}
+                    <ErrorMessage>
+                      You don't have enough {bidToken.symbol} to bid on this auction.
+                      {bidTokenBalance.gt(0) && (
+                        <>
+                          {' '}
+                          You can bid up to{' '}
+                          <DecimalValue
+                            decimals={4}
+                            postfix={bidToken.symbol}
+                            value={BigNumber.min(bidTokenBalance, availableBidVolume)}
+                          />
+                          .
+                          <br />
+                          <a href='' onClick={setMaxBidVolume}>
+                            [set max]
+                          </a>
+                        </>
+                      )}
+                    </ErrorMessage>
+                  )
+                ) : (
+                  <p>
+                    liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' />)
+                    included
+                  </p>
+                )}
+                <Button
+                  type='submit'
+                  disabled={bidding || bidAmount.lte(ZERO) || bidTokenBalance.lt(bidAmount)}
+                  autoFocus
+                >
+                  {bidding ? 'Bid in progress...' : 'Confirm'}
+                </Button>
+              </Step3>
+            </>
+          )}
+        </Popup.Content>
+      )}
 
-                  <Button
-                    type='submit'
-                    disabled={this.state.loading || bidAmount.lte(ZERO) || bidTokenBalance.lt(bidAmount)}
-                    autoFocus
-                  >
-                    {this.state.loading ? 'Bid in progress...' : 'Confirm'}
-                  </Button>
-                </Step3>
-              </>
-            )}
-          </Popup.Content>
-        )}
-
-        {this.state.showDialog ? (
-          <Button mode='dark' onClick={this.handleClose}>
-            Cancel
-          </Button>
-        ) : (
-          <Button mode='secondary' onClick={this.showDialog}>
-            Bid
-          </Button>
-        )}
-      </Popup.Container>
-    );
-  }
-}
+      {dialogVisible ? (
+        <Button mode='dark' onClick={handleClose}>
+          Cancel
+        </Button>
+      ) : (
+        <Button mode='secondary' onClick={showDialog}>
+          Bid
+        </Button>
+      )}
+    </Popup.Container>
+  );
+});
 
 const Step = styled.form`
   width: 100%;
@@ -384,13 +459,13 @@ const Step1 = styled(Step)`
 `;
 
 const Text = styled.h4`
+  margin: var(--spacing-normal) 0;
   font-size: 1.5rem;
   font-weight: bold;
   text-align: center;
   line-height: 1.25;
   letter-spacing: -0.6px;
   color: var(--color-text-primary);
-  margin: var(--spacing-normal) 0;
 `;
 
 const Step2 = styled(Step)`
@@ -398,11 +473,20 @@ const Step2 = styled(Step)`
   align-items: baseline;
   justify-items: left;
 
+  p {
+    text-align: center;
+    color: var(--color-text-primary);
+  }
+
+  a {
+    &:focus {
+      outline: none;
+    }
+  }
+
   & > p {
-    width: 100%;
     line-height: var(--spacing-narrow);
     text-align: center;
-    color: var(--color-text-secondary);
 
     a {
       color: var(--color-text-orange);
@@ -470,6 +554,7 @@ const ErrorMessage = styled.p`
     border-radius: 4px;
     background: #fce4e4;
     border: 1px solid #fcc2c3;
+    color: var(--color-text-primary);
   }
 
   a {
@@ -485,7 +570,7 @@ const Separator = styled.span`
 
 function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
   return {
-    buyToken: getToken(state, props.auction.buyTokenAddress) as Token,
+    bidToken: getToken(state, props.auction.buyTokenAddress) as Token,
     currentAccount: getCurrentAccount(state),
     feeRate: getLiqContribPercentage(state),
   };
