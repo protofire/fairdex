@@ -229,9 +229,14 @@ class DutchExchange extends BaseContract<Event> {
 
   @timeout()
   async getPriceOfTokenInLastAuction(token: Token) {
-    const price = await this.contract.methods.getPriceOfTokenInLastAuction(token.address).call();
+    try {
+      // in case whe call getPriceOfTokenInLastAuction for a token without market (like we do with OWL)
+      const price = await this.contract.methods.getPriceOfTokenInLastAuction(token.address).call();
 
-    return toFractional(price);
+      return toFractional(price);
+    } catch (error) {
+      return toFractional({ den: '0', num: '0' });
+    }
   }
 
   @timeout()
