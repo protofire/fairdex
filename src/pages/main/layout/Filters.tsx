@@ -250,15 +250,25 @@ const Root = styled.div`
 const Content = styled.div`
   overflow: auto;
   flex: 1;
+  margin-bottom: calc(var(--spacing-normal) * 3);
 `;
 
 const Footer = styled.div`
   display: flex;
   flex-direction: column;
-  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff 32%, #fff);
+  background-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.9) 20%,
+    rgba(255, 255, 255, 1) 30%
+  );
   padding: var(--spacing-normal);
   padding-top: calc(var(--spacing-normal) * 2);
   pointer-events: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 
   ${Button} {
     pointer-events: auto;
