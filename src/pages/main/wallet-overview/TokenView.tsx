@@ -75,10 +75,10 @@ const Label = styled.dt`
   }
 `;
 
-const Loading = styled.span.attrs({
+const Loading = styled.span.attrs(props => ({
   children: '…',
   title: 'Calculating value',
-})`
+}))`
   color: var(--color-greyish);
   user-select: none;
   cursor: progress;

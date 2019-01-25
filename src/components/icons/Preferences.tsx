@@ -22,10 +22,10 @@ const PreferencesIcon = () => (
   </g>
 );
 
-export default styled.svg.attrs({
+export default styled.svg.attrs(props => ({
   viewBox: '0 0 24 24',
-  children: PreferencesIcon,
-})`
+  children: <PreferencesIcon />,
+}))`
   width: 24px;
   height: 24px;
 

@@ -42,9 +42,9 @@ const DecimalValue = ({
   );
 };
 
-const Ellipsis = styled.span.attrs({
+const Ellipsis = styled.span.attrs(props => ({
   children: '…',
-})`
+}))`
   font-size: 50%;
 `;
 

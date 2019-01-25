@@ -232,10 +232,10 @@ const Label = styled.dt`
   }
 `;
 
-const Loading = styled.span.attrs({
+const Loading = styled.span.attrs(props => ({
   children: '…',
   title: 'Calculating value',
-})`
+}))`
   color: var(--color-greyish);
   user-select: none;
   cursor: progress;
@@ -255,9 +255,9 @@ interface RowProps {
   helpText?: string;
 }
 
-const Row = styled.div.attrs<RowProps>({
-  title: (props: RowProps) => props.helpText || '',
-})`
+const Row = styled.div.attrs((props: RowProps) => ({
+  title: props.helpText || '',
+}))`
   display: flex;
   overflow: hidden;
 
