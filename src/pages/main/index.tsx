@@ -64,7 +64,7 @@ class MainPage extends React.Component {
                   <Route path='/running' component={RunningAuctions} />
                   <Route path='/scheduled' component={ScheduledAuctions} />
                   <Route path='/ended' component={EndedAuctions} />
-                  {/* {/* <Route path='/wallet' component={WalletOverview} /> */}
+                  <Route path='/wallet' component={WalletOverview} />
                   <Redirect to='/running' />
                 </Switch>
               </Section>
