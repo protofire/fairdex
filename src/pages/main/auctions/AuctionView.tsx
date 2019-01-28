@@ -1,3 +1,4 @@
+import { isAfter } from 'date-fns';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -89,14 +90,10 @@ const AuctionView = React.memo(({ data: auction }: AuctionViewProps) => (
           <Row helpText='Any auction reaches the last auction price of the previous auction after 6h'>
             <Label>Estimated time to end</Label>
             <Value>
-              {getEstimatedEndTime(auction) ? (
-                auction.auctionStart === undefined ? (
-                  <Loading />
-                ) : (
-                  <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
-                )
-              ) : auction.auctionStart === undefined ? (
+              {auction.auctionStart === undefined ? (
                 <Loading />
+              ) : isAfter(getEstimatedEndTime(auction), Date.now()) ? (
+                <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
               ) : (
                 <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
               )}
