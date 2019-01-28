@@ -109,9 +109,7 @@ export function getEstimatedEndTime(auction: RunningAuction) {
   if (auction.auctionStart) {
     const estimatedEndTime = addHours(auction.auctionStart, AUCTION_DURATION);
 
-    if (isAfter(estimatedEndTime, Date.now())) {
-      return estimatedEndTime;
-    }
+    return estimatedEndTime;
   }
 
   return undefined;
