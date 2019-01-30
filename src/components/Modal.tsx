@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Box from './Box';
 import Overley from './Overlay';
@@ -19,7 +19,7 @@ const Modal: FunctionComponent<Props> = ({ isOpen, onClickOutside, onEscPress, c
           <Content>{children}</Content>
         </AuctionPanel>
       </Root>
-      {isOpen && <Overley onClick={onClickOutside} />}
+      {isOpen && <ModalOverley onClick={onClickOutside} />}
     </>
   );
 };
@@ -30,15 +30,59 @@ const Root = styled.div`
   top: 10rem;
   left: calc(var(--sidebar-width) + calc(calc(100% - var(--sidebar-width)) / 2));
   width: calc(calc(100% - var(--sidebar-width)) * 0.8);
-  transition-property: opacity, transform;
+  transition-property: transform;
   transition-duration: var(--animation-duration);
-  opacity: ${(props: Props) => (props.isOpen ? 1 : 0)};
-  transform: ${(props: Props) => (props.isOpen ? 'translateY(0)' : 'translateY(-200%)')} translateX(-50%);
+
+  ${({ isOpen }) => {
+    if (isOpen) {
+      return css`
+        opacity: 0;
+        animation: fadeModalIn;
+        animation-duration: var(--animation-duration);
+        animation-fill-mode: forwards;
+        animation-delay: var(--animation-duration);
+
+        @keyframes fadeModalIn {
+          from {
+            opacity: 0.1;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        transform: translateY(0) translateX(-50%);
+      `;
+    } else {
+      return css`
+        opacity: 1;
+        animation: fadeOut;
+        animation-duration: var(--animation-duration);
+        animation-fill-mode: forwards;
+
+        @keyframes fadeOut {
+          from {
+            opacity: 0.9;
+          }
+          to {
+            opacity: 0;
+          }
+        }
+
+        transition-delay: var(--animation-duration);
+        transform: translateY(-200%) translateX(-50%);
+      `;
+    }
+  }}
 
   @media (max-width: 800px) {
     left: 50%;
     width: 80%;
   }
+`;
+
+const ModalOverley = styled(Overley)`
+  opacity: 0;
+  animation-delay: var(--animation-duration);
 `;
 
 const AuctionPanel = styled(Panel)`

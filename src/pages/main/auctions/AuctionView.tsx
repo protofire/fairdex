@@ -12,6 +12,7 @@ import {
   getEstimatedEndTime,
 } from '../../../contracts/utils/auctions';
 
+import Button from '../../../components/Button';
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
 import BidForm from './BidForm';
@@ -276,8 +277,16 @@ const AuctionCard = styled(Card)`
   cursor: pointer;
 
   &:hover {
-    transform: translate3d(-1px, -1px, 0);
-    box-shadow: 0px 20px 14px 4px rgba(0, 0, 0, 0.05);
+    background-color: #fefeff;
+  }
+
+  &:active {
+    background-color: #fcfdff;
+    box-shadow: inset 0px 0px 20px 2px rgba(0, 0, 0, 0.05);
+
+    ${Button} {
+      background-color: #fcfdff;
+    }
   }
 `;
 
