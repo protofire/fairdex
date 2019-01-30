@@ -1,7 +1,6 @@
+import React, { HTMLAttributes, MouseEvent, useCallback, useRef, useState } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
-import React, { HTMLAttributes, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
-
-import { isAfter } from 'date-fns';
 
 import { DecimalValue, Duration, Timestamp } from '../../../components/formatters';
 import { ZERO } from '../../../contracts/utils';
@@ -14,48 +13,34 @@ import {
 
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
+import Modal from '../../../components/Modal';
 import BidForm from './BidForm';
 import ClaimForm from './claim/ClaimForm';
 
-import AuctionDetail from './AuctionDetail';
-
-interface AuctionViewProps extends HTMLAttributes<HTMLDivElement> {
-  data: Auction;
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  auction: Auction;
+  onClickOutside?: (() => void) | null;
+  onEscPress?: (() => void) | null;
+  parentTop: number;
+  parentLeft: number;
+  isOpen: boolean;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const AuctionView = React.memo(({ data: auction, ...props }: AuctionViewProps) => {
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
+const AuctionView = React.memo(
+  ({ auction, onClickOutside, onEscPress, parentTop, parentLeft, isOpen }: Props) => {
+    const root = useRef(null);
+    const title = useRef(null);
+    const table = useRef(null);
 
-  const root = useRef(null);
-  const title = useRef(null);
-  const table = useRef(null);
-
-  const handleCardClick = useCallback((event: MouseEvent) => {
-    if (event && root && title && table) {
-      if (
-        event.target === root.current ||
-        event.target === title.current ||
-        title.current.contains(event.target) ||
-        table.current.contains(event.target)
-      ) {
-        setIsDetailOpen(true);
-      }
-    }
-  }, []);
-
-  const handleDetailClose = useCallback(() => {
-    setIsDetailOpen(false);
-  }, []);
-
-  return (
-    <>
-      <AuctionCard
-        ref={root}
-        data-testid={`auction-card-${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}
-        onClick={handleCardClick}
-        {...props}
+    return (
+      <Modal
+        onClickOutside={onClickOutside}
+        onEscPress={onEscPress}
+        isOpen={isOpen}
+        parentTop={parentTop}
+        parentLeft={parentLeft}
       >
         <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`} ref={title}>
           <div>
@@ -113,6 +98,22 @@ const AuctionView = React.memo(({ data: auction, ...props }: AuctionViewProps) =
                 </Value>
               </Row>
               <Row>
+                <Label>Sell volume</Label>
+                <Value>
+                  {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
+                    <Loading />
+                  ) : (
+                    <>
+                      <DecimalValue
+                        value={auction.sellVolume.times(auction.currentPrice)}
+                        decimals={DEFAULT_DECIMALS}
+                      />
+                      <small> {auction.buyToken}</small>
+                    </>
+                  )}
+                </Value>
+              </Row>
+              <Row>
                 <Label>Volume needed to end</Label>
                 <Value>
                   {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
@@ -128,13 +129,23 @@ const AuctionView = React.memo(({ data: auction, ...props }: AuctionViewProps) =
                   )}
                 </Value>
               </Row>
+              <Row>
+                <Label>Start time</Label>
+                <Value>
+                  {auction.auctionStart ? <Timestamp value={auction.auctionStart} /> : <Loading />}
+                </Value>
+              </Row>
               <Row helpText='Any auction reaches the last auction price of the previous auction after 6h'>
                 <Label>Estimated time to end</Label>
                 <Value>
-                  {auction.auctionStart === undefined ? (
+                  {getEstimatedEndTime(auction) ? (
+                    auction.auctionStart === undefined ? (
+                      <Loading />
+                    ) : (
+                      <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
+                    )
+                  ) : auction.auctionStart === undefined ? (
                     <Loading />
-                  ) : isAfter(getEstimatedEndTime(auction), Date.now()) ? (
-                    <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
                   ) : (
                     <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
                   )}
@@ -247,6 +258,12 @@ const AuctionView = React.memo(({ data: auction, ...props }: AuctionViewProps) =
                 </Value>
               </Row>
               <Row>
+                <Label>Start time</Label>
+                <Value>
+                  {auction.auctionStart ? <Timestamp value={auction.auctionStart} /> : <Loading />}
+                </Value>
+              </Row>
+              <Row>
                 <Label>End time</Label>
                 <Value>
                   {auction.auctionEnd === undefined ? <Loading /> : <Timestamp value={auction.auctionEnd} />}
@@ -261,25 +278,10 @@ const AuctionView = React.memo(({ data: auction, ...props }: AuctionViewProps) =
             </ButtonGroup>
           </>
         )}
-      </AuctionCard>
-      <AuctionDetail
-        auction={auction}
-        isOpen={isDetailOpen}
-        onClickOutside={handleDetailClose}
-        onEscPress={handleDetailClose}
-      />
-    </>
-  );
-});
-
-const AuctionCard = styled(Card)`
-  cursor: pointer;
-
-  &:hover {
-    transform: translate3d(-1px, -1px, 0);
-    box-shadow: 0px 20px 14px 4px rgba(0, 0, 0, 0.05);
-  }
-`;
+      </Modal>
+    );
+  },
+);
 
 const Label = styled.dt`
   position: relative;
@@ -289,7 +291,7 @@ const Label = styled.dt`
 
   &:after {
     position: absolute;
-    content: '${'.'.repeat(200)}';
+    content: '${'.'.repeat(400)}';
     color: var(--color-grey);
     margin-left: var(--spacing-text);
   }
