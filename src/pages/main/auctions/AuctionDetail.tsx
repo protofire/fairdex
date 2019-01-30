@@ -2,6 +2,8 @@ import React, { HTMLAttributes, MouseEvent, useCallback, useRef, useState } from
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
+import { isAfter } from 'date-fns';
+
 import { DecimalValue, Duration, Timestamp } from '../../../components/formatters';
 import { ZERO } from '../../../contracts/utils';
 import {
@@ -12,7 +14,6 @@ import {
 } from '../../../contracts/utils/auctions';
 
 import ButtonGroup from '../../../components/ButtonGroup';
-import Card from '../../../components/Card';
 import Modal from '../../../components/Modal';
 import BidForm from './BidForm';
 import ClaimForm from './claim/ClaimForm';
@@ -27,13 +28,9 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 const DEFAULT_DECIMALS = 3;
 
 const AuctionView = React.memo(({ auction, onClickOutside, onEscPress, isOpen }: Props) => {
-  const root = useRef(null);
-  const title = useRef(null);
-  const table = useRef(null);
-
   return (
     <Modal onClickOutside={onClickOutside} onEscPress={onEscPress} isOpen={isOpen}>
-      <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`} ref={title}>
+      <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`}>
         <div>
           <small>bid with</small>
           <h3>{auction.buyToken}</h3>
@@ -47,7 +44,7 @@ const AuctionView = React.memo(({ auction, onClickOutside, onEscPress, isOpen }:
 
       {auction.state === 'running' && (
         <>
-          <Table ref={table}>
+          <Table>
             <Row>
               <Label>Current price</Label>
               <Value>
@@ -119,14 +116,10 @@ const AuctionView = React.memo(({ auction, onClickOutside, onEscPress, isOpen }:
             <Row helpText='Any auction reaches the last auction price of the previous auction after 6h'>
               <Label>Estimated time to end</Label>
               <Value>
-                {getEstimatedEndTime(auction) ? (
-                  auction.auctionStart === undefined ? (
-                    <Loading />
-                  ) : (
-                    <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
-                  )
-                ) : auction.auctionStart === undefined ? (
+                {auction.auctionStart === undefined ? (
                   <Loading />
+                ) : isAfter(getEstimatedEndTime(auction), Date.now()) ? (
+                  <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
                 ) : (
                   <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
                 )}
@@ -145,7 +138,7 @@ const AuctionView = React.memo(({ auction, onClickOutside, onEscPress, isOpen }:
 
       {auction.state === 'scheduled' && (
         <>
-          <Table ref={table}>
+          <Table>
             <Row>
               <Label>{auction.auctionIndex === '0' ? 'Initial' : 'Previous'} closing price</Label>
               <Value>
@@ -187,7 +180,7 @@ const AuctionView = React.memo(({ auction, onClickOutside, onEscPress, isOpen }:
 
       {auction.state === 'ended' && (
         <>
-          <Table ref={table}>
+          <Table>
             <Row>
               <Label>{auction.auctionIndex === '0' ? 'Initial' : 'Closing'} price</Label>
               <Value>

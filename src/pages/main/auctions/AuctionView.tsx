@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import React, { HTMLAttributes, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
 
 import { isAfter } from 'date-fns';
 
@@ -34,7 +34,7 @@ const AuctionView = React.memo(({ data: auction, ...props }: AuctionViewProps) =
   const table = useRef(null);
 
   const handleCardClick = useCallback((event: MouseEvent) => {
-    if (event && root && title && table) {
+    if (event && root && title && table && !isDetailOpen) {
       if (
         event.target === root.current ||
         event.target === title.current ||
