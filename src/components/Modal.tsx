@@ -9,21 +9,12 @@ interface Props {
   isOpen: boolean;
   onClickOutside?: (() => void) | null;
   onEscPress?: (() => void) | null;
-  parentTop: number;
-  parentLeft: number;
 }
 
-const Modal: FunctionComponent<Props> = ({
-  isOpen,
-  parentTop,
-  parentLeft,
-  onClickOutside,
-  onEscPress,
-  children,
-}) => {
+const Modal: FunctionComponent<Props> = ({ isOpen, onClickOutside, onEscPress, children }) => {
   return (
     <>
-      <Root isOpen={isOpen} parentLeft={parentLeft} parentTop={parentTop}>
+      <Root isOpen={isOpen}>
         <AuctionPanel onClickOutside={onClickOutside} onEscPress={onEscPress}>
           <Content>{children}</Content>
         </AuctionPanel>
