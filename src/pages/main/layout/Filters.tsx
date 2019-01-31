@@ -8,6 +8,7 @@ import Button from '../../../components/Button';
 import Checkbox from '../../../components/Checkbox';
 import Icon from '../../../components/icons';
 import Overlay from '../../../components/Overlay';
+import Panel from '../../../components/Panel';
 import SortIcon from '../../../components/SortIcon';
 
 import { getBuyTokens, getSellTokens } from '../../../store/blockchain';
@@ -71,6 +72,10 @@ class Filters extends React.PureComponent<Props, State> {
     this.setState({ buyTokenSearchQuery: value });
   };
 
+  handleClose = () => {
+    this.props.actions.toggle();
+  };
+
   render() {
     const { actions, isOpen, sellTokens, buyTokens, filters } = this.props;
 
@@ -85,10 +90,10 @@ class Filters extends React.PureComponent<Props, State> {
 
     return (
       <>
-        <Root {...this.props}>
+        <Root {...this.props} onClickOutside={this.handleClose} onEscPress={this.handleClose}>
           <Header>
             <Title>Sort & Filter</Title>
-            <CloseButton onClick={actions.toggle} />
+            <CloseButton onClick={this.handleClose} />
           </Header>
           <Content>
             <Section>
@@ -163,7 +168,7 @@ class Filters extends React.PureComponent<Props, State> {
             <Button onClick={this.clearFilters}>Clear settings</Button>
           </Footer>
         </Root>
-        {isOpen && <Overlay onClick={actions.toggle} />}
+        {isOpen && <Overlay />}
       </>
     );
   }
@@ -223,7 +228,7 @@ class Filters extends React.PureComponent<Props, State> {
   }
 }
 
-const Root = styled.div`
+const Root = styled(Panel)`
   position: fixed;
   width: var(--sidebar-width);
   display: flex;
