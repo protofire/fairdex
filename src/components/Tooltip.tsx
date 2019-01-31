@@ -90,11 +90,11 @@ const Content = styled.div`
   }
 
   // Fade in animation
-  animation: fadeIn;
+  animation: tooltipFadeIn;
   animation-duration: var(--animation-duration);
   animation-fill-mode: forwards;
 
-  @keyframes fadeIn {
+  @keyframes tooltipFadeIn {
     from {
       opacity: 0;
     }
