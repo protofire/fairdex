@@ -124,7 +124,7 @@ export function filterAuctions(list: Auction[], filters: FiltersState, tokens: M
       'bid-token': (a: Auction, b: Auction) => {
         if (a.buyToken === b.buyToken) {
           if (a.sellToken === b.sellToken) {
-            if (a.sellToken === b.sellToken) {
+            if (a.auctionIndex === b.auctionIndex) {
               return a.buyTokenAddress.localeCompare(b.buyTokenAddress);
             }
 
