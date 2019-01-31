@@ -5,7 +5,7 @@ const frt: Token = {
   decimals: 18,
   name: 'Magnolia Token',
   symbol: 'MGN',
-  balance: [toBigNumber('0')],
+  balance: [toBigNumber('0'), toBigNumber('1')],
 };
 
 export default frt;

@@ -6,6 +6,8 @@ import { createStore } from 'redux';
 
 import reducer from '../store/reducer';
 
+import { toBigNumber } from '../contracts/utils';
+
 interface StateOptions {
   blockchain?: Partial<BlockchainState>;
   filters?: Partial<FiltersState>;
@@ -21,6 +23,8 @@ const initialState: AppState = {
       decimals: 18,
       address: '',
     },
+    feeRatio: toBigNumber(0.005),
+    currentAccount: '0x0313Df45e5B9125333a2437eB91d72685E882A0A',
   },
   filters: {
     sellTokens: [],
@@ -45,6 +49,15 @@ export function renderWithRedux(ui: React.ReactElement<any>, state: StateOptions
 
   return {
     ...render(<Provider store={store}>{ui}</Provider>),
+    store,
+  };
+}
+
+export function rerenderWithRedux(rerender, ui: React.ReactElement<any>, state: StateOptions = {}) {
+  const store = createStore(reducer, { ...initialState, ...state });
+
+  return {
+    ...rerender(<Provider store={store}>{ui}</Provider>),
     store,
   };
 }
