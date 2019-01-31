@@ -8,12 +8,12 @@ import Button from '../../../components/Button';
 import Checkbox from '../../../components/Checkbox';
 import Icon from '../../../components/icons';
 import Overlay from '../../../components/Overlay';
-import Panel from '../../../components/Panel';
+import Panel, { PanelProps } from '../../../components/Panel';
 import SortIcon from '../../../components/SortIcon';
 
 import { getBuyTokens, getSellTokens } from '../../../store/blockchain';
 import { applyFilters, clearFilters } from '../../../store/filters/actions';
-import { toggleFilters } from '../../../store/ui/actions';
+import { hideFilters } from '../../../store/ui/actions';
 import DynamicList from './DynamicList';
 
 type Props = StateProps & DispatchProps & RouteComponentProps;
@@ -35,7 +35,7 @@ interface StateProps {
 
 interface DispatchProps {
   actions: {
-    toggle: typeof toggleFilters;
+    toggle: typeof hideFilters;
     applyFilters: typeof applyFilters;
     clearFilters: typeof clearFilters;
   };
@@ -90,7 +90,7 @@ class Filters extends React.PureComponent<Props, State> {
 
     return (
       <>
-        <Root {...this.props} onClickOutside={this.handleClose} onEscPress={this.handleClose}>
+        <Root isOpen={this.props.isOpen} onClickOutside={this.handleClose} onEscPress={this.handleClose}>
           <Header>
             <Title>Sort & Filter</Title>
             <CloseButton onClick={this.handleClose} />
@@ -228,7 +228,12 @@ class Filters extends React.PureComponent<Props, State> {
   }
 }
 
-const Root = styled(Panel)`
+interface RootProps extends PanelProps {
+  isOpen?: boolean;
+}
+
+// avoid passing Unknown Prop isOpen to div (from Panel)
+const Root = styled(({ isOpen, ...props }) => <Panel {...props} />)`
   position: fixed;
   width: var(--sidebar-width);
   display: flex;
@@ -237,7 +242,7 @@ const Root = styled(Panel)`
   z-index: 101;
   transition: transform var(--animation-duration) ease-in-out;
   background: var(--color-main-bg);
-  transform: translateX(${(props: StateProps) => (props.isOpen ? '0' : '100%')});
+  transform: translateX(${(props: RootProps) => (props.isOpen ? '0' : '100%')});
   color: var(--color-text-primary);
   height: 100vh;
 `;
@@ -358,7 +363,7 @@ function mapStateToProps(state: AppState): StateProps {
 function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
-      toggle: () => dispatch(toggleFilters()),
+      toggle: () => dispatch(hideFilters()),
       applyFilters: (filters: FiltersState) => dispatch(applyFilters(filters)),
       clearFilters: () => dispatch(clearFilters()),
     },
