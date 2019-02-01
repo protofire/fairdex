@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react';
 import styled, { css } from 'styled-components';
 
 import Box from './Box';
-import Overley from './Overlay';
+import Overlay from './Overlay';
 import Panel from './Panel';
 
 interface Props {
@@ -19,7 +19,7 @@ const Modal: FunctionComponent<Props> = ({ isOpen, onClickOutside, onEscPress, c
           <Content>{children}</Content>
         </AuctionPanel>
       </Root>
-      {isOpen && <ModalOverley onClick={onClickOutside} />}
+      {isOpen && <ModalOverlay onClick={onClickOutside} />}
     </>
   );
 };
@@ -34,7 +34,7 @@ const Root = styled.div`
   transition-property: transform;
   transition-duration: var(--animation-duration);
 
-  ${({ isOpen }) => {
+  ${({ isOpen }: Pick<Props, 'isOpen'>) => {
     if (isOpen) {
       return css`
         opacity: 0;
@@ -73,7 +73,7 @@ const Root = styled.div`
         transform: translateY(-200%) translateX(-50%);
       `;
     }
-  }}
+  }};
 
   @media (max-width: 800px) {
     left: 50%;
@@ -81,7 +81,7 @@ const Root = styled.div`
   }
 `;
 
-const ModalOverley = styled(Overley)`
+const ModalOverlay = styled(Overlay)`
   opacity: 0;
   animation-delay: var(--animation-duration);
 `;
