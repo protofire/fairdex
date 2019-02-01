@@ -16,7 +16,6 @@ import buyOrders from '../__mocks__/buyOrders';
 import { toBigNumber } from '../contracts/utils';
 
 beforeAll(() => {
-  // window.web3.eth.getBalance = jest.fn().mockImplementation(() => Promise.resolve(toBigNumber('20000000000000000000')))
   const web3Mock = {
     eth: {
       getBalance() {
@@ -144,7 +143,7 @@ describe('Left Sidebar', () => {
         expect(balance).toHaveAttribute('title', '1.572987420146104349');
       });
 
-      test('should show third token balance with bigest balance', async () => {
+      test('should not show tokens with 0 balance', async () => {
         const newTokens: Map<string, Token> = new Map([
           [
             '0xc778417e063141139fce010982780140aa0cd5ab',
