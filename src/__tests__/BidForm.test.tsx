@@ -64,7 +64,7 @@ describe('in running auctions', () => {
       expect(cancelButton).not.toBeDisabled();
     });
 
-    test('shold show "above previous closing pice" dialog', async () => {
+    test('should show "above previous closing price" dialog', async () => {
       const aboveAuction = { ...data };
       aboveAuction.closingPrice = toBigNumber(1);
       aboveAuction.currentPrice = toBigNumber(1.2);
