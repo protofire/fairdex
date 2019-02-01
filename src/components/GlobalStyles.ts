@@ -24,6 +24,7 @@ const variables = css`
     --card-width: ${rem('280px')};
     --header-height: ${rem('72px')};
     --input-height: ${rem('40px')};
+    --input-modal-width: ${rem('500px')};
     --sidebar-width: ${rem('320px')};
 
     // Spacing

@@ -30,6 +30,7 @@ const Root = styled.div`
   top: 10rem;
   left: calc(var(--sidebar-width) + calc(calc(100% - var(--sidebar-width)) / 2));
   width: calc(calc(100% - var(--sidebar-width)) * 0.8);
+  max-width: var(--input-modal-width);
   transition-property: transform;
   transition-duration: var(--animation-duration);
 
