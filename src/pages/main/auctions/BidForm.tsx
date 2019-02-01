@@ -268,7 +268,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
               <Text>
                 <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
               </Text>
-              <Button type='submit' autoFocus>
+              <Button type='submit' autoFocus data-testid={'proceed-bid-button'}>
                 Proceed
               </Button>
             </Step1>
@@ -283,7 +283,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
                   position='bottom right'
                   content={
                     bidAmount.gt(availableBidVolume) && (
-                      <p>
+                      <p data-testid={'close-auction-message'}>
                         You will close this auction with <br />
                         <DecimalValue value={availableBidVolume} decimals={4} postfix={bidToken.symbol} />
                         <br />
@@ -301,11 +301,12 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
                     onValueChange={setBidAmount}
                     onFocus={handleInputFocus}
                     autoFocus={true}
+                    data-testid={'bid-amount-intput'}
                   />
                 </Tooltip>
               </Field>
 
-              <Field>
+              <Field data-testid={'bid-buy-amount'}>
                 <label>To buy at least:</label>
                 <TextBox align='right'>
                   <DecimalValue value={sellTokenAmount} decimals={4} postfix={auction.sellToken} />
@@ -315,6 +316,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
               <Button
                 type='submit'
                 disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
+                data-testid={'bid-step2-next-button'}
               >
                 Next
               </Button>
@@ -327,7 +329,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
                 <BackButton onClick={currentStep === 3 ? goToStep2 : undefined} />
                 <h4>Your bid</h4>
               </Popup.Header>
-              <Step3 onSubmit={handleSubmit}>
+              <Step3 onSubmit={handleSubmit} data-testid={'bid-confirm-step'}>
                 <div>
                   <div>
                     <small>&nbsp;</small>
@@ -348,7 +350,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
 
                 {bidTokenBalance.lt(bidAmount) ? (
                   bidTokenTotalBalance.gte(bidAmount) ? (
-                    <ErrorMessage>
+                    <ErrorMessage data-testid={'bid-confirm-not-balance-dx'}>
                       Please <Link to='/wallet'>deposit</Link> at least{' '}
                       <DecimalValue
                         decimals={4}
@@ -359,7 +361,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
                       in DX.
                     </ErrorMessage>
                   ) : (
-                    <ErrorMessage>
+                    <ErrorMessage data-testid={'bid-confirm-not-total-balance'}>
                       You don't have enough {bidToken.symbol} to bid on this auction.
                       {bidTokenBalance.gt(0) && (
                         <>
@@ -389,6 +391,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
                   type='submit'
                   disabled={bidding || bidAmount.lte(ZERO) || bidTokenBalance.lt(bidAmount)}
                   autoFocus
+                  data-testid='confirm-bid-button'
                 >
                   {bidding ? 'Bid in progress...' : 'Confirm'}
                 </Button>
@@ -399,11 +402,11 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
       )}
 
       {dialogVisible ? (
-        <Button mode='dark' onClick={handleClose}>
+        <Button mode='dark' onClick={handleClose} data-testid='cancel-bid-button'>
           Cancel
         </Button>
       ) : (
-        <Button mode='secondary' onClick={showDialog}>
+        <Button mode='secondary' onClick={showDialog} data-testid='bid-button'>
           Bid
         </Button>
       )}
