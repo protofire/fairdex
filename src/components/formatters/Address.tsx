@@ -14,7 +14,7 @@ interface AddressProps {
 
 const Address = ({ className, address, shorten = true }: AddressProps) => {
   const [message, setMessage] = useState('');
-  const [closeTimer, setCloseTimeer] = useState(null);
+  const [closeTimer, setCloseTimer] = useState(null);
 
   const copyAddress = useCallback(
     () => {
@@ -26,7 +26,7 @@ const Address = ({ className, address, shorten = true }: AddressProps) => {
         clearTimeout(closeTimer);
       }
 
-      setCloseTimeer(setTimeout(() => setMessage(''), 1_750));
+      setCloseTimer(setTimeout(() => setMessage(''), 1_750));
     },
     [address, closeTimer],
   );
