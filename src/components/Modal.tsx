@@ -27,7 +27,7 @@ const Modal: FunctionComponent<Props> = ({ isOpen, onClickOutside, onEscPress, c
 const Root = styled.div`
   position: fixed;
   z-index: 1000;
-  top: 10rem;
+  top: -10rem;
   left: calc(var(--sidebar-width) + calc(calc(100% - var(--sidebar-width)) / 2));
   width: calc(calc(100% - var(--sidebar-width)) * 0.8);
   max-width: var(--input-modal-width);
@@ -51,7 +51,7 @@ const Root = styled.div`
             opacity: 1;
           }
         }
-        transform: translateY(0) translateX(-50%);
+        transform: translateY(20rem) translateX(-50%);
       `;
     } else {
       return css`
@@ -70,7 +70,7 @@ const Root = styled.div`
         }
 
         transition-delay: var(--animation-duration);
-        transform: translateY(-200%) translateX(-50%);
+        transform: translateY(0) translateX(-50%);
       `;
     }
   }};
