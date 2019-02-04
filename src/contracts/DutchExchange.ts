@@ -235,7 +235,7 @@ class DutchExchange extends BaseContract<Event> {
 
       return toFractional(price);
     } catch (error) {
-      return toFractional({ den: '0', num: '0' });
+      return toFractional({ den: '1', num: '0' });
     }
   }
 
