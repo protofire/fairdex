@@ -123,6 +123,14 @@ export function filterAuctions(list: Auction[], filters: FiltersState, tokens: M
     const sortMap: { [filter in AuctionSortField]: (a: Auction, b: Auction) => number } = {
       'bid-token': (a: Auction, b: Auction) => {
         if (a.buyToken === b.buyToken) {
+          if (a.sellToken === b.sellToken) {
+            if (a.auctionIndex === b.auctionIndex) {
+              return a.buyTokenAddress.localeCompare(b.buyTokenAddress);
+            }
+
+            return parseInt(a.auctionIndex, 10) - parseInt(b.auctionIndex, 10);
+          }
+
           return a.sellToken.localeCompare(b.sellToken);
         }
 
@@ -152,7 +160,7 @@ export function filterAuctions(list: Auction[], filters: FiltersState, tokens: M
 
           return a.auctionStart - b.auctionStart;
         } else if (a.state === 'ended' && b.state === 'ended') {
-          if (a.auctionEnd && a.auctionEnd === b.auctionEnd) {
+          if (typeof a.auctionEnd !== 'undefined' && a.auctionEnd === b.auctionEnd) {
             return sortMap['bid-token'](a, b);
           }
 

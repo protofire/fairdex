@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { HTMLAttributes, MouseEvent, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 
 import { isAfter } from 'date-fns';
@@ -18,36 +18,31 @@ import Card from '../../../components/Card';
 import BidForm from './BidForm';
 import ClaimForm from './claim/ClaimForm';
 
-import AuctionDetail from './AuctionDetail';
-
 interface AuctionViewProps extends HTMLAttributes<HTMLDivElement> {
   data: Auction;
+  onCardClick?: (auction: Auction) => void;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const AuctionView = React.memo(({ data: auction, ...props }: AuctionViewProps) => {
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-
+const AuctionView = React.memo(({ data: auction, onCardClick, ...props }: AuctionViewProps) => {
   const root = useRef(null);
   const title = useRef(null);
   const table = useRef(null);
 
   const handleCardClick = useCallback((event: MouseEvent) => {
-    if (event && root && title && table && !isDetailOpen) {
+    if (event && root && title && table) {
       if (
         event.target === root.current ||
         event.target === title.current ||
         title.current.contains(event.target) ||
         table.current.contains(event.target)
       ) {
-        setIsDetailOpen(true);
+        if (onCardClick && typeof onCardClick === 'function') {
+          onCardClick(auction);
+        }
       }
     }
-  }, []);
-
-  const handleDetailClose = useCallback(() => {
-    setIsDetailOpen(false);
   }, []);
 
   return (
@@ -263,12 +258,6 @@ const AuctionView = React.memo(({ data: auction, ...props }: AuctionViewProps) =
           </>
         )}
       </AuctionCard>
-      <AuctionDetail
-        auction={auction}
-        isOpen={isDetailOpen}
-        onClickOutside={handleDetailClose}
-        onEscPress={handleDetailClose}
-      />
     </>
   );
 });

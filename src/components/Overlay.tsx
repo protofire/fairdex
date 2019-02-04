@@ -12,11 +12,11 @@ const Overlay = styled.div`
 
   touch-action: none;
 
-  animation: fadeIn;
+  animation: overlayFadeIn;
   animation-duration: var(--animation-duration);
   animation-fill-mode: forwards;
 
-  @keyframes fadeIn {
+  @keyframes overlayFadeIn {
     from {
       opacity: 0;
     }
