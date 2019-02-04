@@ -20,7 +20,7 @@ import ClaimForm from './claim/ClaimForm';
 
 interface AuctionViewProps extends HTMLAttributes<HTMLDivElement> {
   data: Auction;
-  onCardClick: (auction: Auction) => void;
+  onCardClick?: (auction: Auction) => void;
 }
 
 const DEFAULT_DECIMALS = 3;
@@ -38,7 +38,9 @@ const AuctionView = React.memo(({ data: auction, onCardClick, ...props }: Auctio
         title.current.contains(event.target) ||
         table.current.contains(event.target)
       ) {
-        onCardClick(auction);
+        if (onCardClick && typeof onCardClick === 'function') {
+          onCardClick(auction);
+        }
       }
     }
   }, []);

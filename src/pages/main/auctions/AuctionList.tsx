@@ -17,10 +17,10 @@ const AuctionList = ({ auctions, isLoading }: AuctionListProps) => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [auctoinDetail, setAuctionDetail] = useState<Auction | null>(null);
 
-  const handleCardClick = (auction: Auction) => {
+  const handleCardClick = useCallback((auction: Auction) => {
     setAuctionDetail(auction);
     setIsDetailOpen(true);
-  };
+  }, []);
 
   const handleDetailClose = useCallback(() => {
     setIsDetailOpen(false);
