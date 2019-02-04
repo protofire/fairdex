@@ -27,10 +27,16 @@ const uiReducer: Reducer<UiState, UiAction> = (state = initialState, action) => 
         sidebarVisible: !state.sidebarVisible,
       };
 
-    case actions.TOGGLE_FILTERS:
+    case actions.SHOW_FILTERS:
       return {
         ...state,
-        filtersVisible: !state.filtersVisible,
+        filtersVisible: true,
+      };
+
+    case actions.HIDE_FILTERS:
+      return {
+        ...state,
+        filtersVisible: false,
       };
 
     case actions.SHOW_NOTIFICATION:

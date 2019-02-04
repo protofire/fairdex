@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import Icon from '../../../../components/icons';
 import { isFiltering } from '../../../../store/filters';
-import { toggleFilters, toggleSidebar } from '../../../../store/ui/actions';
+import { showFilters, toggleSidebar } from '../../../../store/ui/actions';
 import ActionBar from '../ActionBar';
 
 type NavBarProps = StateProps & DispatchProps & RouteComponentProps;
@@ -18,7 +18,7 @@ interface StateProps {
 interface DispatchProps {
   actions: {
     toggleSidebar: typeof toggleSidebar;
-    toggleFilters: typeof toggleFilters;
+    showFilters: typeof showFilters;
   };
 }
 
@@ -39,7 +39,7 @@ const NavBar = ({ actions, filterIndicator }: NavBarProps) => (
       </Tab>
     </TabBar>
     <ActionBar side='right'>
-      <ToggleFilters onClick={actions.toggleFilters} pinned={filterIndicator}>
+      <ToggleFilters onClick={actions.showFilters} pinned={filterIndicator}>
         <Icon.Preferences />
       </ToggleFilters>
     </ActionBar>
@@ -153,7 +153,7 @@ function mapDispatchToProps(dispatch: Dispatch): DispatchProps {
   return {
     actions: {
       toggleSidebar: () => dispatch(toggleSidebar()),
-      toggleFilters: () => dispatch(toggleFilters()),
+      showFilters: () => dispatch(showFilters()),
     },
   };
 }

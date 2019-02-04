@@ -59,6 +59,7 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
         const auction: EndedAuction = {
           ...data,
           state: 'ended',
+          auctionStart,
           auctionEnd,
           buyVolume: bidVolume,
           closingPrice: closingPrice.value,

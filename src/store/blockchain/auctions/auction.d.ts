@@ -28,6 +28,7 @@ interface ScheduledAuction extends AuctionData {
 
 interface EndedAuction extends AuctionData {
   state: 'ended';
+  auctionStart: number;
   auctionEnd: number;
   closingPrice: BigNumber;
 }

@@ -76,5 +76,11 @@
     "name": "Test GEN",
     "address": "0xa1f34744c80e7a9019a5cd2bf697f13df00f9773",
     "decimals": 18
+  },
+  {
+    "symbol": "OWL",
+    "name": "OWL Token",
+    "address": "0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d",
+    "decimals": 18
   }
 ]

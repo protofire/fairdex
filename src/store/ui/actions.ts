@@ -4,7 +4,8 @@ import { ActionCreator } from 'redux';
 export const HIDE_SIDEBAR = 'sidebar/HIDE';
 export const SHOW_SIDEBAR = 'sidebar/SHOW';
 export const TOGGLE_SIDEBAR = 'sidebar/TOGGLE_VISIBILITY';
-export const TOGGLE_FILTERS = 'filters/TOGGLE_VISIBILITY';
+export const SHOW_FILTERS = 'filters/SHOE';
+export const HIDE_FILTERS = 'filters/HIDE';
 export const SHOW_NOTIFICATION = 'notification/SHOW';
 export const HIDE_NOTIFICATION = 'notification/HIDE';
 
@@ -26,9 +27,15 @@ export const toggleSidebar: ActionCreator<UiAction> = () => {
   };
 };
 
-export const toggleFilters: ActionCreator<UiAction> = () => {
+export const showFilters: ActionCreator<UiAction> = () => {
   return {
-    type: TOGGLE_FILTERS,
+    type: SHOW_FILTERS,
+  };
+};
+
+export const hideFilters: ActionCreator<UiAction> = () => {
+  return {
+    type: HIDE_FILTERS,
   };
 };
 

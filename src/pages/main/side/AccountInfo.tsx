@@ -29,7 +29,7 @@ const AccountInfo = ({
   liquidityContribution,
   claimableCount,
 }: AccountProps) => (
-  <Container>
+  <Container data-testid='account-info-card'>
     <Header>
       <Icon>
         <img src={images.wallet.MetaMask} alt='MetaMask' />
@@ -38,19 +38,28 @@ const AccountInfo = ({
     </Header>
     <Content>
       <Item>
-        <DecimalValue value={(frt.balance && frt.balance[1]) || ZERO} decimals={DEFAULT_DECIMALS} />
-        <small>{frt.symbol}</small>
+        <DecimalValue
+          value={(frt.balance && frt.balance[1]) || ZERO}
+          decimals={DEFAULT_DECIMALS}
+          data-testid={'frt-balance'}
+        />
+        <small data-testid={'frt-symbol'}>{frt.symbol}</small>
       </Item>
       <Item>
-        <DecimalValue value={liquidityContribution} decimals={DEFAULT_DECIMALS} postfix={'%'} />
+        <DecimalValue
+          value={liquidityContribution}
+          decimals={DEFAULT_DECIMALS}
+          postfix={'%'}
+          data-testid={'lc-percentage'}
+        />
         <small>Liquidity Contribution</small>
       </Item>
       <Item>
-        <div>{pastBids}</div>
+        <div data-testid={'past-bids-count'}>{pastBids}</div>
         <small>Past bids</small>
       </Item>
       <Item>
-        <div>{claimableCount}</div>
+        <div data-testid={'to-claim-count'}>{claimableCount}</div>
         <small>To claim</small>
       </Item>
     </Content>

@@ -6,7 +6,7 @@ const rawTokens: Token[] = [
     name: 'Wrapped Ether',
     address: '0xc778417e063141139fce010982780140aa0cd5ab',
     decimals: 18,
-    balance: [toBigNumber('1.436597202426861019'), toBigNumber('0.8')],
+    balance: [toBigNumber('1'), toBigNumber('0.2')],
     priceEth: toBigNumber('1'),
   },
   {

@@ -37,30 +37,42 @@ const WalletInfo = ({ tokens, topBalances, currentAccount }: WalletProps) => {
       </WalletHeader>
       <Content>
         <Item>
-          <DecimalValue value={ethBalance} decimals={DEFAULT_DECIMALS} />
+          <DecimalValue value={ethBalance} decimals={DEFAULT_DECIMALS} data-testid='eht-balance' />
           <small>ETH</small>
         </Item>
         <Item>
           {topBalances[0] && topBalances[0].totalBalance.gt(0) && (
             <>
-              <DecimalValue value={topBalances[0].totalBalance} decimals={DEFAULT_DECIMALS} />
-              <small>{topBalances[0].symbol}</small>
+              <DecimalValue
+                value={topBalances[0].totalBalance}
+                decimals={DEFAULT_DECIMALS}
+                data-testid={`${topBalances[0].symbol}-balance`}
+              />
+              <small data-testid={`${topBalances[0].symbol}-symbol`}>{topBalances[0].symbol}</small>
             </>
           )}
         </Item>
         <Item>
           {topBalances[1] && topBalances[1].totalBalance.gt(0) && (
             <>
-              <DecimalValue value={topBalances[1].totalBalance} decimals={DEFAULT_DECIMALS} />
-              <small>{topBalances[1].symbol}</small>
+              <DecimalValue
+                value={topBalances[1].totalBalance}
+                decimals={DEFAULT_DECIMALS}
+                data-testid={`${topBalances[1].symbol}-balance`}
+              />
+              <small data-testid={`${topBalances[1].symbol}-symbol`}>{topBalances[1].symbol}</small>
             </>
           )}
         </Item>
         <Item>
           {topBalances[2] && topBalances[2].totalBalance.gt(0) && (
             <>
-              <DecimalValue value={topBalances[2].totalBalance} decimals={DEFAULT_DECIMALS} />
-              <small>{topBalances[2].symbol}</small>
+              <DecimalValue
+                value={topBalances[2].totalBalance}
+                decimals={DEFAULT_DECIMALS}
+                data-testid={`${topBalances[2].symbol}-balance`}
+              />
+              <small data-testid={`${topBalances[2].symbol}-symbol`}>{topBalances[2].symbol}</small>
             </>
           )}
         </Item>
