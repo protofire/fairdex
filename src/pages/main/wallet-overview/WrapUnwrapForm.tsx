@@ -1,6 +1,14 @@
-import React, { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  AllHTMLAttributes,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
 
 import { fromDecimal, toDecimal, ZERO } from '../../../contracts/utils';
@@ -216,7 +224,9 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
         </Content>
       )}
       {showDialog ? (
-        <Action onClick={handleClose}>Cancel</Action>
+        <Action disabled={loading} onClick={handleClose}>
+          Cancel
+        </Action>
       ) : (
         <>
           {showWrap && <Action onClick={handleWrap}>Wrap</Action>}
@@ -234,7 +244,18 @@ const Container = styled(Popup.Container)`
   letter-spacing: -0.4px;
 `;
 
+interface ActionProps {
+  disabled?: boolean;
+}
+
 const Action = styled.span`
+  ${({ disabled }: Pick<AllHTMLAttributes<HTMLSpanElement>, 'disabled'>) => {
+    if (disabled) {
+      return css`
+        color: var(--color-grey);
+      `;
+    }
+  }}
   text-decoration: underline;
   font-weight: 600;
   cursor: pointer;
