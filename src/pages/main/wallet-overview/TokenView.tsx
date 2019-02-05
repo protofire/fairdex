@@ -9,6 +9,7 @@ import Card from '../../../components/Card';
 import { ZERO } from '../../../contracts/utils';
 import DepositWithdrawForm from './DepositWithdrawForm';
 import EnableForTradingForm from './EnableForTradingForm';
+import WrapUnwrapForm from './WrapUnwrapForm';
 
 interface Props {
   data: Token;
@@ -18,9 +19,12 @@ const DEFAULT_DECIMALS = 3;
 
 const TokenView = ({ data: token }: Props) => (
   <Card>
-    <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
-      <span>{token.symbol}</span>
-    </Title>
+    <Header>
+      <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
+        <span>{token.symbol}</span>
+      </Title>
+      {token.symbol === 'WETH' && <WrapUnwrapForm token={token} />}
+    </Header>
     <Table>
       <Row>
         <Label>Wallet balance</Label>
@@ -109,9 +113,14 @@ const Table = styled.dl`
   letter-spacing: -0.4px;
 `;
 
-const Title = styled.h3`
-  display: inline-flex;
+const Header = styled.header`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+`;
+
+const Title = styled.h3`
   font-size: 2em;
   font-weight: 900;
   color: var(--color-light-grey-blue);
