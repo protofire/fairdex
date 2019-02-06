@@ -1,10 +1,10 @@
 import ReactGA from 'react-ga';
-ReactGA.initialize('UA-133995889-1');
+ReactGA.initialize('UA-133995889-1'); // FIXME - this should be configurable
 
+import createBrowserHistory from 'history/createBrowserHistory'; // tslint:disable-line
 import React from 'react';
 import Loadable from 'react-loadable';
-import { Router, NavLink, Redirect, Route, Switch } from 'react-router-dom';
-import createBrowserHistory from 'history/createBrowserHistory';
+import { NavLink, Redirect, Route, Router, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Spinner from '../../components/Spinner';
