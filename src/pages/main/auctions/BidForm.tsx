@@ -410,7 +410,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
                 <BackButton onClick={goToBackStep} />
                 <h4>Liquidity contribution</h4>
               </Step4Header>
-              <Step4 onSubmit={handleApprove}>
+              <Step4 onSubmit={handleApprove} data-testid={'bid-lc-step'}>
                 <p>You have the option to settle half of your liquidity contribution in OWL.</p>
                 <p>
                   Later you can choose to unsettle it back by disabling OWL token for trading within the
@@ -418,11 +418,11 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
                 </p>
                 <ButtonGroup>
                   {!approving && (
-                    <Button mode='secondary' onClick={goToNextStep}>
+                    <Button mode='secondary' onClick={goToNextStep} data-testid={'dont-use-owl-button'}>
                       Don't use OWL
                     </Button>
                   )}
-                  <Button type='submit' disabled={approving}>
+                  <Button type='submit' disabled={approving} data-testid={'use-owl-button'}>
                     {approving ? 'Appove in progress...' : 'Use OWL'}
                   </Button>
                 </ButtonGroup>

@@ -27,6 +27,17 @@ jest.spyOn(dx, 'postBid').mockImplementation((sellToken, buyToken, auctionIndex,
   };
 });
 
+jest.spyOn(dx, 'toggleAllowance').mockImplementation(token => {
+  return {
+    send() {
+      return this;
+    },
+    once() {
+      return this;
+    },
+  };
+});
+
 describe('in running auctions', () => {
   const data: RunningAuction = {
     auctionIndex: '111',
@@ -128,15 +139,213 @@ describe('in running auctions', () => {
       expect(getByText(buiAmount, '99.1899 OMG')).toBeDefined();
     });
 
-    describe('step 3 - bid confirmation', () => {
-      test('should show deposit message when user does not have enough balance in DX', async () => {
+    describe('step 3 - Liquidity contribution', () => {
+      test('should show step when user has OWL balance but it hasn\t been approved for trading yet ', async () => {
+        const owl = {
+          symbol: 'OWL',
+          name: 'OWL Token',
+          address: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
+          decimals: 18,
+          priceEth: toBigNumber('0'),
+          balance: [toBigNumber('0'), toBigNumber('685.821162404157936')],
+          allowance: toBigNumber('0'),
+        };
+
+        const stateTokens = new Map(tokens);
+        stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
+
         const { queryByTestId, getByTestId, debug } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,
           {
             blockchain: {
-              tokens,
+              tokens: stateTokens,
+            },
+          },
+        );
+
+        fireEvent.click(getByTestId('bid-button'));
+
+        const bidInput = await waitForElement(() => getByTestId('bid-amount-intput').querySelector('input'));
+
+        fireEvent.change(bidInput, { target: { value: '1.2' } });
+        fireEvent.click(getByTestId('bid-step2-next-button'));
+
+        const lcStep = queryByTestId('bid-lc-step');
+        expect(lcStep).not.toBeNull();
+      });
+
+      test('should not show step when user has no OWL balance and it hasn\t been approved for trading yet ', async () => {
+        const owl = {
+          symbol: 'OWL',
+          name: 'OWL Token',
+          address: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
+          decimals: 18,
+          priceEth: toBigNumber('0'),
+          balance: [toBigNumber('0'), toBigNumber('0')],
+          allowance: toBigNumber('0'),
+        };
+
+        const stateTokens = new Map(tokens);
+        stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
+
+        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+          <Router>
+            <BidForm auction={data} />
+          </Router>,
+          {
+            blockchain: {
+              tokens: stateTokens,
+            },
+          },
+        );
+
+        fireEvent.click(getByTestId('bid-button'));
+
+        const bidInput = await waitForElement(() => getByTestId('bid-amount-intput').querySelector('input'));
+
+        fireEvent.change(bidInput, { target: { value: '1.2' } });
+        fireEvent.click(getByTestId('bid-step2-next-button'));
+
+        const lcStep = queryByTestId('bid-lc-step');
+        expect(lcStep).toBeNull();
+      });
+
+      test('should not show step when user OWL balance hasn been approved for trading yet ', async () => {
+        const owl = {
+          symbol: 'OWL',
+          name: 'OWL Token',
+          address: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
+          decimals: 18,
+          priceEth: toBigNumber('0'),
+          balance: [toBigNumber('0'), toBigNumber('1230')],
+          allowance: toBigNumber('10000'),
+        };
+
+        const stateTokens = new Map(tokens);
+        stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
+
+        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+          <Router>
+            <BidForm auction={data} />
+          </Router>,
+          {
+            blockchain: {
+              tokens: stateTokens,
+            },
+          },
+        );
+
+        fireEvent.click(getByTestId('bid-button'));
+
+        const bidInput = await waitForElement(() => getByTestId('bid-amount-intput').querySelector('input'));
+
+        fireEvent.change(bidInput, { target: { value: '1.2' } });
+        fireEvent.click(getByTestId('bid-step2-next-button'));
+
+        const lcStep = queryByTestId('bid-lc-step');
+        expect(lcStep).toBeNull();
+      });
+
+      test("should not try to approve owl for trading when user clicks Don't use OWL, and move to next step", async () => {
+        const owl = {
+          symbol: 'OWL',
+          name: 'OWL Token',
+          address: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
+          decimals: 18,
+          priceEth: toBigNumber('0'),
+          balance: [toBigNumber('0'), toBigNumber('1230')],
+          allowance: toBigNumber('0'),
+        };
+
+        const stateTokens = new Map(tokens);
+        stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
+
+        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+          <Router>
+            <BidForm auction={data} />
+          </Router>,
+          {
+            blockchain: {
+              tokens: stateTokens,
+            },
+          },
+        );
+
+        fireEvent.click(getByTestId('bid-button'));
+
+        const bidInput = await waitForElement(() => getByTestId('bid-amount-intput').querySelector('input'));
+
+        fireEvent.change(bidInput, { target: { value: '1.2' } });
+        fireEvent.click(getByTestId('bid-step2-next-button'));
+
+        fireEvent.click(getByTestId('dont-use-owl-button'));
+        expect(dx.toggleAllowance).toHaveBeenCalledTimes(0);
+
+        const confirmStep = getByTestId('bid-confirm-step');
+        expect(confirmStep).not.toBeNull();
+      });
+
+      test('should try to approve owl for trading when user clicks Use OWL', async () => {
+        const owl = {
+          symbol: 'OWL',
+          name: 'OWL Token',
+          address: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
+          decimals: 18,
+          priceEth: toBigNumber('0'),
+          balance: [toBigNumber('0'), toBigNumber('1230')],
+          allowance: toBigNumber('0'),
+        };
+
+        const stateTokens = new Map(tokens);
+        stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
+
+        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+          <Router>
+            <BidForm auction={data} />
+          </Router>,
+          {
+            blockchain: {
+              tokens: stateTokens,
+            },
+          },
+        );
+
+        fireEvent.click(getByTestId('bid-button'));
+
+        const bidInput = await waitForElement(() => getByTestId('bid-amount-intput').querySelector('input'));
+
+        fireEvent.change(bidInput, { target: { value: '1.2' } });
+        fireEvent.click(getByTestId('bid-step2-next-button'));
+
+        fireEvent.click(getByTestId('use-owl-button'));
+        expect(dx.toggleAllowance).toHaveBeenCalledWith(owl);
+      });
+    });
+
+    describe('step 4 - bid confirmation', () => {
+      test('should show deposit message when user does not have enough balance in DX', async () => {
+        const owl = {
+          symbol: 'OWL',
+          name: 'OWL Token',
+          address: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
+          decimals: 18,
+          priceEth: toBigNumber('0'),
+          balance: [toBigNumber('0'), toBigNumber('1230')],
+          allowance: toBigNumber('123'),
+        };
+
+        const stateTokens = new Map(tokens);
+        stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
+
+        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+          <Router>
+            <BidForm auction={data} />
+          </Router>,
+          {
+            blockchain: {
+              tokens: stateTokens,
             },
           },
         );
@@ -155,13 +364,26 @@ describe('in running auctions', () => {
       });
 
       test('should show not enough message when user does not have enough total balance', async () => {
+        const owl = {
+          symbol: 'OWL',
+          name: 'OWL Token',
+          address: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
+          decimals: 18,
+          priceEth: toBigNumber('0'),
+          balance: [toBigNumber('0'), toBigNumber('1230')],
+          allowance: toBigNumber('123'),
+        };
+
+        const stateTokens = new Map(tokens);
+        stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
+
         const { queryByTestId, getByTestId, debug } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,
           {
             blockchain: {
-              tokens,
+              tokens: stateTokens,
             },
           },
         );
@@ -180,13 +402,26 @@ describe('in running auctions', () => {
       });
 
       test('should show be able to place a bid', async () => {
+        const owl = {
+          symbol: 'OWL',
+          name: 'OWL Token',
+          address: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
+          decimals: 18,
+          priceEth: toBigNumber('0'),
+          balance: [toBigNumber('0'), toBigNumber('1230')],
+          allowance: toBigNumber('123'),
+        };
+
+        const stateTokens = new Map(tokens);
+        stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
+
         const { queryByTestId, getByTestId, debug } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,
           {
             blockchain: {
-              tokens,
+              tokens: stateTokens,
             },
           },
         );
