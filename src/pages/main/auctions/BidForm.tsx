@@ -9,17 +9,20 @@ import * as utils from '../../../contracts/utils';
 import {
   getCurrentAccount,
   getLiqContribPercentage,
+  getOwl,
   getToken,
   loadAvailableTokens,
 } from '../../../store/blockchain';
 import { showNotification } from '../../../store/ui/actions';
 
 import Button from '../../../components/Button';
+import ButtonGroup from '../../../components/ButtonGroup';
 import DecimalInput from '../../../components/DecimalInput';
 import { DecimalValue } from '../../../components/formatters';
 import Icon from '../../../components/icons';
 import Popup from '../../../components/Popup';
 import Tooltip from '../../../components/Tooltip';
+import { getTotalBalance } from '../../../contracts/utils/tokens';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
@@ -31,6 +34,7 @@ interface AppStateProps {
   currentAccount: Address;
   bidToken: Token;
   feeRate: BigNumber;
+  owl?: Token;
 }
 
 interface DispatchProps {
@@ -39,7 +43,7 @@ interface DispatchProps {
 
 const { ZERO } = utils;
 
-const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispatch }: Props) => {
+const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, dispatch }: Props) => {
   if (auction.state !== 'running') {
     return null;
   }
@@ -50,6 +54,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
   const [bidding, setBidding] = useState(false);
   const [currentStep, setCurrentStep] = useState(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
   const [dialogVisible, setDialogVisible] = useState(false);
+  const [approving, setApproving] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -134,29 +139,46 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
     setDialogVisible(true);
   }, []);
 
-  const goToStep2 = useCallback((event?: any) => {
-    if (event) {
-      event.preventDefault();
-    }
-
-    setCurrentStep(2);
-  }, []);
-
-  const goToStep3 = useCallback((event?: any) => {
-    if (event) {
-      event.preventDefault();
-    }
-
-    setCurrentStep(3);
-  }, []);
-
-  const handleBack = useCallback(
-    () => {
-      if (currentStep === 3) {
-        setCurrentStep(2);
+  const goToNextStep = useCallback(
+    (event?: any) => {
+      if (event) {
+        event.preventDefault();
       }
+
+      setCurrentStep(prevValue => {
+        if (prevValue === 4) {
+          return 4;
+        }
+
+        const nextStep = prevValue + 1;
+        return nextStep !== 3 ||
+          (nextStep === 3 && owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0))
+          ? nextStep
+          : 4;
+      });
     },
-    [currentStep],
+    [owl],
+  );
+
+  const goToBackStep = useCallback(
+    (event?: any) => {
+      if (event) {
+        event.preventDefault();
+      }
+
+      setCurrentStep(prevValue => {
+        if (prevValue === 1) {
+          return 1;
+        }
+
+        const nextStep = prevValue - 1;
+        return nextStep !== 3 ||
+          (nextStep === 3 && owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0))
+          ? nextStep
+          : 2;
+      });
+    },
+    [owl],
   );
 
   const handleClose = useCallback(
@@ -251,16 +273,75 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
     [auction, bidAmount, bidToken, currentAccount],
   );
 
+  const handleApprove = useCallback(
+    (event?: any) => {
+      if (event) {
+        event.preventDefault();
+      }
+      setApproving(true);
+
+      dx.toggleAllowance(owl)
+        .send({
+          from: currentAccount,
+          // TODO: estimated gas
+          // TODO: gas price from oracle
+        })
+        .once('transactionHash', transactionHash => {
+          setApproving(true);
+          dispatch(
+            showNotification(
+              'info',
+              'Approve request sent',
+              <p>
+                Approve transaction has been sent.{' '}
+                <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
+                  More info
+                </a>
+              </p>,
+            ),
+          );
+        })
+        .once('confirmation', (confNumber, receipt) => {
+          setApproving(false);
+          dispatch(
+            showNotification(
+              'success',
+              'Approve confirmed',
+              <p>
+                Approve transaction has been confirmed.{' '}
+                <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
+                  More info
+                </a>
+              </p>,
+            ),
+          );
+
+          goToNextStep();
+        })
+        .once('error', (err: Error) => {
+          setApproving(false);
+          dispatch(
+            showNotification(
+              'error',
+              'Approve failed',
+              <p>
+                {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
+                <br />
+                Please try again later.
+              </p>,
+            ),
+          );
+        });
+    },
+    [owl, currentAccount, dispatch],
+  );
+
   return (
-    <Popup.Container
-      onClickOutside={handleClose}
-      onEscPress={handleClose}
-      onBackspacePress={currentStep === 3 ? handleBack : null}
-    >
+    <Popup.Container onClickOutside={handleClose} onEscPress={handleClose} onBackspacePress={goToBackStep}>
       {dialogVisible && (
         <Popup.Content theme={currentStep === 1 ? 'accent' : 'default'}>
           {currentStep === 1 && (
-            <Step1 onSubmit={goToStep2}>
+            <Step1 onSubmit={goToNextStep}>
               <p>
                 You are bidding above the previous <br /> closing price for {auction.sellToken}/
                 {auction.buyToken}
@@ -275,7 +356,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
           )}
 
           {currentStep === 2 && (
-            <Step2 onSubmit={goToStep3}>
+            <Step2 onSubmit={goToNextStep}>
               <Field>
                 <label>Bid volume</label>
                 <Tooltip
@@ -325,8 +406,34 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, dispat
 
           {currentStep === 3 && (
             <>
+              <Step4Header>
+                <BackButton onClick={goToBackStep} />
+                <h4>Liquidity contribution</h4>
+              </Step4Header>
+              <Step4 onSubmit={handleApprove}>
+                <p>You have the option to settle half of your liquidity contribution in OWL.</p>
+                <p>
+                  Later you can choose to unsettle it back by disabling OWL token for trading within the
+                  Wallet overview page.
+                </p>
+                <ButtonGroup>
+                  {!approving && (
+                    <Button mode='secondary' onClick={goToNextStep}>
+                      Don't use OWL
+                    </Button>
+                  )}
+                  <Button type='submit' disabled={approving}>
+                    {approving ? 'Appove in progress...' : 'Use OWL'}
+                  </Button>
+                </ButtonGroup>
+              </Step4>
+            </>
+          )}
+
+          {currentStep === 4 && (
+            <>
               <Popup.Header>
-                <BackButton onClick={currentStep === 3 ? goToStep2 : undefined} />
+                <BackButton onClick={goToBackStep} />
                 <h4>Your bid</h4>
               </Popup.Header>
               <Step3 onSubmit={handleSubmit} data-testid={'bid-confirm-step'}>
@@ -547,6 +654,13 @@ const Step3 = styled(Step)`
   }
 `;
 
+const Step4 = styled(Step2)``;
+const Step4Header = styled(Popup.Header)`
+  h4 {
+    line-height: 1rem;
+  }
+`;
+
 const BackButton = styled(Icon.Back)`
   cursor: pointer;
 `;
@@ -576,6 +690,7 @@ function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
     bidToken: getToken(state, props.auction.buyTokenAddress) as Token,
     currentAccount: getCurrentAccount(state),
     feeRate: getLiqContribPercentage(state),
+    owl: getOwl(state),
   };
 }
 

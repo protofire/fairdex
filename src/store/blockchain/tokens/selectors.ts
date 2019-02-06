@@ -51,6 +51,15 @@ export const getTopBalances = createSelector(
   },
 );
 
+export const getOwl = createSelector(
+  getAllTokens,
+  tokens => {
+    return Array.from(tokens)
+      .map(([_, token]: [Address, Token]) => token)
+      .find((token: Token) => token.symbol === 'OWL');
+  },
+);
+
 export const getFilteredTokens = createSelector(
   getAllTokens,
   (state: AppState) => state.filters,
