@@ -202,10 +202,10 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
     <Container onClickOutside={handleClose} onEscPress={handleClose}>
       {showDialog && (
         <Content>
-          <Form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit} data-testid={`wrap-unwrap-dialog`}>
             <div>
               <h4>Volume</h4>
-              <p>
+              <p data-testid={'max-allowed'}>
                 {isWrapping ? 'ETH' : token.symbol} (max{' '}
                 <DecimalValue value={maxAlloed} decimals={DEFAULT_DECIMALS} />)
               </p>
@@ -217,21 +217,33 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
               onFocus={handleInputFocus}
               autoFocus={true}
             />
-            <Button type='submit' disabled={loading || amount.lte(ZERO) || amount.gt(maxAlloed)}>
+            <Button
+              type='submit'
+              disabled={loading || amount.lte(ZERO) || amount.gt(maxAlloed)}
+              data-testid={'confirm-button'}
+            >
               {loading ? `${isWrapping ? 'Wrapp' : 'Unwrap'} in progress...` : 'Confirm'}
             </Button>
           </Form>
         </Content>
       )}
       {showDialog ? (
-        <Action disabled={loading} onClick={handleClose}>
+        <Action disabled={loading} onClick={handleClose} data-testid={'cancel-button'}>
           Cancel
         </Action>
       ) : (
         <>
-          {showWrap && <Action onClick={handleWrap}>Wrap</Action>}
+          {showWrap && (
+            <Action onClick={handleWrap} data-testid={'wrap-button'}>
+              Wrap
+            </Action>
+          )}
           {showWrap && showUnwrap && '|'}
-          {showUnwrap && <Action onClick={handleUnwrap}>Unwrap</Action>}
+          {showUnwrap && (
+            <Action onClick={handleUnwrap} data-testid={'unwrap-button'}>
+              Unwrap
+            </Action>
+          )}
         </>
       )}
     </Container>
