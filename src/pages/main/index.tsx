@@ -1,6 +1,10 @@
+import ReactGA from 'react-ga';
+ReactGA.initialize('UA-133995889-1');
+
 import React from 'react';
 import Loadable from 'react-loadable';
-import { BrowserRouter as Router, NavLink, Redirect, Route, Switch } from 'react-router-dom';
+import { Router, NavLink, Redirect, Route, Switch } from 'react-router-dom';
+import createBrowserHistory from 'history/createBrowserHistory';
 import styled from 'styled-components';
 
 import Spinner from '../../components/Spinner';
@@ -31,6 +35,9 @@ const WalletOverview = Loadable({
   loading: () => <Spinner size='large' />,
 });
 
+const history = createBrowserHistory();
+history.listen(location => ReactGA.pageview(location.pathname));
+
 class MainPage extends React.Component {
   componentDidMount() {
     window.scrollTo({
@@ -41,7 +48,7 @@ class MainPage extends React.Component {
 
   render() {
     return (
-      <Router>
+      <Router history={history}>
         <Layout>
           <Sidebar>
             <Branding>
