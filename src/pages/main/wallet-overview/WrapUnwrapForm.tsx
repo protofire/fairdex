@@ -45,15 +45,14 @@ interface State {
 const DEFAULT_DECIMALS = 3;
 
 const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
-  const [amount, setAmmount] = useState(ZERO);
+  const [amount, setAmount] = useState(ZERO);
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [showWrap, setShowWrap] = useState(false);
-  const [showUnwrap, setShowUnwrap] = useState(false);
+  const [showWrapForm, setShowWrapForm] = useState(false);
+  const [showUnwrapForm, setShowUnwrapForm] = useState(false);
   const [ethBalance, setEthBalance] = useState(ZERO);
   const [isWrapping, setIsWrapping] = useState(false);
-  const [isUnwrapping, setIsUnwrapping] = useState(false);
-  const [maxAlloed, setMaxallowed] = useState(ZERO);
+  const [maxAlloed, setMaxAllowed] = useState(ZERO);
 
   useEffect(
     () => {
@@ -63,13 +62,13 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
           setEthBalance(ethB);
 
           if (ethB.gt(ZERO)) {
-            setShowWrap(true);
+            setShowWrapForm(true);
           }
         });
       }
 
       if (getWalletBalance(token).gt(ZERO)) {
-        setShowUnwrap(true);
+        setShowUnwrapForm(true);
       }
     },
     [token],
@@ -85,9 +84,8 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
     () => {
       if (!loading) {
         setShowDialog(false);
-        setAmmount(ZERO);
-        setMaxallowed(ZERO);
-        setIsUnwrapping(false);
+        setAmount(ZERO);
+        setMaxAllowed(ZERO);
         setIsWrapping(false);
       }
     },
@@ -97,7 +95,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
   const handleWrap = useCallback(
     () => {
       setIsWrapping(true);
-      setMaxallowed(ethBalance);
+      setMaxAllowed(ethBalance);
       handleOpen();
     },
     [ethBalance],
@@ -105,8 +103,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
 
   const handleUnwrap = useCallback(
     () => {
-      setIsUnwrapping(true);
-      setMaxallowed(getWalletBalance(token));
+      setMaxAllowed(getWalletBalance(token));
       handleOpen();
     },
     [token],
@@ -124,13 +121,11 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
           // TODO: estimated gas
           // TODO: gas price from oracle
         })
-      : isUnwrapping
-      ? dx.unwrapEther(token, amount).send({
+      : dx.unwrapEther(token, amount).send({
           from: currentAccount,
           // TODO: estimated gas
           // TODO: gas price from oracle
-        })
-      : null;
+        });
   };
 
   const handleSubmit = useCallback(
@@ -142,7 +137,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
 
       const request = sendRequest();
       if (request) {
-        const action = isWrapping ? 'Wrapp' : 'Unwrap';
+        const action = isWrapping ? 'Wrap' : 'Unwrap';
 
         request
           .once('transactionHash', (transactionHash: TransactionHash) => {
@@ -213,7 +208,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
             <DecimalInput
               value={amount.toString(10)}
               ref={inputRef}
-              onValueChange={setAmmount}
+              onValueChange={setAmount}
               onFocus={handleInputFocus}
               autoFocus={true}
             />
@@ -222,7 +217,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
               disabled={loading || amount.lte(ZERO) || amount.gt(maxAlloed)}
               data-testid={'confirm-button'}
             >
-              {loading ? `${isWrapping ? 'Wrapp' : 'Unwrap'} in progress...` : 'Confirm'}
+              {loading ? `${isWrapping ? 'Wrap' : 'Unwrap'} in progress...` : 'Confirm'}
             </Button>
           </Form>
         </Content>
@@ -233,13 +228,13 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
         </Action>
       ) : (
         <>
-          {showWrap && (
+          {showWrapForm && (
             <Action onClick={handleWrap} data-testid={'wrap-button'}>
               Wrap
             </Action>
           )}
-          {showWrap && showUnwrap && '|'}
-          {showUnwrap && (
+          {showWrapForm && showUnwrapForm && ' | '}
+          {showUnwrapForm && (
             <Action onClick={handleUnwrap} data-testid={'unwrap-button'}>
               Unwrap
             </Action>

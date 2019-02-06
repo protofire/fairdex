@@ -39,7 +39,7 @@ const DEFAULT_DECIMALS = 3;
 const DEPOSIT = 'Deposit';
 
 const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatch }: Props) => {
-  const [amount, setAmmount] = useState(ZERO);
+  const [amount, setAmount] = useState(ZERO);
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
 
@@ -54,7 +54,7 @@ const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatc
     () => {
       if (!loading) {
         setShowDialog(false);
-        setAmmount(ZERO);
+        setAmount(ZERO);
       }
     },
     [loading],
@@ -156,7 +156,7 @@ const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatc
             <DecimalInput
               value={amount.toString(10)}
               ref={inputRef}
-              onValueChange={setAmmount}
+              onValueChange={setAmount}
               onFocus={handleInputFocus}
               autoFocus={true}
             />
