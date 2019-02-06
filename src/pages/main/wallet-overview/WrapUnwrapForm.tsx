@@ -52,7 +52,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
   const [showUnwrapForm, setShowUnwrapForm] = useState(false);
   const [ethBalance, setEthBalance] = useState(ZERO);
   const [isWrapping, setIsWrapping] = useState(false);
-  const [maxAlloed, setMaxAllowed] = useState(ZERO);
+  const [maxAllowed, setMaxAllowed] = useState(ZERO);
 
   useEffect(
     () => {
@@ -202,7 +202,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
               <h4>Volume</h4>
               <p data-testid={'max-allowed'}>
                 {isWrapping ? 'ETH' : token.symbol} (max{' '}
-                <DecimalValue value={maxAlloed} decimals={DEFAULT_DECIMALS} />)
+                <DecimalValue value={maxAllowed} decimals={DEFAULT_DECIMALS} />)
               </p>
             </div>
             <DecimalInput
@@ -214,7 +214,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
             />
             <Button
               type='submit'
-              disabled={loading || amount.lte(ZERO) || amount.gt(maxAlloed)}
+              disabled={loading || amount.lte(ZERO) || amount.gt(maxAllowed)}
               data-testid={'confirm-button'}
             >
               {loading ? `${isWrapping ? 'Wrap' : 'Unwrap'} in progress...` : 'Confirm'}
