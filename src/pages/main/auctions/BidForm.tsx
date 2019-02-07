@@ -23,6 +23,7 @@ import Icon from '../../../components/icons';
 import Popup from '../../../components/Popup';
 import Tooltip from '../../../components/Tooltip';
 import { getTotalBalance } from '../../../contracts/utils/tokens';
+import { updateTokenAllowance } from '../../../store/blockchain/tokens';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
@@ -54,7 +55,10 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
   const [bidding, setBidding] = useState(false);
   const [currentStep, setCurrentStep] = useState(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [approving, setApproving] = useState(false);
+  const [approvingOwl, setApprovingOwl] = useState(false);
+  const [canUseOwlToPayFee, setCanUseOwlToPayFee] = useState(
+    owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0),
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -145,19 +149,17 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
         event.preventDefault();
       }
 
-      setCurrentStep(prevValue => {
-        if (prevValue === 4) {
-          return 4;
-        }
-
-        const nextStep = prevValue + 1;
-        return nextStep !== 3 ||
-          (nextStep === 3 && owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0))
-          ? nextStep
-          : 4;
-      });
+      if (!bidding && !approvingOwl) {
+        setCurrentStep(prevValue => {
+          if (prevValue === 4) {
+            return 4;
+          }
+          const nextStep = prevValue + 1;
+          return nextStep !== 3 || (nextStep === 3 && canUseOwlToPayFee) ? nextStep : 4;
+        });
+      }
     },
-    [owl],
+    [canUseOwlToPayFee, currentStep, bidding, approvingOwl],
   );
 
   const goToBackStep = useCallback(
@@ -166,30 +168,38 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
         event.preventDefault();
       }
 
-      setCurrentStep(prevValue => {
-        if (prevValue === 1) {
-          return 1;
-        }
+      if (!bidding && !approvingOwl) {
+        setCurrentStep(prevValue => {
+          if (prevValue === 1) {
+            return 1;
+          }
 
-        const nextStep = prevValue - 1;
-        return nextStep !== 3 ||
-          (nextStep === 3 && owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0))
-          ? nextStep
-          : 2;
-      });
+          const nextStep = prevValue - 1;
+          return nextStep !== 3 || (nextStep === 3 && canUseOwlToPayFee) ? nextStep : 2;
+        });
+      }
     },
-    [owl],
+    [canUseOwlToPayFee, currentStep, bidding, approvingOwl],
+  );
+
+  const handleBackspacePress = useCallback(
+    () => {
+      if (!bidding && !approvingOwl && currentStep !== 2) {
+        goToBackStep();
+      }
+    },
+    [bidding, approvingOwl, currentStep],
   );
 
   const handleClose = useCallback(
     () => {
-      if (!bidding) {
+      if (!bidding && !approvingOwl) {
         setDialogVisible(false);
         setBidAmount(ZERO);
         setCurrentStep(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
       }
     },
-    [bidding],
+    [bidding, approvingOwl],
   );
 
   const handleInputFocus = useCallback<React.FocusEventHandler<HTMLInputElement>>(
@@ -278,7 +288,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
       if (event) {
         event.preventDefault();
       }
-      setApproving(true);
+      setApprovingOwl(true);
 
       dx.toggleAllowance(owl)
         .send({
@@ -287,13 +297,13 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
           // TODO: gas price from oracle
         })
         .once('transactionHash', transactionHash => {
-          setApproving(true);
+          setApprovingOwl(true);
           dispatch(
             showNotification(
               'info',
-              'Approve request sent',
+              'Approve OWL request sent',
               <p>
-                Approve transaction has been sent.{' '}
+                Approve OWL transaction has been sent.{' '}
                 <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
                   More info
                 </a>
@@ -302,28 +312,30 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
           );
         })
         .once('confirmation', (confNumber, receipt) => {
-          setApproving(false);
+          setApprovingOwl(false);
           dispatch(
             showNotification(
               'success',
-              'Approve confirmed',
+              'Approve OWL confirmed',
               <p>
-                Approve transaction has been confirmed.{' '}
+                Approve OWL transaction has been confirmed.{' '}
                 <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
                   More info
                 </a>
               </p>,
             ),
           );
-
+          // Reload token balances and allowance
+          dispatch(updateTokenAllowance(owl));
+          setCanUseOwlToPayFee(false);
           goToNextStep();
         })
         .once('error', (err: Error) => {
-          setApproving(false);
+          setApprovingOwl(false);
           dispatch(
             showNotification(
               'error',
-              'Approve failed',
+              'Approve OWL failed',
               <p>
                 {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
                 <br />
@@ -336,8 +348,17 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
     [owl, currentAccount, dispatch],
   );
 
+  const shouldHandleBackspace = useMemo(() => dialogVisible && currentStep !== 2, [
+    dialogVisible,
+    currentStep,
+  ]);
+
   return (
-    <Popup.Container onClickOutside={handleClose} onEscPress={handleClose} onBackspacePress={goToBackStep}>
+    <Popup.Container
+      onClickOutside={handleClose}
+      onEscPress={handleClose}
+      onBackspacePress={shouldHandleBackspace ? handleBackspacePress : null}
+    >
       {dialogVisible && (
         <Popup.Content theme={currentStep === 1 ? 'accent' : 'default'}>
           {currentStep === 1 && (
@@ -417,13 +438,13 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
                   Wallet overview page.
                 </p>
                 <ButtonGroup>
-                  {!approving && (
+                  {!approvingOwl && (
                     <Button mode='secondary' onClick={goToNextStep} data-testid={'dont-use-owl-button'}>
                       Don't use OWL
                     </Button>
                   )}
-                  <Button type='submit' disabled={approving} data-testid={'use-owl-button'}>
-                    {approving ? 'Appove in progress...' : 'Use OWL'}
+                  <Button type='submit' disabled={approvingOwl} data-testid={'use-owl-button'}>
+                    {approvingOwl ? 'Appove use OWL in progress...' : 'Use OWL'}
                   </Button>
                 </ButtonGroup>
               </Step4>
