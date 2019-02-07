@@ -1,12 +1,9 @@
-import ReactGA from 'react-ga';
-ReactGA.initialize('UA-133995889-1'); // FIXME - this should be configurable
-
-import createBrowserHistory from 'history/createBrowserHistory'; // tslint:disable-line
 import React from 'react';
 import Loadable from 'react-loadable';
 import { NavLink, Redirect, Route, Router, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { history } from '../../analytics';
 import Spinner from '../../components/Spinner';
 import logo from '../../images/protofire.svg';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
@@ -34,9 +31,6 @@ const WalletOverview = Loadable({
   loader: () => import('./wallet-overview'),
   loading: () => <Spinner size='large' />,
 });
-
-const history = createBrowserHistory();
-history.listen(location => ReactGA.pageview(location.pathname));
 
 class MainPage extends React.Component {
   componentDidMount() {
