@@ -444,7 +444,7 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
                     </Button>
                   )}
                   <Button type='submit' disabled={approvingOwl} data-testid={'use-owl-button'}>
-                    {approvingOwl ? 'Appove use OWL in progress...' : 'Use OWL'}
+                    {approvingOwl ? 'Approving use OWL...' : 'Use OWL'}
                   </Button>
                 </ButtonGroup>
               </Step4>
