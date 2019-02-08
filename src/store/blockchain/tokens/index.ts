@@ -60,11 +60,7 @@ export function loadAvailableTokens() {
     interval: 2 * 60_000, // check for tokens every 2 minutes
 
     async task(dispatch, getState) {
-      const network = getNetworkType(getState());
-
       try {
-        const { default: tokens } = await import(`./networks/${network}.json`);
-
         // Load tokens
         dispatch(loadTokens());
 

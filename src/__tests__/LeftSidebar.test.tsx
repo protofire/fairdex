@@ -16,7 +16,7 @@ import buyOrders from '../__mocks__/buyOrders';
 import { toBigNumber } from '../contracts/utils';
 
 beforeAll(() => {
-  const web3Mock = {
+  const web3Mock: any = {
     eth: {
       getBalance() {
         return Promise.resolve(toBigNumber('20000000000000000000'));
@@ -50,8 +50,8 @@ describe('Left Sidebar', () => {
     test('should show MGN balance', () => {
       const { getByTestId } = renderPage(<AccountInfo />);
 
-      const balance = getByTestId('frt-balance');
-      const symbol = getByTestId('frt-symbol');
+      const balance = getByTestId('MGN-balance');
+      const symbol = getByTestId('MGN-symbol');
 
       expect(balance).toBeDefined();
       expect(symbol).toBeDefined();
@@ -95,7 +95,7 @@ describe('Left Sidebar', () => {
         </Router>,
       );
 
-      const eth = getByTestId('eht-balance');
+      const eth = getByTestId('ETH-balance');
       expect(eth).toBeDefined();
 
       await wait(() => {
@@ -103,8 +103,8 @@ describe('Left Sidebar', () => {
       });
     });
 
-    describe('should show the 3 tokens with the bigest total balance', () => {
-      test('should show first token balance with bigest balance', async () => {
+    describe('should show the 3 tokens with the biggest total balance', () => {
+      test('should show first token balance with biggest balance', async () => {
         const { getByTestId } = renderPage(
           <Router>
             <WalletInfo />
@@ -117,7 +117,7 @@ describe('Left Sidebar', () => {
         expect(balance).toHaveAttribute('title', '1995.701027281609654618');
       });
 
-      test('should show second token balance with bigest balance', async () => {
+      test('should show second token balance with biggest balance', async () => {
         const { getByTestId } = renderPage(
           <Router>
             <WalletInfo />
@@ -130,7 +130,7 @@ describe('Left Sidebar', () => {
         expect(balance).toHaveAttribute('title', '1754.311859462121882781');
       });
 
-      test('should show third token balance with bigest balance', async () => {
+      test('should show third token balance with biggest balance', async () => {
         const { getByTestId } = renderPage(
           <Router>
             <WalletInfo />
@@ -180,7 +180,7 @@ describe('Left Sidebar', () => {
           ],
         ]);
 
-        const { getByTestId, queryByTestId } = renderPage(
+        const { queryByTestId } = renderPage(
           <Router>
             <WalletInfo />
           </Router>,

@@ -1,11 +1,8 @@
-import { ZERO } from '../../../contracts/utils';
+import { createSelector } from 'reselect';
 
-const dummyToken: Token = {
-  address: '0x',
-  balance: [ZERO, ZERO],
-  symbol: '',
-  name: '',
-  decimals: 18,
-};
+export const getFrt = (state: AppState) => state.blockchain.frt;
 
-export const getFrt = (state: AppState): Token => state.blockchain.frt || dummyToken;
+export const getLiqContribPercentage = createSelector(
+  (state: AppState) => state.blockchain.feeRatio,
+  (feeRatio?: BigNumber) => feeRatio && feeRatio.times(100),
+);

@@ -710,7 +710,7 @@ function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
   return {
     bidToken: getToken(state, props.auction.buyTokenAddress) as Token,
     currentAccount: getCurrentAccount(state),
-    feeRate: getLiqContribPercentage(state),
+    feeRate: getLiqContribPercentage(state) || ZERO,
     owl: getOwl(state),
   };
 }

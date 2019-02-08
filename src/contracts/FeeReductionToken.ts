@@ -25,17 +25,12 @@ class FeeReductionToken extends BaseContract implements Token {
       account ? this.contract.methods.lockedTokenBalances(account).call() : 0,
     ]);
 
-    this.decimals = decimals;
+    this.decimals = Number(decimals) || 18;
     this.name = name;
     this.symbol = symbol;
     this.balance = [toDecimal(balance, this.decimals) || ZERO];
 
-    return {
-      decimals,
-      name,
-      symbol,
-      balance: [balance],
-    };
+    return this;
   }
 
   @timeout()

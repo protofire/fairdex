@@ -91,7 +91,7 @@ describe('in running auctions', () => {
     });
 
     test('should display tooltip when user close the auction with its bid', async () => {
-      const { getByTestId, debug } = renderWithRedux(<BidForm auction={data} />, {
+      const { getByTestId } = renderWithRedux(<BidForm auction={data} />, {
         blockchain: {
           tokens,
         },
@@ -113,7 +113,7 @@ describe('in running auctions', () => {
     });
 
     test('should show the amount the user will buy at least', async () => {
-      const { getByTestId, queryByTestId, debug } = renderWithRedux(<BidForm auction={data} />, {
+      const { getByTestId, queryByTestId } = renderWithRedux(<BidForm auction={data} />, {
         blockchain: {
           tokens,
         },
@@ -154,7 +154,7 @@ describe('in running auctions', () => {
         const stateTokens = new Map(tokens);
         stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
 
-        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+        const { queryByTestId, getByTestId } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,
@@ -212,7 +212,7 @@ describe('in running auctions', () => {
         expect(lcStep).toBeNull();
       });
 
-      test('should not show step when user OWL balance hasn been approved for trading yet ', async () => {
+      test('should not show step when user OWL balance has been approved for trading yet ', async () => {
         const owl = {
           symbol: 'OWL',
           name: 'OWL Token',
@@ -226,7 +226,7 @@ describe('in running auctions', () => {
         const stateTokens = new Map(tokens);
         stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
 
-        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+        const { queryByTestId, getByTestId } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,
@@ -262,7 +262,7 @@ describe('in running auctions', () => {
         const stateTokens = new Map(tokens);
         stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
 
-        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+        const { getByTestId } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,
@@ -339,7 +339,7 @@ describe('in running auctions', () => {
         const stateTokens = new Map(tokens);
         stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
 
-        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+        const { queryByTestId, getByTestId } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,
@@ -377,7 +377,7 @@ describe('in running auctions', () => {
         const stateTokens = new Map(tokens);
         stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
 
-        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+        const { queryByTestId, getByTestId } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,
@@ -415,7 +415,7 @@ describe('in running auctions', () => {
         const stateTokens = new Map(tokens);
         stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
 
-        const { queryByTestId, getByTestId, debug } = renderWithRedux(
+        const { getByTestId } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,

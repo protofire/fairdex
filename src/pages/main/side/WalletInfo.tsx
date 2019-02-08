@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { DecimalValue } from '../../../components/formatters';
 import { toDecimal, ZERO } from '../../../contracts/utils';
 import { getTokensWithBalance, getTopBalances } from '../../../store/blockchain';
+import TokenBalance from './TokenBalance';
 import WalletCard, { Content, Header, Item } from './WalletCard';
 
 interface StateProps {
@@ -19,7 +20,7 @@ type WalletProps = StateProps & RouteComponentProps;
 const DEFAULT_DECIMALS = 3;
 
 const WalletInfo = ({ tokens, topBalances, currentAccount }: WalletProps) => {
-  const [ethBalance, setEthBalance] = useState(ZERO);
+  const [ethBalance, setEthBalance] = useState<BigNumber | undefined>(undefined);
 
   useEffect(() => {
     if (currentAccount) {
@@ -32,48 +33,27 @@ const WalletInfo = ({ tokens, topBalances, currentAccount }: WalletProps) => {
   return (
     <Container>
       <WalletHeader>
-        <div>Available balance</div>
+        <div>Available balances</div>
         <ViewAllTokens to='/wallet'>View all tokens &#x279C;</ViewAllTokens>
       </WalletHeader>
       <Content>
         <Item>
-          <DecimalValue value={ethBalance} decimals={DEFAULT_DECIMALS} data-testid='eht-balance' />
-          <small>ETH</small>
+          <DecimalValue value={ethBalance} decimals={DEFAULT_DECIMALS} data-testid='ETH-balance' />
+          {ethBalance && <small title='Ethereum'>ETH</small>}
         </Item>
         <Item>
           {topBalances[0] && topBalances[0].totalBalance.gt(0) && (
-            <>
-              <DecimalValue
-                value={topBalances[0].totalBalance}
-                decimals={DEFAULT_DECIMALS}
-                data-testid={`${topBalances[0].symbol}-balance`}
-              />
-              <small data-testid={`${topBalances[0].symbol}-symbol`}>{topBalances[0].symbol}</small>
-            </>
+            <TokenBalance token={topBalances[0]} decimals={DEFAULT_DECIMALS} />
           )}
         </Item>
         <Item>
           {topBalances[1] && topBalances[1].totalBalance.gt(0) && (
-            <>
-              <DecimalValue
-                value={topBalances[1].totalBalance}
-                decimals={DEFAULT_DECIMALS}
-                data-testid={`${topBalances[1].symbol}-balance`}
-              />
-              <small data-testid={`${topBalances[1].symbol}-symbol`}>{topBalances[1].symbol}</small>
-            </>
+            <TokenBalance token={topBalances[1]} decimals={DEFAULT_DECIMALS} />
           )}
         </Item>
         <Item>
           {topBalances[2] && topBalances[2].totalBalance.gt(0) && (
-            <>
-              <DecimalValue
-                value={topBalances[2].totalBalance}
-                decimals={DEFAULT_DECIMALS}
-                data-testid={`${topBalances[2].symbol}-balance`}
-              />
-              <small data-testid={`${topBalances[2].symbol}-symbol`}>{topBalances[2].symbol}</small>
-            </>
+            <TokenBalance token={topBalances[2]} decimals={DEFAULT_DECIMALS} />
           )}
         </Item>
       </Content>

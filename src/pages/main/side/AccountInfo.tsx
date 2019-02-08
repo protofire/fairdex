@@ -3,19 +3,23 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { Address, DecimalValue } from '../../../components/formatters';
-import { ZERO } from '../../../contracts/utils';
+import Spinner from '../../../components/Spinner';
 import * as images from '../../../images';
-import { getClaimableAuctionsCount, getCurrentAccount } from '../../../store/blockchain';
+import {
+  getClaimableAuctionsCount,
+  getCurrentAccount,
+  getLiqContribPercentage,
+} from '../../../store/blockchain';
 import { getBidsCount } from '../../../store/blockchain/buy-orders';
 import { getFrt } from '../../../store/blockchain/frt';
-import { getLiqContribPercentage } from '../../../store/blockchain/tokens';
 
+import TokenBalance from './TokenBalance';
 import WalletCard, { Content, Header, Item } from './WalletCard';
 
 export interface AccountProps {
   claimableCount?: number;
   currentAccount: Address;
-  frt: Token;
+  frt?: Token;
   liquidityContribution?: BigNumber;
   pastBids: number;
 }
@@ -38,28 +42,29 @@ const AccountInfo = ({
     </Header>
     <Content>
       <Item>
-        <DecimalValue
-          value={(frt.balance && frt.balance[1]) || ZERO}
-          decimals={DEFAULT_DECIMALS}
-          data-testid={'frt-balance'}
-        />
-        <small data-testid={'frt-symbol'}>{frt.symbol}</small>
+        <TokenBalance token={frt} decimals={DEFAULT_DECIMALS} />
       </Item>
       <Item>
-        <DecimalValue
-          value={liquidityContribution}
-          decimals={DEFAULT_DECIMALS}
-          postfix={'%'}
-          data-testid={'lc-percentage'}
-        />
-        <small>Liquidity Contribution</small>
+        {liquidityContribution != null ? (
+          <>
+            <DecimalValue
+              value={liquidityContribution}
+              decimals={DEFAULT_DECIMALS}
+              postfix='%'
+              data-testid='lc-percentage'
+            />
+            <small>Liquidity Contribution</small>
+          </>
+        ) : (
+          <Spinner size='small' inline />
+        )}
       </Item>
       <Item>
-        <div data-testid={'past-bids-count'}>{pastBids}</div>
+        <div data-testid='past-bids-count'>{pastBids}</div>
         <small>Past bids</small>
       </Item>
       <Item>
-        <div data-testid={'to-claim-count'}>{claimableCount}</div>
+        <div data-testid='to-claim-count'>{claimableCount}</div>
         <small>To claim</small>
       </Item>
     </Content>
