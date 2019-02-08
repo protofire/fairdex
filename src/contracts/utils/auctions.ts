@@ -35,7 +35,7 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
       };
 
       return auction;
-    } else if (auctionStart > AUCTION_START_WAITING_FOR_FUNDING) {
+    } else {
       const [currentPrice, closingPrice] = await Promise.all([
         dx.getCurrentPrice(sellToken, buyToken, auctionIndex),
         dx.getClosingPrice(sellToken, buyToken, auctionIndex),
