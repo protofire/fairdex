@@ -1,5 +1,5 @@
-import React, { HTMLAttributes, MouseEvent, useCallback, useRef } from 'react';
-import styled from 'styled-components';
+import React, { HTMLAttributes, MouseEvent, useCallback, useRef, useState } from 'react';
+import styled, { css, StyledFunction } from 'styled-components';
 
 import { isAfter } from 'date-fns';
 
@@ -26,9 +26,12 @@ interface AuctionViewProps extends HTMLAttributes<HTMLDivElement> {
 const DEFAULT_DECIMALS = 3;
 
 const AuctionView = React.memo(({ data: auction, onCardClick, ...props }: AuctionViewProps) => {
+  const [isMouseDown, setIsMouseDown] = useState(false);
+
   const root = useRef(null);
   const title = useRef(null);
   const table = useRef(null);
+  const buttonGroup = useRef(null);
 
   const handleCardClick = useCallback((event: MouseEvent) => {
     if (event && root && title && table) {
@@ -45,12 +48,28 @@ const AuctionView = React.memo(({ data: auction, onCardClick, ...props }: Auctio
     }
   }, []);
 
+  const handleActive = useCallback(
+    (event: MouseEvent) => {
+      if (event && buttonGroup && buttonGroup.current) {
+        if (event.type === 'mousedown' && !buttonGroup.current.contains(event.target)) {
+          setIsMouseDown(true);
+        } else {
+          setIsMouseDown(false);
+        }
+      }
+    },
+    [isMouseDown],
+  );
+
   return (
     <>
       <AuctionCard
         ref={root}
         data-testid={`auction-card-${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}
         onClick={handleCardClick}
+        onMouseDown={handleActive}
+        onMouseUp={handleActive}
+        active={isMouseDown}
         {...props}
       >
         <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`} ref={title}>
@@ -138,7 +157,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, ...props }: Auctio
               </Row>
             </Table>
 
-            <ButtonGroup>
+            <ButtonGroup ref={buttonGroup}>
               <BidForm auction={auction} />
               {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
                 <ClaimForm auction={auction} />
@@ -250,7 +269,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, ...props }: Auctio
               </Row>
             </Table>
 
-            <ButtonGroup>
+            <ButtonGroup ref={buttonGroup}>
               {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
                 <ClaimForm auction={auction} />
               )}
@@ -269,14 +288,20 @@ const AuctionCard = styled(Card)`
     background-color: #fefeff;
   }
 
-  &:active {
-    background-color: #fcfdff;
-    box-shadow: inset 0px 0px 20px 2px rgba(0, 0, 0, 0.05);
+  ${(props: any) => {
+    if (props.active) {
+      return css`
+        &:active {
+          background-color: #fcfdff;
+          box-shadow: inset 0px 0px 20px 2px rgba(0, 0, 0, 0.05);
 
-    ${Button} {
-      background-color: #fcfdff;
+          ${Button} {
+            background-color: #fcfdff;
+          }
+        }
+      `;
     }
-  }
+  }}
 `;
 
 const Label = styled.dt`
