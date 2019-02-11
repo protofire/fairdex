@@ -9,10 +9,12 @@ import TokenView from './TokenView';
 
 export interface TokenListProps {
   tokens: Token[];
+  owlAddress?: Address;
+  owlListed: boolean;
   isLoading?: boolean;
 }
 
-const TokenList = ({ tokens, isLoading }: TokenListProps) => (
+const TokenList = ({ tokens, owlAddress, owlListed, isLoading }: TokenListProps) => (
   <Flipper flipKey={tokens.map(({ address }) => address.substr(address.length - 8)).join('-')}>
     {isLoading ? (
       <EmptyList>
@@ -23,7 +25,7 @@ const TokenList = ({ tokens, isLoading }: TokenListProps) => (
         {tokens.map(token => (
           <Flipped key={token.address} flipId={token.address}>
             <div>
-              <TokenView data={token} />
+              <TokenView data={token} owlAddress={owlAddress} owlListed={owlListed} />
             </div>
           </Flipped>
         ))}

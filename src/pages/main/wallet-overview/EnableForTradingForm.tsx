@@ -14,6 +14,7 @@ import { getWalletBalance } from '../../../contracts/utils/tokens';
 interface OwnProps {
   token: Token;
   enabled: boolean;
+  notOwlOrListed: boolean;
 }
 
 interface AppStateProps {
@@ -26,12 +27,14 @@ interface DispatchProps {
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
-const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Props) => {
+const EnableForTradingForm = ({ token, enabled, currentAccount, notOwlOrListed, dispatch }: Props) => {
   const [toggling, setToggling] = useState(false);
 
   const onChangeHandler = useCallback(
     () => {
-      const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for trading`;
+      const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for ${
+        notOwlOrListed ? 'trading' : 'paying LC'
+      }`;
 
       dx.toggleAllowance(token)
         .send({
@@ -92,7 +95,7 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
 
   return (
     <Container>
-      <Label>Enable for trading</Label>
+      <Label>{notOwlOrListed ? 'Enable for trading' : 'Enable for paying Liquidity Contribution'}</Label>
       <dd>
         <TradingToggle
           onToggle={onChangeHandler}

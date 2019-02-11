@@ -236,6 +236,13 @@ class DutchExchange extends BaseContract<Event> {
   }
 
   @timeout()
+  async getOwlAddress() {
+    const owlAddress: Address = await this.contract.methods.owlToken().call();
+
+    return owlAddress;
+  }
+
+  @timeout()
   async getPriceOfTokenInLastAuction(token: Token) {
     try {
       // in case whe call getPriceOfTokenInLastAuction for a token without market (like we do with OWL)
