@@ -54,10 +54,11 @@ const TermsAndConditions: FunctionComponent<DispatchProps> = ({ onAcceptTermsCon
 
   return (
     <Wrapper>
-      <Header>
-        <h1>Verification and Terms</h1>
-      </Header>
       <Content>
+        <Header>
+          <h1>Verification and Terms</h1>
+          <h3>Please read and truly confirm all sections before you continue</h3>
+        </Header>
         <Label>
           <Checkbox name='disclaimer1' checked={disclaimer1} onToggle={handleDisclaimer1Toggle} />I am NEITHER
           a citizen or resident of, NOR currently located in any of the following states or territories, NOR
@@ -172,11 +173,9 @@ const Wrapper = styled.div`
   h1 {
     font-size: 2em;
     font-weight: bold;
-    color: #303b3e;
   }
 
   h3 {
-    color: #303b3e;
     font-size: 1em;
     line-height: 24px;
   }
@@ -190,13 +189,21 @@ const Wrapper = styled.div`
 
 const Header = styled.div`
   height: var(--header-heigh);
-  padding: var(--spacing-normal) 0;
+  padding-bottom: var(--spacing-normal);
   text-align: left;
+  h1 {
+    margin-bottom: 1em;
+  }
+
+  h3 {
+    color: var(--color-light-grey-blue);
+  }
 `;
 
 const Content = styled.section`
   max-width: 850px;
   padding: var(--spacing-normal);
+  margin-top: var(--spacing-normal);
   border: none;
   border-radius: 8px;
   box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.05);
