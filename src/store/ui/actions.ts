@@ -8,6 +8,8 @@ export const SHOW_FILTERS = 'filters/SHOE';
 export const HIDE_FILTERS = 'filters/HIDE';
 export const SHOW_NOTIFICATION = 'notification/SHOW';
 export const HIDE_NOTIFICATION = 'notification/HIDE';
+export const SHOW_AUCTION_DETAILS = 'SHOW_AUCTION_DETAILS';
+export const HIDE_AUCTION_DETAILS = 'HIDE_AUCTION_DETAILS';
 
 export const hideSidebar: ActionCreator<UiAction> = () => {
   return {
@@ -59,5 +61,20 @@ export const showNotification: ActionCreator<UiAction> = (
 export const hideNotification: ActionCreator<UiAction> = () => {
   return {
     type: HIDE_NOTIFICATION,
+  };
+};
+
+export const showAuctionDetail: ActionCreator<UiAction> = (auctionDetail: AuctionDetail) => {
+  return {
+    type: SHOW_AUCTION_DETAILS,
+    payload: {
+      auctionDetail,
+    },
+  };
+};
+
+export const hideAuctionDetail: ActionCreator<UiAction> = () => {
+  return {
+    type: HIDE_AUCTION_DETAILS,
   };
 };

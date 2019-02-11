@@ -5,10 +5,6 @@ import createBrowserHistory from 'history/createBrowserHistory'; // tslint:disab
 import React, { ComponentProps, ComponentType } from 'react';
 
 const history = createBrowserHistory();
-// history.listen(location => {
-//   ReactGA.pageview(location.pathname)
-//   console.log(location.pathname)
-// });
 
 const pageview = ReactGA.pageview;
 

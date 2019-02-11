@@ -1,4 +1,5 @@
 import React, { HTMLAttributes, MouseEvent, useCallback, useRef, useState } from 'react';
+import { connect } from 'react-redux';
 import styled, { css, StyledFunction } from 'styled-components';
 
 import { isAfter } from 'date-fns';
@@ -15,6 +16,7 @@ import {
 import Button from '../../../components/Button';
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
+import { showAuctionDetail } from '../../../store/ui/actions';
 import BidForm from './BidForm';
 import ClaimForm from './claim/ClaimForm';
 
@@ -23,9 +25,15 @@ interface AuctionViewProps extends HTMLAttributes<HTMLDivElement> {
   onCardClick?: (auction: Auction) => void;
 }
 
+interface DispatchProps {
+  dispatch: any;
+}
+
+type Props = AuctionViewProps & DispatchProps;
+
 const DEFAULT_DECIMALS = 3;
 
-const AuctionView = React.memo(({ data: auction, onCardClick, ...props }: AuctionViewProps) => {
+const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props }: Props) => {
   const [isMouseDown, setIsMouseDown] = useState(false);
 
   const root = useRef(null);
@@ -42,6 +50,12 @@ const AuctionView = React.memo(({ data: auction, onCardClick, ...props }: Auctio
         table.current.contains(event.target)
       ) {
         if (onCardClick && typeof onCardClick === 'function') {
+          const detail: AuctionDetail = {
+            buyToken: auction.buyToken,
+            sellToken: auction.sellToken,
+            auctionIndex: auction.auctionIndex,
+          };
+          dispatch(showAuctionDetail(detail));
           onCardClick(auction);
         }
       }
@@ -392,4 +406,13 @@ const Separator = styled.div`
   user-select: none;
 `;
 
-export default AuctionView;
+function mapDispatchToProps(dispatch: any): DispatchProps {
+  return {
+    dispatch,
+  };
+}
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(AuctionView);
