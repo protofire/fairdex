@@ -219,7 +219,7 @@ const Terms = styled.div`
 `;
 
 const Footer = styled.footer`
-  padding: var(--spacing-normal) 0;
+  padding-top: var(--spacing-normal);
   border-top: 1px solid var(--color-content-bg);
   margin-top: 1em;
 `;
