@@ -96,6 +96,7 @@ function renderList(Container: ReactElement<any>, auctionList?: Auction[]) {
       auctions: auctionList,
       frt,
       tokens,
+      buyOrders: [],
     },
   });
 }
