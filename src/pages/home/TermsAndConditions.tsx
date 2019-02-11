@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useState, useMemo } from 'react';
+import React, { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
@@ -208,6 +208,7 @@ const Terms = styled.div`
   margin-top: 1em;
   overflow: auto;
   background: var(--color-content-bg);
+  padding: var(--spacing-narrow);
 `;
 
 const Footer = styled.footer`
@@ -217,12 +218,7 @@ const Footer = styled.footer`
 `;
 const Label = styled.label`
   flex: 1 1 auto;
-  margin-bottom: var(--spacing-normal);
   cursor: pointer;
-
-  .text {
-    vertical-align: middle;
-  }
 `;
 
 function mapDispatchToProps(dispatch: any): DispatchProps {

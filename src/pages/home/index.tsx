@@ -5,9 +5,9 @@ import styled from 'styled-components';
 
 import * as images from '../../images';
 import { getNetworkType } from '../../store/blockchain';
+import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import spinner from './spinner';
 import TermsAndConditions from './TermsAndConditions';
-import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 
 const MainPage = Loadable({
   loader: () => import('../main'),
@@ -27,10 +27,10 @@ const SelectWallet = Loadable({
 interface Props {
   network?: Network | null;
   wallet?: Wallet;
-  isTermsConditionsAccepted: boolean;
+  termsConditionsAccepted: boolean;
 }
 
-const HomePage = React.memo(({ network, wallet, isTermsConditionsAccepted }: Props) => {
+const HomePage = React.memo(({ network, wallet, termsConditionsAccepted }: Props) => {
   let content = null;
 
   if (!wallet || !network) {
@@ -41,7 +41,7 @@ const HomePage = React.memo(({ network, wallet, isTermsConditionsAccepted }: Pro
     return <MainPage />;
   }
 
-  return !isTermsConditionsAccepted ? (
+  return !termsConditionsAccepted ? (
     <TermsAndConditions />
   ) : (
     <Container>
@@ -111,7 +111,7 @@ function mapStateToProps(state: AppState): Props {
   return {
     network: getNetworkType(state),
     wallet: state.blockchain.wallet,
-    isTermsConditionsAccepted: isTermsConditionsAccepted(state),
+    termsConditionsAccepted: isTermsConditionsAccepted(state),
   };
 }
 

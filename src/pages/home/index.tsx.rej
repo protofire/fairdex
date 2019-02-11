@@ -1,0 +1,22 @@
+diff a/src/pages/home/index.tsx b/src/pages/home/index.tsx	(rejected hunks)
+@@ -44,10 +44,10 @@ const HomePage = React.memo(({ network, wallet, isTermsConditionsAccepted }: Pro
+-  return !isTermsConditionsAccepted
+-    ? <TermsAndConditions />
+-    : (
+-        <Container>
+-          <Content>{content}</Content>
+-          <Footer>
+-            <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
+-          </Footer>
+-        </Container>
+-      );
++  return !isTermsConditionsAccepted ? (
++    <TermsAndConditions />
++  ) : (
++    <Container>
++      <Content>{content}</Content>
++      <Footer>
++        <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
++      </Footer>
++    </Container>
++  );
