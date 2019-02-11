@@ -42,7 +42,7 @@ const HomePage = React.memo(({ network, wallet }: Props) => {
     <Container>
       <Content>{content}</Content>
       <Footer>
-        <img src={images.logo} />
+        <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
       </Footer>
     </Container>
   );
@@ -91,8 +91,14 @@ const Footer = styled.footer`
   user-select: none;
 
   img {
-    width: 144px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
+    vertical-align: middle;
+  }
+
+  span {
+    margin-left: 10px;
+    color: var(--color-greyish);
   }
 `;
 
