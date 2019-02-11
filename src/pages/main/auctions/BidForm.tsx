@@ -65,12 +65,13 @@ const BidForm = React.memo(
 
     const hasBiddedBefore = useMemo(
       () =>
-        buyOrders.find(
+        buyOrders &&
+        buyOrders.filter(
           order =>
             order.sellToken === auction.sellTokenAddress &&
             order.buyToken === auction.buyTokenAddress &&
             order.auctionIndex === auction.auctionIndex,
-        ),
+        ).length > 0,
       [buyOrders, auction],
     );
 
