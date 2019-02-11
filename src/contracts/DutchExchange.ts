@@ -91,7 +91,7 @@ class DutchExchange extends BaseContract<Event> {
 
     const epoch = parseInt(auctionStart, 10);
 
-    return epoch <= 1 ? 0 : epoch * 1_000;
+    return epoch ? (epoch > 1 ? epoch * 1_000 : epoch) : undefined;
   }
 
   @timeout()

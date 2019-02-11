@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import DutchExchange from '../../../contracts/DutchExchange';
 import { loadAuctions } from '../auctions';
 import { addBuyOrder, initBuyOrder } from '../buy-orders';
-import { updateFrt } from '../frt';
+import { loadFrtData } from '../frt';
 import { loadAvailableTokens, loadTokens, updateFeeRatio } from '../tokens';
 
 export * from './selectors';
@@ -57,7 +57,7 @@ export function initWallet(wallet: Wallet) {
       // Instantiate DutchX contract
       window.dx = new DutchExchange(networkId);
 
-      dispatch(updateFrt());
+      dispatch(loadFrtData());
 
       dispatch(selectWallet(wallet, networkId, accountAddress));
 

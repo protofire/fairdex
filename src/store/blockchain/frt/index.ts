@@ -3,6 +3,8 @@ import { ActionCreator, AnyAction, Reducer } from 'redux';
 import FeeReductionToken from '../../../contracts/FeeReductionToken';
 import { Decimal } from '../../../contracts/utils';
 import { periodicAction } from '../../utils';
+import { getCurrentAccount } from '../wallet';
+import { getFrt } from './selectors';
 
 export * from './selectors';
 
@@ -34,23 +36,39 @@ const reducer: Reducer<FrtState> = (state = {}, action) => {
   }
 };
 
-export function updateFrt() {
+export function loadFrtData() {
   return periodicAction({
-    name: 'updateFrt',
+    name: 'load-frt',
     interval: 15_000, // check for tokens every 15 seconds
 
     async task(dispatch, getState) {
-      const {
-        blockchain: { frt },
-      } = getState();
-
       try {
-        // Initialize frt
+        const frt = getFrt(getState());
+
         if (!frt) {
-          dispatch(loadFrt());
-        }
-        {
-          dispatch(updateFrtBalance());
+          // Initialize fee reduction token
+          contract = new FeeReductionToken(await dx.getFrtAddress());
+
+          if (contract) {
+            const currentAccount = getCurrentAccount(getState());
+
+            if (currentAccount) {
+              const tokenInfo = await contract.initialise(currentAccount);
+
+              dispatch(initFrt(tokenInfo));
+            }
+          }
+        } else {
+          // Update fee reduction token balance
+          if (contract) {
+            const currentAccount = getCurrentAccount(getState());
+
+            if (currentAccount) {
+              const balance = await contract.getLockedTokenBalances(currentAccount);
+
+              dispatch(setFrtBalance(balance));
+            }
+          }
         }
       } catch (err) {
         // TODO: Handle error

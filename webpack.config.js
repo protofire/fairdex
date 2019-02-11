@@ -20,10 +20,17 @@ module.exports = (env, { mode }) => ({
       },
       {
         test: /\.tsx?$/,
-        loader: 'babel-loader',
-        options: {
-          cacheDirectory: true,
-        },
+        use: [
+          {
+            loader: 'react-hot-loader/webpack',
+          },
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+            },
+          },
+        ],
       },
       {
         test: /\.(png|jp(e*)g|svg)$/,
