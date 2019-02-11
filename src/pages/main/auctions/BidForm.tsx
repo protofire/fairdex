@@ -7,6 +7,7 @@ import styled from 'styled-components';
 
 import * as utils from '../../../contracts/utils';
 import {
+  getAllBuyOrders,
   getCurrentAccount,
   getLiqContribPercentage,
   getOwl,
@@ -36,6 +37,7 @@ interface AppStateProps {
   bidToken: Token;
   feeRate: BigNumber;
   owl?: Token;
+  buyOrders: BuyOrder[];
 }
 
 interface DispatchProps {
@@ -44,194 +46,280 @@ interface DispatchProps {
 
 const { ZERO } = utils;
 
-const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, dispatch }: Props) => {
-  if (auction.state !== 'running') {
-    return null;
-  }
-
-  const { currentPrice = ZERO } = auction;
-
-  const [bidAmount, setBidAmount] = useState(ZERO);
-  const [bidding, setBidding] = useState(false);
-  const [currentStep, setCurrentStep] = useState(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [approvingOwl, setApprovingOwl] = useState(false);
-  const [canUseOwlToPayFee, setCanUseOwlToPayFee] = useState(
-    owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0),
-  );
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const selectInput = useCallback(() => {
-    setImmediate(() => {
-      if (inputRef.current) {
-        inputRef.current.select();
-      }
-    });
-  }, []);
-
-  const sellTokenAmount = useMemo(
-    () => {
-      if (currentPrice.isPositive()) {
-        const liquidityContribution = bidAmount.times(feeRate).div(100);
-
-        return bidAmount.minus(liquidityContribution).div(currentPrice);
-      }
-
-      return ZERO;
-    },
-    [bidAmount, currentAccount, feeRate],
-  );
-
-  const availableSellVolume = useMemo(
-    () => {
-      return utils.auction.getAvailableVolume(auction);
-    },
-    [auction],
-  );
-
-  const availableBidVolume = useMemo(
-    () => {
-      return availableSellVolume.times(currentPrice);
-    },
-    [availableSellVolume, currentPrice],
-  );
-
-  const bidTokenBalance = useMemo(
-    () => {
-      return utils.token.getDxBalance(bidToken);
-    },
-    [bidToken],
-  );
-
-  const bidTokenTotalBalance = useMemo(
-    () => {
-      return utils.token.getTotalBalance(bidToken);
-    },
-    [bidToken],
-  );
-
-  const setMaxAvailableVolume = useCallback(
-    (event?: any) => {
-      if (event) {
-        event.preventDefault();
-      }
-
-      setBidAmount(availableBidVolume.decimalPlaces(4, BigNumber.ROUND_DOWN));
-      selectInput();
-    },
-    [availableBidVolume],
-  );
-
-  const setMaxBidVolume = useCallback(
-    (event?: any) => {
-      if (event) {
-        event.preventDefault();
-      }
-
-      setBidAmount(BigNumber.min(bidTokenBalance, availableBidVolume).decimalPlaces(4, BigNumber.ROUND_DOWN));
-      selectInput();
-    },
-    [availableBidVolume, bidTokenBalance],
-  );
-
-  const showDialog = useCallback((event?: any) => {
-    if (event) {
-      event.preventDefault();
+const BidForm = React.memo(
+  ({ auction, bidToken, currentAccount, feeRate, owl, buyOrders, dispatch }: Props) => {
+    if (auction.state !== 'running') {
+      return null;
     }
 
-    setDialogVisible(true);
-  }, []);
+    const { currentPrice = ZERO } = auction;
 
-  const goToNextStep = useCallback(
-    (event?: any) => {
+    const [bidAmount, setBidAmount] = useState(ZERO);
+    const [bidding, setBidding] = useState(false);
+    const [currentStep, setCurrentStep] = useState(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
+    const [dialogVisible, setDialogVisible] = useState(false);
+    const [approvingOwl, setApprovingOwl] = useState(false);
+    const [canUseOwlToPayFee, setCanUseOwlToPayFee] = useState(
+      owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0),
+    );
+
+    const hasBiddedBefore = useMemo(
+      () =>
+        buyOrders.find(
+          order =>
+            order.sellToken === auction.sellTokenAddress &&
+            order.buyToken === auction.buyTokenAddress &&
+            order.auctionIndex === auction.auctionIndex,
+        ),
+      [buyOrders, auction],
+    );
+
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const selectInput = useCallback(() => {
+      setImmediate(() => {
+        if (inputRef.current) {
+          inputRef.current.select();
+        }
+      });
+    }, []);
+
+    const sellTokenAmount = useMemo(
+      () => {
+        if (currentPrice.isPositive()) {
+          const liquidityContribution = bidAmount.times(feeRate).div(100);
+
+          return bidAmount.minus(liquidityContribution).div(currentPrice);
+        }
+
+        return ZERO;
+      },
+      [bidAmount, currentAccount, feeRate],
+    );
+
+    const availableSellVolume = useMemo(
+      () => {
+        return utils.auction.getAvailableVolume(auction);
+      },
+      [auction],
+    );
+
+    const availableBidVolume = useMemo(
+      () => {
+        return availableSellVolume.times(currentPrice);
+      },
+      [availableSellVolume, currentPrice],
+    );
+
+    const bidTokenBalance = useMemo(
+      () => {
+        return utils.token.getDxBalance(bidToken);
+      },
+      [bidToken],
+    );
+
+    const bidTokenTotalBalance = useMemo(
+      () => {
+        return utils.token.getTotalBalance(bidToken);
+      },
+      [bidToken],
+    );
+
+    const setMaxAvailableVolume = useCallback(
+      (event?: any) => {
+        if (event) {
+          event.preventDefault();
+        }
+
+        setBidAmount(availableBidVolume.decimalPlaces(4, BigNumber.ROUND_DOWN));
+        selectInput();
+      },
+      [availableBidVolume],
+    );
+
+    const setMaxBidVolume = useCallback(
+      (event?: any) => {
+        if (event) {
+          event.preventDefault();
+        }
+
+        setBidAmount(
+          BigNumber.min(bidTokenBalance, availableBidVolume).decimalPlaces(4, BigNumber.ROUND_DOWN),
+        );
+        selectInput();
+      },
+      [availableBidVolume, bidTokenBalance],
+    );
+
+    const showDialog = useCallback((event?: any) => {
       if (event) {
         event.preventDefault();
       }
 
-      if (!bidding && !approvingOwl) {
-        setCurrentStep(prevValue => {
-          if (prevValue === 4) {
-            return 4;
-          }
-          const nextStep = prevValue + 1;
-          return nextStep !== 3 || (nextStep === 3 && canUseOwlToPayFee) ? nextStep : 4;
-        });
-      }
-    },
-    [canUseOwlToPayFee, currentStep, bidding, approvingOwl],
-  );
+      setDialogVisible(true);
+    }, []);
 
-  const goToBackStep = useCallback(
-    (event?: any) => {
-      if (event) {
-        event.preventDefault();
-      }
+    const goToNextStep = useCallback(
+      (event?: any) => {
+        if (event) {
+          event.preventDefault();
+        }
 
-      if (!bidding && !approvingOwl) {
-        setCurrentStep(prevValue => {
-          if (prevValue === 1) {
-            return 1;
-          }
+        if (!bidding && !approvingOwl) {
+          setCurrentStep(prevValue => {
+            if (prevValue === 4) {
+              return 4;
+            }
+            const nextStep = prevValue + 1;
+            return nextStep !== 3 || (nextStep === 3 && canUseOwlToPayFee) ? nextStep : 4;
+          });
+        }
+      },
+      [canUseOwlToPayFee, currentStep, bidding, approvingOwl],
+    );
 
-          const nextStep = prevValue - 1;
-          return nextStep !== 3 || (nextStep === 3 && canUseOwlToPayFee) ? nextStep : 2;
-        });
-      }
-    },
-    [canUseOwlToPayFee, currentStep, bidding, approvingOwl],
-  );
+    const goToBackStep = useCallback(
+      (event?: any) => {
+        if (event) {
+          event.preventDefault();
+        }
 
-  const handleBackspacePress = useCallback(
-    () => {
-      if (!bidding && !approvingOwl && currentStep !== 2) {
-        goToBackStep();
-      }
-    },
-    [bidding, approvingOwl, currentStep],
-  );
+        if (!bidding && !approvingOwl) {
+          setCurrentStep(prevValue => {
+            if (prevValue === 1) {
+              return 1;
+            }
 
-  const handleClose = useCallback(
-    () => {
-      if (!bidding && !approvingOwl) {
-        setDialogVisible(false);
-        setBidAmount(ZERO);
-        setCurrentStep(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
-      }
-    },
-    [bidding, approvingOwl],
-  );
+            const nextStep = prevValue - 1;
+            return nextStep !== 3 || (nextStep === 3 && canUseOwlToPayFee) ? nextStep : 2;
+          });
+        }
+      },
+      [canUseOwlToPayFee, currentStep, bidding, approvingOwl],
+    );
 
-  const handleInputFocus = useCallback<React.FocusEventHandler<HTMLInputElement>>(
-    event => {
-      event.target.select();
-    },
-    [inputRef],
-  );
+    const handleBackspacePress = useCallback(
+      () => {
+        if (!bidding && !approvingOwl && currentStep !== 2) {
+          goToBackStep();
+        }
+      },
+      [bidding, approvingOwl, currentStep],
+    );
 
-  const handleSubmit = useCallback(
-    (event?: any) => {
-      if (bidAmount && bidAmount.isGreaterThan(ZERO)) {
-        setBidding(true);
+    const handleClose = useCallback(
+      () => {
+        if (!bidding && !approvingOwl) {
+          setDialogVisible(false);
+          setBidAmount(ZERO);
+          setCurrentStep(utils.auction.isAbovePriorClosingPrice(auction) ? 1 : 2);
+        }
+      },
+      [bidding, approvingOwl],
+    );
 
-        dx.postBid(
-          auction.sellTokenAddress,
-          auction.buyTokenAddress,
-          auction.auctionIndex,
-          utils.fromDecimal(bidAmount, bidToken ? bidToken.decimals : 18),
-        )
+    const handleInputFocus = useCallback<React.FocusEventHandler<HTMLInputElement>>(
+      event => {
+        event.target.select();
+      },
+      [inputRef],
+    );
+
+    const handleSubmit = useCallback(
+      (event?: any) => {
+        if (bidAmount && bidAmount.isGreaterThan(ZERO)) {
+          setBidding(true);
+
+          dx.postBid(
+            auction.sellTokenAddress,
+            auction.buyTokenAddress,
+            auction.auctionIndex,
+            utils.fromDecimal(bidAmount, bidToken ? bidToken.decimals : 18),
+          )
+            .send({
+              from: currentAccount,
+              // TODO: gas
+              // TODO: gasPrice
+            })
+            .once('transactionHash', transactionHash => {
+              dispatch(
+                showNotification(
+                  'info',
+                  'Bid request sent',
+                  <p>
+                    Bid transaction has been sent.{' '}
+                    <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
+                      More info
+                    </a>
+                  </p>,
+                ),
+              );
+            })
+            .once('confirmation', (confNumber, receipt) => {
+              dispatch(
+                showNotification(
+                  'success',
+                  'Bid confirmed',
+                  <p>
+                    Bid transaction has been confirmed.{' '}
+                    <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
+                      More info
+                    </a>
+                  </p>,
+                ),
+              );
+
+              // Reload token balances and auction list
+              dispatch(loadAvailableTokens());
+
+              setBidding(false);
+              handleClose();
+            })
+            .once('error', err => {
+              dispatch(
+                showNotification(
+                  'error',
+                  'Bid failed',
+                  <p>
+                    {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
+                    <br />
+                    Please try again later.
+                  </p>,
+                ),
+              );
+
+              setBidding(false);
+            });
+        }
+
+        if (event) {
+          event.preventDefault();
+        }
+      },
+      [auction, bidAmount, bidToken, currentAccount],
+    );
+
+    const handleApprove = useCallback(
+      (event?: any) => {
+        if (event) {
+          event.preventDefault();
+        }
+        setApprovingOwl(true);
+
+        dx.toggleAllowance(owl)
           .send({
             from: currentAccount,
-            // TODO: gas
-            // TODO: gasPrice
+            // TODO: estimated gas
+            // TODO: gas price from oracle
           })
           .once('transactionHash', transactionHash => {
+            setApprovingOwl(true);
             dispatch(
               showNotification(
                 'info',
-                'Bid request sent',
+                'Approve OWL request sent',
                 <p>
-                  Bid transaction has been sent.{' '}
+                  Approve OWL transaction has been sent.{' '}
                   <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
                     More info
                   </a>
@@ -240,30 +328,30 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
             );
           })
           .once('confirmation', (confNumber, receipt) => {
+            setApprovingOwl(false);
             dispatch(
               showNotification(
                 'success',
-                'Bid confirmed',
+                'Approve OWL confirmed',
                 <p>
-                  Bid transaction has been confirmed.{' '}
+                  Approve OWL transaction has been confirmed.{' '}
                   <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
                     More info
                   </a>
                 </p>,
               ),
             );
-
-            // Reload token balances and auction list
-            dispatch(loadAvailableTokens());
-
-            setBidding(false);
-            handleClose();
+            // Reload token balances and allowance
+            dispatch(updateTokenAllowance(owl));
+            setCanUseOwlToPayFee(false);
+            goToNextStep();
           })
-          .once('error', err => {
+          .once('error', (err: Error) => {
+            setApprovingOwl(false);
             dispatch(
               showNotification(
                 'error',
-                'Bid failed',
+                'Approve OWL failed',
                 <p>
                   {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
                   <br />
@@ -271,278 +359,207 @@ const BidForm = React.memo(({ auction, bidToken, currentAccount, feeRate, owl, d
                 </p>,
               ),
             );
-
-            setBidding(false);
           });
-      }
+      },
+      [owl, currentAccount, dispatch],
+    );
 
-      if (event) {
-        event.preventDefault();
-      }
-    },
-    [auction, bidAmount, bidToken, currentAccount],
-  );
+    const shouldHandleBackspace = useMemo(() => dialogVisible && currentStep !== 2, [
+      dialogVisible,
+      currentStep,
+    ]);
 
-  const handleApprove = useCallback(
-    (event?: any) => {
-      if (event) {
-        event.preventDefault();
-      }
-      setApprovingOwl(true);
-
-      dx.toggleAllowance(owl)
-        .send({
-          from: currentAccount,
-          // TODO: estimated gas
-          // TODO: gas price from oracle
-        })
-        .once('transactionHash', transactionHash => {
-          setApprovingOwl(true);
-          dispatch(
-            showNotification(
-              'info',
-              'Approve OWL request sent',
-              <p>
-                Approve OWL transaction has been sent.{' '}
-                <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                  More info
-                </a>
-              </p>,
-            ),
-          );
-        })
-        .once('confirmation', (confNumber, receipt) => {
-          setApprovingOwl(false);
-          dispatch(
-            showNotification(
-              'success',
-              'Approve OWL confirmed',
-              <p>
-                Approve OWL transaction has been confirmed.{' '}
-                <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                  More info
-                </a>
-              </p>,
-            ),
-          );
-          // Reload token balances and allowance
-          dispatch(updateTokenAllowance(owl));
-          setCanUseOwlToPayFee(false);
-          goToNextStep();
-        })
-        .once('error', (err: Error) => {
-          setApprovingOwl(false);
-          dispatch(
-            showNotification(
-              'error',
-              'Approve OWL failed',
-              <p>
-                {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
-                <br />
-                Please try again later.
-              </p>,
-            ),
-          );
-        });
-    },
-    [owl, currentAccount, dispatch],
-  );
-
-  const shouldHandleBackspace = useMemo(() => dialogVisible && currentStep !== 2, [
-    dialogVisible,
-    currentStep,
-  ]);
-
-  return (
-    <Popup.Container
-      onClickOutside={handleClose}
-      onEscPress={handleClose}
-      onBackspacePress={shouldHandleBackspace ? handleBackspacePress : null}
-    >
-      {dialogVisible && (
-        <Popup.Content theme={currentStep === 1 ? 'accent' : 'default'}>
-          {currentStep === 1 && (
-            <Step1 onSubmit={goToNextStep}>
-              <p>
-                You are bidding above the previous <br /> closing price for {auction.sellToken}/
-                {auction.buyToken}
-              </p>
-              <Text>
-                <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
-              </Text>
-              <Button type='submit' autoFocus data-testid={'proceed-bid-button'}>
-                Proceed
-              </Button>
-            </Step1>
-          )}
-
-          {currentStep === 2 && (
-            <Step2 onSubmit={goToNextStep}>
-              <Field>
-                <label>Bid volume</label>
-                <Tooltip
-                  theme='error'
-                  position='bottom right'
-                  content={
-                    bidAmount.gt(availableBidVolume) && (
-                      <p data-testid={'close-auction-message'}>
-                        You will close this auction with <br />
-                        <DecimalValue value={availableBidVolume} decimals={4} postfix={bidToken.symbol} />
-                        <br />
-                        <a href='' onClick={setMaxAvailableVolume}>
-                          [set max]
-                        </a>
-                      </p>
-                    )
-                  }
-                >
-                  <DecimalInput
-                    ref={inputRef}
-                    right={auction.buyToken}
-                    value={bidAmount.toString(10)}
-                    onValueChange={setBidAmount}
-                    onFocus={handleInputFocus}
-                    autoFocus={true}
-                    data-testid={'bid-amount-intput'}
-                  />
-                </Tooltip>
-              </Field>
-
-              <Field data-testid={'bid-buy-amount'}>
-                <label>To buy at least:</label>
-                <TextBox align='right'>
-                  <DecimalValue value={sellTokenAmount} decimals={4} postfix={auction.sellToken} />
-                </TextBox>
-              </Field>
-
-              <Button
-                type='submit'
-                disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
-                data-testid={'bid-step2-next-button'}
-              >
-                Next
-              </Button>
-            </Step2>
-          )}
-
-          {currentStep === 3 && (
-            <>
-              <Step4Header>
-                <BackButton onClick={goToBackStep} />
-                <h4 title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'>
-                  Liquidity contribution
-                </h4>
-              </Step4Header>
-              <Step4 onSubmit={handleApprove} data-testid={'bid-lc-step'}>
-                <p>You have the option to settle half of your liquidity contribution in OWL.</p>
+    return (
+      <Popup.Container
+        onClickOutside={handleClose}
+        onEscPress={handleClose}
+        onBackspacePress={shouldHandleBackspace ? handleBackspacePress : null}
+      >
+        {dialogVisible && (
+          <Popup.Content theme={currentStep === 1 ? 'accent' : 'default'}>
+            {currentStep === 1 && (
+              <Step1 onSubmit={goToNextStep}>
                 <p>
-                  Later you can choose to unsettle it back by disabling OWL token for trading within the
-                  Wallet overview page.
+                  You are bidding above the previous <br /> closing price for {auction.sellToken}/
+                  {auction.buyToken}
                 </p>
-                <ButtonGroup>
-                  {!approvingOwl && (
-                    <Button mode='secondary' onClick={goToNextStep} data-testid={'dont-use-owl-button'}>
-                      Don't use OWL
-                    </Button>
-                  )}
-                  <Button type='submit' disabled={approvingOwl} data-testid={'use-owl-button'}>
-                    {approvingOwl ? 'Approving use OWL...' : 'Use OWL'}
-                  </Button>
-                </ButtonGroup>
-              </Step4>
-            </>
-          )}
+                <Text>
+                  <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
+                </Text>
+                <Button type='submit' autoFocus data-testid={'proceed-bid-button'}>
+                  Proceed
+                </Button>
+              </Step1>
+            )}
 
-          {currentStep === 4 && (
-            <>
-              <Popup.Header>
-                <BackButton onClick={goToBackStep} />
-                <h4>Your bid</h4>
-              </Popup.Header>
-              <Step3 onSubmit={handleSubmit} data-testid={'bid-confirm-step'}>
-                <div>
-                  <div>
-                    <small>&nbsp;</small>
-                    <h4>
-                      <DecimalValue value={bidAmount} decimals={2} />
-                    </h4>
-                    <span>{auction.buyToken}</span>
-                  </div>
-                  <Separator>▶</Separator>
-                  <div>
-                    <small>min getting</small>
-                    <h4>
-                      <DecimalValue value={sellTokenAmount} decimals={2} />
-                    </h4>
-                    <span>{auction.sellToken}</span>
-                  </div>
-                </div>
-
-                {bidTokenBalance.lt(bidAmount) ? (
-                  bidTokenTotalBalance.gte(bidAmount) ? (
-                    <ErrorMessage data-testid={'bid-confirm-not-balance-dx'}>
-                      Please <Link to='/wallet'>deposit</Link> at least{' '}
-                      <DecimalValue
-                        decimals={4}
-                        postfix={bidToken.symbol}
-                        roundingMode={BigNumber.ROUND_UP}
-                        value={bidAmount.minus(bidTokenBalance)}
-                      />{' '}
-                      in DX.
-                    </ErrorMessage>
-                  ) : (
-                    <ErrorMessage data-testid={'bid-confirm-not-total-balance'}>
-                      You don't have enough {bidToken.symbol} to bid on this auction.
-                      {bidTokenBalance.gt(0) && (
-                        <>
-                          {' '}
-                          You can bid up to{' '}
-                          <DecimalValue
-                            decimals={4}
-                            postfix={bidToken.symbol}
-                            value={BigNumber.min(bidTokenBalance, availableBidVolume)}
-                          />
-                          .
+            {currentStep === 2 && (
+              <Step2 onSubmit={goToNextStep}>
+                <Field>
+                  <label>Bid volume</label>
+                  <Tooltip
+                    theme='error'
+                    position='bottom right'
+                    content={
+                      bidAmount.gt(availableBidVolume) && (
+                        <p data-testid={'close-auction-message'}>
+                          You will close this auction with <br />
+                          <DecimalValue value={availableBidVolume} decimals={4} postfix={bidToken.symbol} />
                           <br />
-                          <a href='' onClick={setMaxBidVolume}>
+                          <a href='' onClick={setMaxAvailableVolume}>
                             [set max]
                           </a>
-                        </>
-                      )}
-                    </ErrorMessage>
-                  )
-                ) : (
-                  <p>
-                    liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' />)
-                    included
-                  </p>
-                )}
+                        </p>
+                      )
+                    }
+                  >
+                    <DecimalInput
+                      ref={inputRef}
+                      right={auction.buyToken}
+                      value={bidAmount.toString(10)}
+                      onValueChange={setBidAmount}
+                      onFocus={handleInputFocus}
+                      autoFocus={true}
+                      data-testid={'bid-amount-intput'}
+                    />
+                  </Tooltip>
+                </Field>
+
+                <Field data-testid={'bid-buy-amount'}>
+                  <label>To buy at least:</label>
+                  <TextBox align='right'>
+                    <DecimalValue value={sellTokenAmount} decimals={4} postfix={auction.sellToken} />
+                  </TextBox>
+                </Field>
+
                 <Button
                   type='submit'
-                  disabled={bidding || bidAmount.lte(ZERO) || bidTokenBalance.lt(bidAmount)}
-                  autoFocus
-                  data-testid='confirm-bid-button'
+                  disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
+                  data-testid={'bid-step2-next-button'}
                 >
-                  {bidding ? 'Bid in progress...' : 'Confirm'}
+                  Next
                 </Button>
-              </Step3>
-            </>
-          )}
-        </Popup.Content>
-      )}
+              </Step2>
+            )}
 
-      {dialogVisible ? (
-        <Button mode='dark' onClick={handleClose} data-testid='cancel-bid-button'>
-          Cancel
-        </Button>
-      ) : (
-        <Button mode='secondary' onClick={showDialog} data-testid='bid-button'>
-          Bid
-        </Button>
-      )}
-    </Popup.Container>
-  );
-});
+            {currentStep === 3 && (
+              <>
+                <Step4Header>
+                  <BackButton onClick={goToBackStep} />
+                  <h4 title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'>
+                    Liquidity contribution
+                  </h4>
+                </Step4Header>
+                <Step4 onSubmit={handleApprove} data-testid={'bid-lc-step'}>
+                  <p>You have the option to settle half of your liquidity contribution in OWL.</p>
+                  <p>
+                    Later you can choose to unsettle it back by disabling OWL token for trading within the
+                    Wallet overview page.
+                  </p>
+                  <ButtonGroup>
+                    {!approvingOwl && (
+                      <Button mode='secondary' onClick={goToNextStep} data-testid={'dont-use-owl-button'}>
+                        Don't use OWL
+                      </Button>
+                    )}
+                    <Button type='submit' disabled={approvingOwl} data-testid={'use-owl-button'}>
+                      {approvingOwl ? 'Approving use OWL...' : 'Use OWL'}
+                    </Button>
+                  </ButtonGroup>
+                </Step4>
+              </>
+            )}
+
+            {currentStep === 4 && (
+              <>
+                <Popup.Header>
+                  <BackButton onClick={goToBackStep} />
+                  <h4>Your bid</h4>
+                </Popup.Header>
+                <Step3 onSubmit={handleSubmit} data-testid={'bid-confirm-step'}>
+                  <div>
+                    <div>
+                      <small>&nbsp;</small>
+                      <h4>
+                        <DecimalValue value={bidAmount} decimals={2} />
+                      </h4>
+                      <span>{auction.buyToken}</span>
+                    </div>
+                    <Separator>▶</Separator>
+                    <div>
+                      <small>min getting</small>
+                      <h4>
+                        <DecimalValue value={sellTokenAmount} decimals={2} />
+                      </h4>
+                      <span>{auction.sellToken}</span>
+                    </div>
+                  </div>
+
+                  {bidTokenBalance.lt(bidAmount) ? (
+                    bidTokenTotalBalance.gte(bidAmount) ? (
+                      <ErrorMessage data-testid={'bid-confirm-not-balance-dx'}>
+                        Please <Link to='/wallet'>deposit</Link> at least{' '}
+                        <DecimalValue
+                          decimals={4}
+                          postfix={bidToken.symbol}
+                          roundingMode={BigNumber.ROUND_UP}
+                          value={bidAmount.minus(bidTokenBalance)}
+                        />{' '}
+                        in DX.
+                      </ErrorMessage>
+                    ) : (
+                      <ErrorMessage data-testid={'bid-confirm-not-total-balance'}>
+                        You don't have enough {bidToken.symbol} to bid on this auction.
+                        {bidTokenBalance.gt(0) && (
+                          <>
+                            {' '}
+                            You can bid up to{' '}
+                            <DecimalValue
+                              decimals={4}
+                              postfix={bidToken.symbol}
+                              value={BigNumber.min(bidTokenBalance, availableBidVolume)}
+                            />
+                            .
+                            <br />
+                            <a href='' onClick={setMaxBidVolume}>
+                              [set max]
+                            </a>
+                          </>
+                        )}
+                      </ErrorMessage>
+                    )
+                  ) : (
+                    <p>
+                      liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' />)
+                      included
+                    </p>
+                  )}
+                  <Button
+                    type='submit'
+                    disabled={bidding || bidAmount.lte(ZERO) || bidTokenBalance.lt(bidAmount)}
+                    autoFocus
+                    data-testid='confirm-bid-button'
+                  >
+                    {bidding ? 'Bid in progress...' : 'Confirm'}
+                  </Button>
+                </Step3>
+              </>
+            )}
+          </Popup.Content>
+        )}
+
+        {dialogVisible ? (
+          <Button mode='dark' onClick={handleClose} data-testid='cancel-bid-button'>
+            Cancel
+          </Button>
+        ) : (
+          <Button mode='secondary' onClick={showDialog} data-testid='bid-button'>
+            {hasBiddedBefore ? 'Bid again' : 'Bid'}
+          </Button>
+        )}
+      </Popup.Container>
+    );
+  },
+);
 
 const Step = styled.form`
   width: 100%;
@@ -714,6 +731,7 @@ function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
     currentAccount: getCurrentAccount(state),
     feeRate: getLiqContribPercentage(state) || ZERO,
     owl: getOwl(state),
+    buyOrders: getAllBuyOrders(state),
   };
 }
 
