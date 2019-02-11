@@ -12,6 +12,7 @@ export * from './selectors';
 const SET_TOKENS = 'SET_TOKENS';
 const SET_FEE_RATIO = 'SET_FEE_RATIO';
 const SET_TOKEN_ALLOWANCE = 'SET_TOKEN_ALLOWANCE';
+const SET_OWL_ADDRESS = 'SET_OWL_ADDRESS';
 
 const initialState: TokensState = {
   tokens: new Map<Address, Token>(),
@@ -47,6 +48,12 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
             },
           ),
         ),
+      };
+
+    case SET_OWL_ADDRESS:
+      return {
+        ...state,
+        owlAddress: action.payload && action.payload.toLowerCase(),
       };
 
     default:
@@ -125,6 +132,14 @@ export function loadTokens() {
   };
 }
 
+export function loadOwlAddress() {
+  return async (dispatch: any, getState: () => AppState) => {
+    const owlAddress = await dx.getOwlAddress();
+
+    dispatch(setOwlAddress(owlAddress));
+  };
+}
+
 const setTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
   return {
     type: SET_TOKENS,
@@ -165,6 +180,13 @@ const getAvailableTokens = async (network: Network | null) => {
   const { default: tokens } = await import(`./networks/${network}.json`);
 
   return tokens.filter((token: Token) => !token.symbol.startsWith('test'));
+};
+
+const setOwlAddress: ActionCreator<AnyAction> = (owlAddress: Address) => {
+  return {
+    type: SET_OWL_ADDRESS,
+    payload: owlAddress,
+  };
 };
 
 export default reducer;

@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import { ZERO } from '../../../contracts/utils';
 import { getSellVolumeInEth } from '../../../contracts/utils/auctions';
 import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
-import { getAllTokens } from '../tokens';
+import { getAllTokens, getOwlAddress } from '../tokens';
 
 export const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
 
@@ -71,6 +71,17 @@ export const getFilteredClaimableAuctions = createSelector(
 export const getClaimableAuctionsCount = createSelector(
   getFilteredClaimableAuctions,
   auctions => auctions.length || 0,
+);
+
+export const isOwlListed = createSelector(
+  getAllAuctions,
+  getOwlAddress,
+  (auctions, owlAddress) => {
+    const owlAuctions = auctions.filter(
+      auction => auction.sellTokenAddress === owlAddress || auction.buyTokenAddress === owlAddress,
+    );
+    return owlAuctions.length > 0;
+  },
 );
 
 export const getAuctionDetail = createSelector(

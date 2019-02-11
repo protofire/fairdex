@@ -6,6 +6,8 @@ import { getFrt } from '../frt';
 
 export const getToken = (state: AppState, address: Address) => state.blockchain.tokens.get(address);
 
+export const getOwlAddress = (state: AppState) => state.blockchain.owlAddress;
+
 export const getAllTokens = (state: AppState) => state.blockchain.tokens || new Map();
 
 export const getTokensWithBalance = createSelector(
@@ -45,10 +47,11 @@ export const getTopBalances = createSelector(
 
 export const getOwl = createSelector(
   getAllTokens,
-  tokens => {
+  getOwlAddress,
+  (tokens, owlAddress) => {
     return Array.from(tokens)
       .map(([_, token]: [Address, Token]) => token)
-      .find((token: Token) => token.symbol === 'OWL');
+      .find((token: Token) => token.address === owlAddress);
   },
 );
 
