@@ -1,10 +1,12 @@
 import React, { useCallback, useState } from 'react';
 import { Flipped, Flipper } from 'react-flip-toolkit';
+import { connect } from 'react-redux';
 
 import { EmptyList, ListContainer } from '../../../components/CardList';
 
 import Spinner from '../../../components/Spinner';
 import * as images from '../../../images';
+import { hideAuctionDetail } from '../../../store/ui/actions';
 import AuctionDetail from './AuctionDetail';
 import AuctionView from './AuctionView';
 
@@ -13,18 +15,23 @@ export interface AuctionListProps {
   isLoading?: boolean;
 }
 
-const AuctionList = ({ auctions, isLoading }: AuctionListProps) => {
+interface DispatchProps {
+  dispatch: any;
+}
+
+type Props = AuctionListProps & DispatchProps;
+
+const AuctionList = ({ auctions, isLoading, dispatch }: Props) => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [auctoinDetail, setAuctionDetail] = useState<Auction | null>(null);
 
   const handleCardClick = useCallback((auction: Auction) => {
-    setAuctionDetail(auction);
     setIsDetailOpen(true);
   }, []);
 
   const handleDetailClose = useCallback(() => {
     setIsDetailOpen(false);
-    setAuctionDetail(null);
+    dispatch(hideAuctionDetail());
   }, []);
 
   return (
@@ -56,7 +63,6 @@ const AuctionList = ({ auctions, isLoading }: AuctionListProps) => {
         )}
       </Flipper>
       <AuctionDetail
-        auction={auctoinDetail}
         isOpen={isDetailOpen}
         onClickOutside={handleDetailClose}
         onEscPress={handleDetailClose}
@@ -70,4 +76,13 @@ AuctionList.defaultProps = {
   loading: false,
 };
 
-export default React.memo(AuctionList);
+function mapDispatchToProps(dispatch: any): DispatchProps {
+  return {
+    dispatch,
+  };
+}
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(AuctionList);

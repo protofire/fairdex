@@ -1,4 +1,5 @@
 import React, { HTMLAttributes } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { isAfter } from 'date-fns';
@@ -14,25 +15,31 @@ import {
 
 import ButtonGroup from '../../../components/ButtonGroup';
 import Modal from '../../../components/Modal';
+import { getAuctionDetail } from '../../../store/blockchain';
 import BidForm from './BidForm';
 import ClaimForm from './claim/ClaimForm';
 
-interface Props extends HTMLAttributes<HTMLDivElement> {
-  auction: Auction | null;
+interface StateProps {
+  auction?: Auction | null;
+}
+
+interface OwnProps extends HTMLAttributes<HTMLDivElement> {
   onClickOutside?: (() => void) | null;
   onEscPress?: (() => void) | null;
   isOpen: boolean;
 }
 
+type Props = StateProps & OwnProps;
+
 const DEFAULT_DECIMALS = 3;
 
-const AuctionDetail = React.memo(({ auction, onClickOutside, onEscPress, isOpen }: Props) => {
+const AuctionDetail = ({ auction, onClickOutside, onEscPress, isOpen }: Props) => {
   return (
     <Modal onClickOutside={onClickOutside} onEscPress={onEscPress} isOpen={isOpen}>
       {auction && <Content auction={auction} />}
     </Modal>
   );
-});
+};
 
 interface ContentProp {
   auction: Auction;
@@ -343,4 +350,10 @@ const Separator = styled.div`
   user-select: none;
 `;
 
-export default AuctionDetail;
+function mapStateToProps(state: AppState): StateProps {
+  return {
+    auction: getAuctionDetail(state),
+  };
+}
+
+export default connect(mapStateToProps)(AuctionDetail);

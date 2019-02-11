@@ -9,6 +9,8 @@ export const getAllAuctions = (state: AppState) => state.blockchain.auctions || 
 
 export const getAuctionFilters = (state: AppState) => state.filters;
 
+export const getSelectedAuctionForDetail = (state: AppState) => state.ui && state.ui.auctionDetail;
+
 export const getSellTokens = createSelector(
   getAllAuctions,
   (auctions: Auction[]) => buildTokens(auctions, 'sellToken'),
@@ -69,6 +71,23 @@ export const getFilteredClaimableAuctions = createSelector(
 export const getClaimableAuctionsCount = createSelector(
   getFilteredClaimableAuctions,
   auctions => auctions.length || 0,
+);
+
+export const getAuctionDetail = createSelector(
+  getAllAuctions,
+  getSelectedAuctionForDetail,
+  (auctions, selectedAuction) => {
+    if (selectedAuction) {
+      return auctions.find(
+        auction =>
+          auction.sellToken === selectedAuction.sellToken &&
+          auction.buyToken === selectedAuction.buyToken &&
+          auction.auctionIndex === selectedAuction.auctionIndex,
+      );
+    }
+
+    return null;
+  },
 );
 
 function buildTokens(list: Auction[], type: 'sellToken' | 'buyToken') {
