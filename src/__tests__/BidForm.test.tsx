@@ -94,6 +94,7 @@ describe('in running auctions', () => {
       const { getByTestId } = renderWithRedux(<BidForm auction={data} />, {
         blockchain: {
           tokens,
+          owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
         },
       });
 
@@ -116,6 +117,7 @@ describe('in running auctions', () => {
       const { getByTestId, queryByTestId } = renderWithRedux(<BidForm auction={data} />, {
         blockchain: {
           tokens,
+          owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
         },
       });
 
@@ -161,6 +163,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -197,6 +200,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -233,6 +237,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -269,6 +274,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -308,6 +314,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -346,6 +353,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -384,6 +392,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -422,6 +431,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
