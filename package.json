@@ -14,7 +14,7 @@
     "test:watch": "npm run test -- --watch"
   },
   "dependencies": {
-    "@gnosis.pm/dx-contracts": "^2.0.0-RC17",
+    "@gnosis.pm/dx-contracts": "^2.0.0",
     "bignumber.js": "^8.0.2",
     "clipboard-copy": "^2.0.1",
     "date-fns": "^2.0.0-alpha.27",
