@@ -3,7 +3,7 @@ import Loadable from 'react-loadable';
 import { NavLink, Redirect, Route, Router, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { history } from '../../analytics';
+import { history, pageview } from '../../analytics';
 import Spinner from '../../components/Spinner';
 import logo from '../../images/protofire.svg';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
@@ -38,6 +38,10 @@ class MainPage extends React.Component {
       behavior: 'smooth',
       top: 0,
     });
+
+    pageview(history.location.pathname);
+
+    history.listen(location => pageview(location.pathname));
   }
 
   render() {

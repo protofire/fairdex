@@ -5,17 +5,24 @@ import createBrowserHistory from 'history/createBrowserHistory'; // tslint:disab
 import React, { ComponentProps, ComponentType } from 'react';
 
 const history = createBrowserHistory();
-history.listen(location => ReactGA.pageview(location.pathname));
+// history.listen(location => {
+//   ReactGA.pageview(location.pathname)
+//   console.log(location.pathname)
+// });
+
+const pageview = ReactGA.pageview;
 
 const withPageview = <P extends ComponentProps<any>>(pathname: string = '/', Component: ComponentType<P>) => {
   class WithPageview extends React.Component<P> {
-    render() {
+    componentDidMount() {
       ReactGA.pageview(pathname);
+    }
 
+    render() {
       return <Component {...this.props} />;
     }
   }
   return WithPageview;
 };
 
-export { history, withPageview };
+export { history, withPageview, pageview };
