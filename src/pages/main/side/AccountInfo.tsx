@@ -42,7 +42,11 @@ const AccountInfo = ({
     </Header>
     <Content>
       <Item>
-        <TokenBalance token={frt} decimals={DEFAULT_DECIMALS} />
+        <TokenBalance
+          token={frt}
+          decimals={DEFAULT_DECIMALS}
+          description='Magnolia (MGN) tokens reduce your liquidity contribution.The more MGN you hold as a percentage of the total MGN market volume, the lower your liquidity contribution is (if within the relevant percentages).'
+        />
       </Item>
       <Item>
         {liquidityContribution != null ? (
