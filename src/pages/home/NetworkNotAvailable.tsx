@@ -1,4 +1,5 @@
 import React from 'react';
+import { withPageview } from '../../analytics';
 
 import Separator from '../../components/Separator';
 
@@ -10,4 +11,4 @@ const NetworkNotAvailable = () => (
   </>
 );
 
-export default NetworkNotAvailable;
+export default withPageview('/netwok-not-available', NetworkNotAvailable);

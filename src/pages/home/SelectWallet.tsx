@@ -2,6 +2,7 @@ import React, { FunctionComponent, useCallback } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
+import { withPageview } from '../../analytics';
 import Separator from '../../components/Separator';
 import * as images from '../../images';
 import { getNetworkType, getPreviouslyUsedWallet, initWallet } from '../../store/blockchain';
@@ -138,7 +139,10 @@ function mapDispatchToProps(dispatch: any): DispatchProps {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SelectWallet);
+export default withPageview(
+  '/',
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+  )(SelectWallet),
+);
