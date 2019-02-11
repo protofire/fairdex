@@ -9,6 +9,7 @@ import {
   getClaimableAuctionsCount,
   getCurrentAccount,
   getLiqContribPercentage,
+  getNetworkType,
 } from '../../../store/blockchain';
 import { getBidsCount } from '../../../store/blockchain/buy-orders';
 import { getFrt } from '../../../store/blockchain/frt';
@@ -19,6 +20,7 @@ import WalletCard, { Content, Header, Item } from './WalletCard';
 export interface AccountProps {
   claimableCount?: number;
   currentAccount: Address;
+  currentNetwork: Address;
   frt?: Token;
   liquidityContribution?: BigNumber;
   pastBids: number;
@@ -28,6 +30,7 @@ const DEFAULT_DECIMALS = 3;
 
 const AccountInfo = ({
   currentAccount,
+  currentNetwork,
   frt,
   pastBids,
   liquidityContribution,
@@ -39,6 +42,7 @@ const AccountInfo = ({
         <img src={images.wallet.MetaMask} alt='MetaMask' />
       </Icon>
       <HeaderAddress address={currentAccount} />
+      <NetworkName>{currentNetwork}</NetworkName>
     </Header>
     <Content>
       <Item>
@@ -99,11 +103,17 @@ const Icon = styled.div`
   padding-top: 15px;
   user-select: none;
 `;
+const NetworkName = styled.span`
+  font-size: 12px;
+  border-bottom: 1px dashed black;
+  text-transform: capitalize;
+`;
 
 function mapStateToProps(state: AppState): AccountProps {
   return {
     claimableCount: getClaimableAuctionsCount(state),
     currentAccount: getCurrentAccount(state),
+    currentNetwork: getNetworkType(state),
     frt: getFrt(state),
     liquidityContribution: getLiqContribPercentage(state),
     pastBids: getBidsCount(state),
