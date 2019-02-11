@@ -1,4 +1,4 @@
-import React, { FormEvent, useCallback, useContext, useMemo, useState } from 'react';
+import React, { FormEvent, useCallback, useContext, useState } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
