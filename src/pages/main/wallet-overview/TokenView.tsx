@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import { DecimalValue } from '../../../components/formatters';
@@ -11,21 +11,13 @@ import DepositWithdrawForm from './DepositWithdrawForm';
 import EnableForTradingForm from './EnableForTradingForm';
 import WrapUnwrapForm from './WrapUnwrapForm';
 
-interface Props {
+interface TokenViewProps {
   data: Token;
-  owlAddress?: Address;
-  owlListed: boolean;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const TokenView = ({ data: token, owlAddress, owlListed }: Props) => {
-  const notOwlOrListed = useMemo(() => token.address !== owlAddress || owlListed, [
-    token,
-    owlAddress,
-    owlListed,
-  ]);
-
+const TokenView = ({ data: token }: TokenViewProps) => {
   return (
     <Card>
       <Header>
@@ -65,17 +57,14 @@ const TokenView = ({ data: token, owlAddress, owlListed }: Props) => {
             )}
           </Value>
         </Row>
-        <EnableForTradingForm
-          token={token}
-          enabled={token.allowance ? token.allowance.gt(0) : false}
-          notOwlOrListed={notOwlOrListed}
-        />
+        <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
       </Table>
       <ButtonGroup>
-        {notOwlOrListed && getWalletBalance(token).gt(ZERO) && (
+        {token.tradeable && getWalletBalance(token).gt(ZERO) && (
           <DepositWithdrawForm action={'Deposit'} token={token} />
         )}
-        {notOwlOrListed && getDxBalance(token).gt(ZERO) && (
+
+        {token.tradeable && getDxBalance(token).gt(ZERO) && (
           <DepositWithdrawForm action={'Withdraw'} token={token} />
         )}
       </ButtonGroup>

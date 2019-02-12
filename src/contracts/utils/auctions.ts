@@ -3,7 +3,6 @@ import { addHours, isAfter } from 'date-fns';
 import { formatNumber, toBigNumber, ZERO } from './decimal';
 
 const AUCTION_DURATION = 6; // 6 hours
-const AUCTION_START_WAITING_FOR_FUNDING = 1;
 const AUCTION_ABOVE_PRIOR_PRICE_THRESHOLD = 1.1; // 10% above prior price
 
 export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionIndex: string) {
@@ -24,38 +23,29 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
       buyVolume,
     };
 
-    if (auctionStart > Date.now()) {
-      const previousClosingPrice = await dx.getPreviousClosingPrice(sellToken, buyToken, auctionIndex);
+    const [currentPrice, closingPrice] = await Promise.all([
+      dx.getCurrentPrice(sellToken, buyToken, auctionIndex),
+      dx.getClosingPrice(sellToken, buyToken, auctionIndex),
+    ]);
 
-      const auction: ScheduledAuction = {
-        ...data,
-        state: 'scheduled',
-        auctionStart,
-        closingPrice: previousClosingPrice.value,
-      };
+    const isClosed =
+      (sellVolume && (!sellVolume.isFinite() || sellVolume.isZero())) ||
+      (closingPrice && closingPrice.value.isFinite());
 
-      return auction;
-    } else {
-      const [currentPrice, closingPrice] = await Promise.all([
-        dx.getCurrentPrice(sellToken, buyToken, auctionIndex),
-        dx.getClosingPrice(sellToken, buyToken, auctionIndex),
+    const isTheoreticalClosed =
+      currentPrice &&
+      toBigNumber(currentPrice.numerator)
+        .times(sellVolume || ZERO)
+        .minus(toBigNumber(currentPrice.denominator).times(buyVolume || ZERO))
+        .isZero();
+
+    if (isClosed || isTheoreticalClosed) {
+      const [auctionEnd, bidVolume = ZERO] = await Promise.all([
+        dx.getAuctionEnd(sellToken, buyToken, auctionIndex),
+        dx.getBuyVolume(sellToken, buyToken, auctionIndex),
       ]);
 
-      const isClosed = !sellVolume.isFinite() || sellVolume.isZero() || closingPrice.value.isFinite();
-
-      const isTheoreticalClosed =
-        currentPrice &&
-        toBigNumber(currentPrice.numerator)
-          .times(sellVolume || ZERO)
-          .minus(toBigNumber(currentPrice.denominator).times(buyVolume || ZERO))
-          .isZero();
-
-      if (isClosed || isTheoreticalClosed) {
-        const [auctionEnd, bidVolume = ZERO] = await Promise.all([
-          dx.getAuctionEnd(sellToken, buyToken, auctionIndex),
-          dx.getBuyVolume(sellToken, buyToken, auctionIndex),
-        ]);
-
+      if (auctionEnd && bidVolume.isPositive()) {
         const auction: EndedAuction = {
           ...data,
           state: 'ended',
@@ -66,9 +56,22 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
         };
 
         return auction;
-      } else {
-        const previousClosingPrice = await dx.getPreviousClosingPrice(sellToken, buyToken, auctionIndex);
+      }
+    } else {
+      const previousClosingPrice = await dx.getPreviousClosingPrice(sellToken, buyToken, auctionIndex);
 
+      if (auctionStart > Date.now()) {
+        const auction: ScheduledAuction = {
+          ...data,
+          state: 'scheduled',
+          auctionStart,
+          closingPrice: previousClosingPrice.value,
+        };
+
+        return auction;
+      }
+
+      if (currentPrice) {
         const auction: RunningAuction = {
           ...data,
           state: 'running',

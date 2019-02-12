@@ -23,9 +23,8 @@ type Props = AuctionListProps & DispatchProps;
 
 const AuctionList = ({ auctions, isLoading, dispatch }: Props) => {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [auctoinDetail, setAuctionDetail] = useState<Auction | null>(null);
 
-  const handleCardClick = useCallback((auction: Auction) => {
+  const handleCardClick = useCallback(() => {
     setIsDetailOpen(true);
   }, []);
 

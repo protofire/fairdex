@@ -8,6 +8,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('1'), toBigNumber('0.2')],
     priceEth: toBigNumber('1'),
+    tradeable: true,
   },
   {
     symbol: 'RDN',
@@ -16,6 +17,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('0'), toBigNumber('0')],
     priceEth: toBigNumber('0.00325791341502291798'),
+    tradeable: true,
   },
   {
     symbol: 'RDN',
@@ -24,6 +26,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('702.256360915461158047'), toBigNumber('1293.444666366148496571')],
     priceEth: toBigNumber('10.002008601439680864'),
+    tradeable: true,
   },
   {
     symbol: 'GEN',
@@ -32,6 +35,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('0'), toBigNumber('0')],
     priceEth: toBigNumber('0.00050328373937176549'),
+    tradeable: true,
   },
   {
     symbol: 'DAI',
@@ -40,6 +44,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('0'), toBigNumber('0')],
     priceEth: toBigNumber('0.00459921773214932546'),
+    tradeable: true,
   },
   {
     symbol: 'MKR',
@@ -48,6 +53,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('0.312987420146104349'), toBigNumber('1.26')],
     priceEth: toBigNumber('3.84966708010913675756'),
+    tradeable: true,
   },
   {
     symbol: 'CWBR',
@@ -56,6 +62,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('0'), toBigNumber('0')],
     priceEth: toBigNumber('0.005'),
+    tradeable: true,
   },
   {
     symbol: 'PXT',
@@ -64,6 +71,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('0'), toBigNumber('0')],
     priceEth: toBigNumber('1'),
+    tradeable: true,
   },
   {
     symbol: 'PXT',
@@ -72,6 +80,7 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('0'), toBigNumber('0')],
     priceEth: toBigNumber('0.5'),
+    tradeable: true,
   },
   {
     symbol: 'OMG',
@@ -80,9 +89,10 @@ const rawTokens: Token[] = [
     decimals: 18,
     balance: [toBigNumber('854.311859462121882881'), toBigNumber('899.9999999999999999')],
     priceEth: toBigNumber('0.01083930216719024862'),
+    tradeable: true,
   },
 ];
 
-const tokens: Map<Address, Token> = new Map(rawTokens.map((token: Token) => [token.address, token]));
+const tokens = new Map(rawTokens.map<[Address, Token]>((token: Token) => [token.address, token]));
 
 export default tokens;

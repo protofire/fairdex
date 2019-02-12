@@ -1,12 +1,4 @@
-import React, {
-  AllHTMLAttributes,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { AllHTMLAttributes, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import styled, { css } from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
@@ -19,6 +11,7 @@ import { DecimalValue } from '../../../components/formatters';
 
 import Button from '../../../components/Button';
 import DecimalInput from '../../../components/DecimalInput';
+import ExplorerLink from '../../../components/ExplorerLink';
 import Popup from '../../../components/Popup';
 import { getWalletBalance } from '../../../contracts/utils/tokens';
 
@@ -34,12 +27,6 @@ interface AppStateProps {
 
 interface DispatchProps {
   dispatch: any;
-}
-
-interface State {
-  amount: BigNumber;
-  loading: boolean;
-  showDialog: boolean;
 }
 
 const DEFAULT_DECIMALS = 3;
@@ -147,9 +134,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
                 `${action} request sent`,
                 <p>
                   {action} transaction has been sent.{' '}
-                  <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                    More info
-                  </a>
+                  <ExplorerLink hash={transactionHash}>More info</ExplorerLink>
                 </p>,
               ),
             );
@@ -161,9 +146,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
                 `${action} confirmed`,
                 <p>
                   {action} has been confirmed.{' '}
-                  <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                    More info
-                  </a>
+                  <ExplorerLink hash={receipt.transactionHash}>More info</ExplorerLink>
                 </p>,
               ),
             );
@@ -251,10 +234,6 @@ const Container = styled(Popup.Container)`
   letter-spacing: -0.4px;
 `;
 
-interface ActionProps {
-  disabled?: boolean;
-}
-
 const Action = styled.span`
   ${({ disabled }: Pick<AllHTMLAttributes<HTMLSpanElement>, 'disabled'>) => {
     if (disabled) {
@@ -262,7 +241,8 @@ const Action = styled.span`
         color: var(--color-grey);
       `;
     }
-  }}
+  }};
+
   text-decoration: underline;
   font-weight: 600;
   cursor: pointer;
@@ -312,7 +292,7 @@ const Form = styled.form`
   }
 `;
 
-function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
+function mapStateToProps(state: AppState): AppStateProps {
   return {
     currentAccount: getCurrentAccount(state),
   };

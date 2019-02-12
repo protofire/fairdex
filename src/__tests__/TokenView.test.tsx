@@ -1,7 +1,7 @@
 import 'jest-dom/extend-expect';
 
 import React from 'react';
-import { cleanup, waitForElement } from 'react-testing-library';
+import { cleanup } from 'react-testing-library';
 
 import { renderWithRedux } from './utils';
 import { toBigNumber } from '../contracts/utils';
@@ -19,6 +19,7 @@ const tokenWithBalance: Token = {
   name: 'Token1',
   symbol: 'TK1',
   priceEth: toBigNumber(1),
+  tradeable: true,
 };
 
 const tokenWithOutBalance: Token = {
@@ -28,6 +29,7 @@ const tokenWithOutBalance: Token = {
   name: 'Token2',
   symbol: 'TK2',
   priceEth: toBigNumber(1),
+  tradeable: true,
 };
 
 describe('Wallet overview', () => {

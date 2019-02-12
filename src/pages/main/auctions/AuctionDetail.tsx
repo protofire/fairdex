@@ -16,7 +16,7 @@ import {
 import ButtonGroup from '../../../components/ButtonGroup';
 import Modal from '../../../components/Modal';
 import { getAuctionDetail } from '../../../store/blockchain';
-import BidForm from './BidForm';
+import BidForm from './bid/BidForm';
 import ClaimForm from './claim/ClaimForm';
 
 interface StateProps {

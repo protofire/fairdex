@@ -32,6 +32,7 @@ const Content = styled.div`
   top: calc(100% + 3.5px);
   padding: var(--spacing-text);
   border-radius: 4px;
+  z-index: 1001;
 
   font-size: 0.8rem;
   font-weight: normal;

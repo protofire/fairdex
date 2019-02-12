@@ -17,7 +17,7 @@ import Button from '../../../components/Button';
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
 import { showAuctionDetail } from '../../../store/ui/actions';
-import BidForm from './BidForm';
+import BidForm from './bid/BidForm';
 import ClaimForm from './claim/ClaimForm';
 
 interface AuctionViewProps extends HTMLAttributes<HTMLDivElement> {
