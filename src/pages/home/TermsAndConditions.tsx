@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { withPageview } from '../../analytics';
 import Button from '../../components/Button';
 import Checkbox from '../../components/Checkbox';
+import { PrivacyPolicy } from '../../files';
 import { acceptTermsConditions } from '../../store/terms-conditions/actions';
 
 interface DispatchProps {
@@ -149,7 +150,10 @@ const TermsAndConditions: FunctionComponent<DispatchProps> = ({ onAcceptTermsCon
             checked={readAndUnderstood}
             onToggle={handleReadAndUnderstoodToggle}
           />
-          I have read and understood the Privacy Policy
+          I have read and understood the{' '}
+          <Link href={PrivacyPolicy} target='_blank' rel='noopener noreferrer'>
+            Privacy Policy
+          </Link>
         </Label>
         <Footer>
           <Button disabled={isAcceptDisabled} onClick={onAcceptTermsConditions}>
@@ -223,9 +227,20 @@ const Footer = styled.footer`
   border-top: 1px solid var(--color-content-bg);
   margin-top: 1em;
 `;
+
 const Label = styled.label`
   flex: 1 1 auto;
   cursor: pointer;
+`;
+
+const Link = styled.a`
+  color: var(--color-light-grey-blue);
+  text-decoration: underline;
+
+  &:link,
+  &:visited {
+    color: var(--color-light-grey-blue);
+  }
 `;
 
 function mapDispatchToProps(dispatch: any): DispatchProps {
