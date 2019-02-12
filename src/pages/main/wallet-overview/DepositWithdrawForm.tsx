@@ -4,13 +4,14 @@ import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
 
 import { ZERO } from '../../../contracts/utils';
-import { getCurrentAccount, loadTokens } from '../../../store/blockchain';
+import { getCurrentAccount } from '../../../store/blockchain';
 import { showNotification } from '../../../store/ui/actions';
 
 import { DecimalValue } from '../../../components/formatters';
 
 import Button from '../../../components/Button';
 import DecimalInput from '../../../components/DecimalInput';
+import ExplorerLink from '../../../components/ExplorerLink';
 import Popup from '../../../components/Popup';
 import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
 
@@ -27,12 +28,6 @@ interface AppStateProps {
 
 interface DispatchProps {
   dispatch: any;
-}
-
-interface State {
-  amount: BigNumber;
-  loading: boolean;
-  showDialog: boolean;
 }
 
 const DEFAULT_DECIMALS = 3;
@@ -84,9 +79,7 @@ const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatc
               `${action} request sent`,
               <p>
                 {action} transaction has been sent.{' '}
-                <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                  More info
-                </a>
+                <ExplorerLink hash={transactionHash}>More info</ExplorerLink>
               </p>,
             ),
           );
@@ -98,15 +91,11 @@ const DepositWithdrawForm = React.memo(({ token, action, currentAccount, dispatc
               `${action} confirmed`,
               <p>
                 {action} has been confirmed.{' '}
-                <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                  More info
-                </a>
+                <ExplorerLink hash={receipt.transactionHash}>More info</ExplorerLink>
               </p>,
             ),
           );
 
-          // Reload tokensbalances and allowance
-          dispatch(loadTokens());
           setLoading(false);
           handleClose();
         })
@@ -231,7 +220,7 @@ const Form = styled.form`
   }
 `;
 
-function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
+function mapStateToProps(state: AppState): AppStateProps {
   return {
     currentAccount: getCurrentAccount(state),
   };

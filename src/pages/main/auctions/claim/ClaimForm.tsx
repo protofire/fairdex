@@ -3,15 +3,15 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
 
-import { getCurrentAccount } from '../../../../store/blockchain/wallet';
+import { getCurrentAccount } from '../../../../store/blockchain';
 import { showNotification } from '../../../../store/ui/actions';
 
 import Button from '../../../../components/Button';
+import ExplorerLink from '../../../../components/ExplorerLink';
 import DecimalValue from '../../../../components/formatters/DecimalValue';
 import Popup from '../../../../components/Popup';
 import { ZERO } from '../../../../contracts/utils';
 import { getTotalClaimFound } from '../../../../contracts/utils/auctions';
-import { loadAvailableTokens } from '../../../../store/blockchain/tokens';
 import { ClaimContext } from './ClaimContext';
 
 interface OwnProps {
@@ -72,9 +72,7 @@ const ClaimForm = React.memo(
                   'Claim request sent',
                   <p>
                     Claim transaction has been sent.{' '}
-                    <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                      More info
-                    </a>
+                    <ExplorerLink hash={transactionHash}>More info</ExplorerLink>
                   </p>,
                 ),
               );
@@ -86,15 +84,10 @@ const ClaimForm = React.memo(
                   'Claim confirmed',
                   <p>
                     Claim transaction has been confirmed.{' '}
-                    <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                      More info
-                    </a>
+                    <ExplorerLink hash={receipt.transactionHash}>More info</ExplorerLink>
                   </p>,
                 ),
               );
-
-              // Reload token balances and auction list
-              dispatch(loadAvailableTokens());
 
               setOpened(false);
             })

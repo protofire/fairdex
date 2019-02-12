@@ -1,29 +1,31 @@
 import React from 'react';
 import Loadable from 'react-loadable';
+import { connect } from 'react-redux';
 import { NavLink, Redirect, Route, Router, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { history, pageview } from '../../analytics';
 import Spinner from '../../components/Spinner';
 import logo from '../../images/protofire.svg';
+import { fetchData } from '../../store/blockchain';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
-import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 
+import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 import AccountInfo from './side/AccountInfo';
 import WalletInfo from './side/WalletInfo';
 
 const EndedAuctions = Loadable({
-  loader: () => import('./auctions/containers/EndedAuctions'),
+  loader: () => import('./auctions/tabs/EndedAuctions'),
   loading: () => <Spinner size='large' />,
 });
 
 const RunningAuctions = Loadable({
-  loader: () => import('./auctions/containers/RunningAuctions'),
+  loader: () => import('./auctions/tabs/RunningAuctions'),
   loading: () => <Spinner size='large' />,
 });
 
 const ScheduledAuctions = Loadable({
-  loader: () => import('./auctions/containers/ScheduledAuctions'),
+  loader: () => import('./auctions/tabs/ScheduledAuctions'),
   loading: () => <Spinner size='large' />,
 });
 
@@ -32,8 +34,14 @@ const WalletOverview = Loadable({
   loading: () => <Spinner size='large' />,
 });
 
-class MainPage extends React.Component {
+interface DispatchProps {
+  fetchData: () => void;
+}
+
+class MainPage extends React.Component<DispatchProps> {
   componentDidMount() {
+    this.props.fetchData();
+
     window.scrollTo({
       behavior: 'smooth',
       top: 0,
@@ -113,4 +121,13 @@ const SideContent = styled.div`
   gap: var(--spacing-normal);
 `;
 
-export default MainPage;
+function mapDispatchToProps(dispatch: any): DispatchProps {
+  return {
+    fetchData: () => dispatch(fetchData()),
+  };
+}
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(MainPage);

@@ -61,6 +61,7 @@ class Filters extends React.PureComponent<Props, State> {
       buyTokenSearchQuery: '',
       resetCounter: this.state.resetCounter + 1,
     });
+
     this.props.actions.clearFilters();
   };
 
@@ -73,11 +74,13 @@ class Filters extends React.PureComponent<Props, State> {
   };
 
   handleClose = () => {
-    this.props.actions.toggle();
+    if (this.props.isOpen) {
+      this.props.actions.toggle();
+    }
   };
 
   render() {
-    const { actions, isOpen, sellTokens, buyTokens, filters } = this.props;
+    const { isOpen, sellTokens, buyTokens, filters } = this.props;
 
     const sellTokensList = this.buildTokenList(
       this.filterTokens(sellTokens, this.state.sellTokenSearchQuery),

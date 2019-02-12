@@ -73,17 +73,6 @@ export const getClaimableAuctionsCount = createSelector(
   auctions => auctions.length || 0,
 );
 
-export const isOwlListed = createSelector(
-  getAllAuctions,
-  getOwlAddress,
-  (auctions, owlAddress) => {
-    const owlAuctions = auctions.filter(
-      auction => auction.sellTokenAddress === owlAddress || auction.buyTokenAddress === owlAddress,
-    );
-    return owlAuctions.length > 0;
-  },
-);
-
 export const getAuctionDetail = createSelector(
   getAllAuctions,
   getSelectedAuctionForDetail,
