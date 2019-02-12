@@ -8,8 +8,6 @@ import { getCurrentAccount } from '../../../store/blockchain/wallet';
 import { showNotification } from '../../../store/ui/actions';
 
 import CheckboxToggle from '../../../components/CheckboxToggle';
-import { ZERO } from '../../../contracts/utils';
-import { getWalletBalance } from '../../../contracts/utils/tokens';
 
 interface OwnProps {
   token: Token;
@@ -95,7 +93,15 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, notOwlOrListed, 
 
   return (
     <Container>
-      <Label>{notOwlOrListed ? 'Enable for trading' : 'Enable for paying Liquidity Contribution'}</Label>
+      <Label>
+        {notOwlOrListed ? (
+          'Enable for trading'
+        ) : (
+          <>
+            Enable for paying <abbr title='Liquidity Contribution'>LC</abbr>
+          </>
+        )}
+      </Label>
       <dd>
         <TradingToggle
           onToggle={onChangeHandler}
