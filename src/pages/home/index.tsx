@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import * as images from '../../images';
 import { getNetworkType } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
+import Landing from './Landing';
 import spinner from './spinner';
 import TermsAndConditions from './TermsAndConditions';
 
@@ -41,16 +42,18 @@ const HomePage = React.memo(({ network, wallet, termsConditionsAccepted }: Props
     return <MainPage />;
   }
 
-  return !termsConditionsAccepted ? (
-    <TermsAndConditions />
-  ) : (
-    <Container>
-      <Content>{content}</Content>
-      <Footer>
-        <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
-      </Footer>
-    </Container>
-  );
+  return <Landing />;
+
+  // return !termsConditionsAccepted ? (
+  //   <TermsAndConditions />
+  // ) : (
+  //   <Container>
+  //     <Content>{content}</Content>
+  //     <Footer>
+  //       <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
+  //     </Footer>
+  //   </Container>
+  // );
 });
 
 const Container = styled.section`

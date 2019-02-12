@@ -140,7 +140,7 @@ function mapDispatchToProps(dispatch: any): DispatchProps {
 }
 
 export default withPageview(
-  '/',
+  '/select-wallet',
   connect(
     mapStateToProps,
     mapDispatchToProps,
