@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { withPageview } from '../../analytics';
 import Separator from '../../components/Separator';
 import * as images from '../../images';
-import { getNetworkType, getPreviouslyUsedWallet, initWallet } from '../../store/blockchain';
+import { getNetworkType, getPreviouslyUsedWallet, init } from '../../store/blockchain';
 import spinner from './spinner';
 
 type Props = AppStateProps & DispatchProps;
@@ -135,7 +135,7 @@ function mapStateToProps(state: AppState): AppStateProps {
 
 function mapDispatchToProps(dispatch: any): DispatchProps {
   return {
-    onSelectWallet: wallet => dispatch(initWallet(wallet)),
+    onSelectWallet: wallet => dispatch(init(wallet)),
   };
 }
 

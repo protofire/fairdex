@@ -1,4 +1,4 @@
-type BlockchainState = AuctionsState & TokensState & WalletState & BuyOrdersState & FrtState & OwlState;
+type BlockchainState = AuctionsState & TokensState & WalletState & BuyOrdersState & FrtState;
 
 interface AuctionsState {
   auctions?: Auction[];
@@ -11,10 +11,6 @@ interface TokensState {
 
 interface FrtState {
   frt?: Token;
-}
-
-interface OwlState {
-  owlAddress?: Address;
 }
 
 interface WalletState {

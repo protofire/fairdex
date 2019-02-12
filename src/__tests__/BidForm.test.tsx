@@ -7,7 +7,7 @@ import { cleanup, fireEvent, waitForElement, wait, getByText } from 'react-testi
 import { renderWithRedux } from './utils';
 import { toBigNumber } from '../contracts/utils';
 
-import BidForm from '../pages/main/auctions/BidForm';
+import BidForm from '../pages/main/auctions/bid/BidForm';
 import { getAvailableVolume } from '../contracts/utils/auctions';
 
 import tokens from '../__mocks__/tokens';
@@ -95,7 +95,6 @@ describe('in running auctions', () => {
         blockchain: {
           tokens,
           buyOrders: [],
-          owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
         },
       });
 
@@ -119,7 +118,6 @@ describe('in running auctions', () => {
         blockchain: {
           tokens,
           buyOrders: [],
-          owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
         },
       });
 
@@ -166,7 +164,6 @@ describe('in running auctions', () => {
             blockchain: {
               tokens: stateTokens,
               buyOrders: [],
-              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -204,7 +201,6 @@ describe('in running auctions', () => {
             blockchain: {
               tokens: stateTokens,
               buyOrders: [],
-              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -242,7 +238,6 @@ describe('in running auctions', () => {
             blockchain: {
               tokens: stateTokens,
               buyOrders: [],
-              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -280,7 +275,6 @@ describe('in running auctions', () => {
             blockchain: {
               tokens: stateTokens,
               buyOrders: [],
-              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -321,7 +315,6 @@ describe('in running auctions', () => {
             blockchain: {
               tokens: stateTokens,
               buyOrders: [],
-              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -361,7 +354,6 @@ describe('in running auctions', () => {
             blockchain: {
               tokens: stateTokens,
               buyOrders: [],
-              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -401,7 +393,6 @@ describe('in running auctions', () => {
             blockchain: {
               tokens: stateTokens,
               buyOrders: [],
-              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );
@@ -441,7 +432,6 @@ describe('in running auctions', () => {
             blockchain: {
               tokens: stateTokens,
               buyOrders: [],
-              owlAddress: '0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d',
             },
           },
         );

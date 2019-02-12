@@ -1,18 +1,16 @@
 import { Action, ActionCreator, AnyAction, Reducer } from 'redux';
 
-import { getTokenContract } from '../../../contracts';
-import { Decimal } from '../../../contracts/utils';
-import { periodicAction } from '../../utils';
+import { getErc20Contract } from '../../../contracts';
 import { loadAuctions } from '../auctions';
-import { getCurrentAccount, getNetworkType } from '../wallet';
+import { getCurrentAccount, getNetworkType } from '../web3';
+
+import whitelist from './whitelist';
 
 export * from './selectors';
 
 // Actions
 const SET_TOKENS = 'SET_TOKENS';
-const SET_FEE_RATIO = 'SET_FEE_RATIO';
 const SET_TOKEN_ALLOWANCE = 'SET_TOKEN_ALLOWANCE';
-const SET_OWL_ADDRESS = 'SET_OWL_ADDRESS';
 
 const initialState: TokensState = {
   tokens: new Map<Address, Token>(),
@@ -24,12 +22,6 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
       return {
         ...state,
         tokens: new Map<Address, Token>(action.payload.map((token: Token) => [token.address, token])),
-      };
-
-    case SET_FEE_RATIO:
-      return {
-        ...state,
-        feeRatio: action.payload,
       };
 
     case SET_TOKEN_ALLOWANCE:
@@ -50,107 +42,51 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
         ),
       };
 
-    case SET_OWL_ADDRESS:
-      return {
-        ...state,
-        owlAddress: action.payload && action.payload.toLowerCase(),
-      };
-
     default:
       return state;
   }
 };
 
-export function loadAvailableTokens() {
-  return periodicAction({
-    name: 'loadAvailableTokens',
-    interval: 2 * 60_000, // check for tokens every 2 minutes
-
-    async task(dispatch, getState) {
-      try {
-        // Load tokens
-        dispatch(loadTokens());
-
-        // Load auctions
-        dispatch(loadAuctions());
-      } catch (err) {
-        // TODO: Handle error
-      }
-    },
-  });
-}
-
-export function updateFeeRatio() {
-  return periodicAction({
-    name: 'updateFeeRatio',
-    interval: 60_000 * 2, // update fee ratio every 2 minutes
-
-    async task(dispatch, getState) {
-      const { dx } = window;
-      const { blockchain } = getState();
-
-      if (blockchain.currentAccount) {
-        const ratio = await dx.getFeeRatio(blockchain.currentAccount);
-
-        if (ratio) {
-          dispatch(setFeeRatio(ratio.value));
-        }
-      }
-    },
-  });
-}
-
 export function loadTokens() {
   return async (dispatch: any, getState: () => AppState) => {
-    const { blockchain } = getState();
+    const accountAddress = getCurrentAccount(getState());
 
-    const tokens: Token[] = await getAvailableTokens(getNetworkType(getState()));
-    const accountAddress = blockchain.currentAccount;
+    if (accountAddress) {
+      const tokens = await getAvailableTokens(getNetworkType(getState()));
 
-    if (accountAddress && tokens.length > 0) {
-      const tokensWithData = await Promise.all(
-        Array.from(tokens).map(async token => {
-          const tokenContract = getTokenContract(token);
+      if (tokens.length > 0) {
+        const tokensWithBalances = await Promise.all(
+          Array.from(tokens).map(token => getTokenBalances(token, accountAddress)),
+        );
 
-          const [contractBalance, walletBalance, priceEth, allowance] = await Promise.all([
-            dx.getBalance(token, accountAddress),
-            tokenContract.getBalance(accountAddress),
-            dx.getPriceOfTokenInLastAuction(token),
-            tokenContract.getAllowance(accountAddress, dx.address),
-          ]);
+        dispatch(setTokens(tokensWithBalances));
 
-          token.balance = [contractBalance, walletBalance];
-          token.priceEth = priceEth.value;
-          token.allowance = allowance;
+        // Load auctions if needed
+        const { blockchain } = getState();
 
-          return token;
-        }),
-      );
-
-      dispatch(setTokens(tokensWithData));
+        if (!blockchain.auctions) {
+          dispatch(loadAuctions());
+        }
+      }
     }
   };
 }
 
-export function loadOwlAddress() {
+export const updateTokenAllowance = (token: Token) => {
   return async (dispatch: any, getState: () => AppState) => {
-    const owlAddress = await dx.getOwlAddress();
+    const currentAccount = getCurrentAccount(getState());
+    const tokenContract = getErc20Contract(token.address);
 
-    dispatch(setOwlAddress(owlAddress));
+    const allowance = await tokenContract.getAllowance(currentAccount, window.dx.address);
+
+    dispatch(setTokenAllowance(token.address, allowance));
   };
-}
+};
 
 const setTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
   return {
     type: SET_TOKENS,
     payload: tokens,
-  };
-};
-
-const setFeeRatio: ActionCreator<AnyAction> = (ratio: BigNumber) => {
-  return {
-    type: SET_FEE_RATIO,
-    payload: ratio,
   };
 };
 
@@ -161,32 +97,79 @@ const setTokenAllowance: ActionCreator<Action> = (address: Address, allowance: B
   };
 };
 
-export const updateTokenAllowance = (token: Token) => {
-  return async (dispatch: any, getState: () => AppState) => {
-    const currentAccount = getCurrentAccount(getState());
-    const tokenContract = getTokenContract(token);
+async function getAvailableTokens(network: Network | null) {
+  const markets = await dx.getAvailableMarkets();
 
-    const allowance = await tokenContract.getAllowance(currentAccount, window.dx.address);
+  const tokenAddresses = markets.reduce<Set<Address>>(
+    (addresses, market) => addresses.add(market[0]).add(market[1]),
+    new Set(),
+  );
 
-    dispatch(setTokenAllowance(token.address, allowance));
-  };
-};
+  // Filter non-whitelisted token
+  const whitelistedTokens = network && whitelist[network];
 
-const getAvailableTokens = async (network: Network | null) => {
-  if (!network) {
-    return [];
+  if (whitelistedTokens != null) {
+    tokenAddresses.forEach(address => {
+      const isWhitelisted = whitelistedTokens.some(
+        approvedToken => approvedToken.address.toLowerCase() === address.toLowerCase(),
+      );
+
+      if (!isWhitelisted) {
+        tokenAddresses.delete(address);
+      }
+    });
   }
 
-  const { default: tokens } = await import(`./networks/${network}.json`);
+  // Load tokens that require special treatment
+  const [wethAddress, owlAddress] = await Promise.all([dx.getEthTokenAddress(), dx.getOwlAddress()]);
+
+  const isWethListed = tokenAddresses.has(wethAddress);
+  const isOwlListed = tokenAddresses.has(owlAddress);
+
+  if (!isWethListed) {
+    tokenAddresses.add(wethAddress);
+  }
+
+  if (!isOwlListed) {
+    tokenAddresses.add(owlAddress);
+  }
+
+  // Create contract instance for each token
+  const tokens = await Promise.all(
+    Array.from(tokenAddresses.values()).map<Promise<Token>>(async tokenAddress => {
+      const token = await getErc20Contract(tokenAddress).getTokenInfo();
+
+      // Tokens are tradeable by default
+      token.tradeable = true;
+
+      if (tokenAddress === owlAddress) {
+        token.tradeable = isOwlListed;
+      } else if (tokenAddress === wethAddress) {
+        token.tradeable = isWethListed;
+      }
+
+      return token;
+    }),
+  );
 
   return tokens.filter((token: Token) => !token.symbol.startsWith('test'));
-};
+}
 
-const setOwlAddress: ActionCreator<AnyAction> = (owlAddress: Address) => {
-  return {
-    type: SET_OWL_ADDRESS,
-    payload: owlAddress,
-  };
-};
+async function getTokenBalances(token: Token, account: Address) {
+  const tokenContract = getErc20Contract(token.address);
+
+  const [contractBalance, walletBalance, priceEth, allowance] = await Promise.all([
+    dx.getBalance(token, account),
+    tokenContract.getBalance(account),
+    dx.getPriceOfTokenInLastAuction(token),
+    tokenContract.getAllowance(account, dx.address),
+  ]);
+
+  token.balance = [contractBalance, walletBalance];
+  token.priceEth = priceEth.value;
+  token.allowance = allowance;
+
+  return token;
+}
 
 export default reducer;

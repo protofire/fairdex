@@ -4,7 +4,7 @@ import { ActionCreator } from 'redux';
 export const HIDE_SIDEBAR = 'sidebar/HIDE';
 export const SHOW_SIDEBAR = 'sidebar/SHOW';
 export const TOGGLE_SIDEBAR = 'sidebar/TOGGLE_VISIBILITY';
-export const SHOW_FILTERS = 'filters/SHOE';
+export const SHOW_FILTERS = 'filters/SHOW';
 export const HIDE_FILTERS = 'filters/HIDE';
 export const SHOW_NOTIFICATION = 'notification/SHOW';
 export const HIDE_NOTIFICATION = 'notification/HIDE';

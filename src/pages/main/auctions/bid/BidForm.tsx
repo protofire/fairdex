@@ -4,27 +4,30 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { TransactionReceipt } from 'web3/types';
 
-import * as utils from '../../../contracts/utils';
+import * as utils from '../../../../contracts/utils';
+
 import {
   getAllBuyOrders,
   getCurrentAccount,
   getLiqContribPercentage,
   getOwl,
   getToken,
-  loadAvailableTokens,
-} from '../../../store/blockchain';
-import { showNotification } from '../../../store/ui/actions';
+} from '../../../../store/blockchain';
+import { showNotification } from '../../../../store/ui/actions';
 
-import Button from '../../../components/Button';
-import ButtonGroup from '../../../components/ButtonGroup';
-import DecimalInput from '../../../components/DecimalInput';
-import { DecimalValue } from '../../../components/formatters';
-import Icon from '../../../components/icons';
-import Popup from '../../../components/Popup';
-import Tooltip from '../../../components/Tooltip';
-import { getTotalBalance } from '../../../contracts/utils/tokens';
-import { updateTokenAllowance } from '../../../store/blockchain/tokens';
+import Button from '../../../../components/Button';
+import ButtonGroup from '../../../../components/ButtonGroup';
+import DecimalInput from '../../../../components/DecimalInput';
+import ExplorerLink from '../../../../components/ExplorerLink';
+import { DecimalValue } from '../../../../components/formatters';
+import Icon from '../../../../components/icons';
+import Popup from '../../../../components/Popup';
+import Tooltip from '../../../../components/Tooltip';
+
+import { getTotalBalance } from '../../../../contracts/utils/tokens';
+import { updateTokenAllowance } from '../../../../store/blockchain/tokens';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
@@ -37,7 +40,7 @@ interface AppStateProps {
   bidToken: Token;
   feeRate: BigNumber;
   owl?: Token;
-  buyOrders: BuyOrder[];
+  buyOrders?: BuyOrder[];
 }
 
 interface DispatchProps {
@@ -63,15 +66,19 @@ const BidForm = React.memo(
       owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0),
     );
 
-    const hasBiddedBefore = useMemo(
-      () =>
-        buyOrders &&
-        buyOrders.filter(
+    const hasBidded = useMemo(
+      () => {
+        if (!buyOrders || !buyOrders.length) {
+          return false;
+        }
+
+        return buyOrders.find(
           order =>
             order.sellToken === auction.sellTokenAddress &&
             order.buyToken === auction.buyTokenAddress &&
             order.auctionIndex === auction.auctionIndex,
-        ).length > 0,
+        );
+      },
       [buyOrders, auction],
     );
 
@@ -248,10 +255,8 @@ const BidForm = React.memo(
                   'info',
                   'Bid request sent',
                   <p>
-                    Bid transaction has been sent.{' '}
-                    <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                      More info
-                    </a>
+                    Bid transaction has been sent.
+                    <ExplorerLink hash={transactionHash}>More info</ExplorerLink>
                   </p>,
                 ),
               );
@@ -263,15 +268,10 @@ const BidForm = React.memo(
                   'Bid confirmed',
                   <p>
                     Bid transaction has been confirmed.{' '}
-                    <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                      More info
-                    </a>
+                    <ExplorerLink hash={receipt.transactionHash}>More info</ExplorerLink>
                   </p>,
                 ),
               );
-
-              // Reload token balances and auction list
-              dispatch(loadAvailableTokens());
 
               setBidding(false);
               handleClose();
@@ -305,62 +305,61 @@ const BidForm = React.memo(
         if (event) {
           event.preventDefault();
         }
-        setApprovingOwl(true);
 
-        dx.toggleAllowance(owl)
-          .send({
-            from: currentAccount,
-            // TODO: estimated gas
-            // TODO: gas price from oracle
-          })
-          .once('transactionHash', transactionHash => {
-            setApprovingOwl(true);
-            dispatch(
-              showNotification(
-                'info',
-                'Approve OWL request sent',
-                <p>
-                  Approve OWL transaction has been sent.{' '}
-                  <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                    More info
-                  </a>
-                </p>,
-              ),
-            );
-          })
-          .once('confirmation', (confNumber, receipt) => {
-            setApprovingOwl(false);
-            dispatch(
-              showNotification(
-                'success',
-                'Approve OWL confirmed',
-                <p>
-                  Approve OWL transaction has been confirmed.{' '}
-                  <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                    More info
-                  </a>
-                </p>,
-              ),
-            );
-            // Reload token balances and allowance
-            dispatch(updateTokenAllowance(owl));
-            setCanUseOwlToPayFee(false);
-            goToNextStep();
-          })
-          .once('error', (err: Error) => {
-            setApprovingOwl(false);
-            dispatch(
-              showNotification(
-                'error',
-                'Approve OWL failed',
-                <p>
-                  {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
-                  <br />
-                  Please try again later.
-                </p>,
-              ),
-            );
-          });
+        if (owl) {
+          setApprovingOwl(true);
+
+          dx.toggleAllowance(owl)
+            .send({
+              from: currentAccount,
+              // TODO: estimated gas
+              // TODO: gas price from oracle
+            })
+            .once('transactionHash', (transactionHash: string) => {
+              setApprovingOwl(true);
+              dispatch(
+                showNotification(
+                  'info',
+                  'Approve OWL request sent',
+                  <p>
+                    Approve OWL transaction has been sent.{' '}
+                    <ExplorerLink hash={transactionHash}>More info</ExplorerLink>
+                  </p>,
+                ),
+              );
+            })
+            .once('confirmation', (confNumber: number, { transactionHash }: TransactionReceipt) => {
+              setApprovingOwl(false);
+              dispatch(
+                showNotification(
+                  'success',
+                  'Approve OWL confirmed',
+                  <p>
+                    Approve OWL transaction has been confirmed.{' '}
+                    <ExplorerLink hash={transactionHash}>More info</ExplorerLink>
+                  </p>,
+                ),
+              );
+              // Reload token balances and allowance
+              dispatch(updateTokenAllowance(owl));
+              setCanUseOwlToPayFee(false);
+              goToNextStep();
+            })
+            .once('error', (err: Error) => {
+              setApprovingOwl(false);
+              dispatch(
+                showNotification(
+                  'error',
+                  'Approve OWL failed',
+                  <p>
+                    {err.message.substring(err.message.lastIndexOf(':') + 1).trim()}
+                    <br />
+                    Please try again later.
+                  </p>,
+                ),
+              );
+            });
+        }
       },
       [owl, currentAccount, dispatch],
     );
@@ -554,7 +553,7 @@ const BidForm = React.memo(
           </Button>
         ) : (
           <Button mode='secondary' onClick={showDialog} data-testid='bid-button'>
-            {hasBiddedBefore ? 'Bid again' : 'Bid'}
+            {hasBidded ? 'Bid again' : 'Bid'}
           </Button>
         )}
       </Popup.Container>

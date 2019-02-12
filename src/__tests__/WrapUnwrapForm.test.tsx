@@ -54,6 +54,7 @@ const wethWithBalance: Token = {
   symbol: 'WETH',
   priceEth: toBigNumber(1),
   allowance: toBigNumber(0),
+  tradeable: true,
 };
 
 const wethNoBalance: Token = {
@@ -64,6 +65,7 @@ const wethNoBalance: Token = {
   symbol: 'WETH',
   priceEth: toBigNumber(1),
   allowance: toBigNumber(0),
+  tradeable: true,
 };
 
 describe('Despoit and Withdraw functionality', () => {

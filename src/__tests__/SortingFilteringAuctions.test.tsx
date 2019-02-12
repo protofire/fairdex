@@ -6,7 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 
 import { renderWithRedux } from './utils';
 
-import EndedAuctions from '../pages/main/auctions/containers/EndedAuctions';
+import EndedAuctions from '../pages/main/auctions/tabs/EndedAuctions';
 
 import AuctionNavBar from '../pages/main/layout/NavBar/Auctions';
 import Filters from '../pages/main/layout/Filters';
@@ -14,7 +14,7 @@ import Filters from '../pages/main/layout/Filters';
 import auctions from '../__mocks__/auctions';
 import frt from '../__mocks__/frt';
 import tokens from '../__mocks__/tokens';
-import RunningAuctions from '../pages/main/auctions/containers/RunningAuctions';
+import RunningAuctions from '../pages/main/auctions/tabs/RunningAuctions';
 
 beforeEach(jest.resetAllMocks);
 
