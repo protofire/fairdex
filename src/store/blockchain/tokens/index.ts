@@ -100,17 +100,23 @@ const setTokenAllowance: ActionCreator<Action> = (address: Address, allowance: B
 async function getAvailableTokens(network: Network | null) {
   const markets = await dx.getAvailableMarkets();
 
-  const tokenAddresses = markets.reduce<Set<string>>(
+  const tokenAddresses = markets.reduce<Set<Address>>(
     (addresses, market) => addresses.add(market[0]).add(market[1]),
     new Set(),
   );
 
   // Filter non-whitelisted token
-  const approvedTokens = network && whitelist[network];
+  const whitelistedTokens = network && whitelist[network];
 
-  if (approvedTokens != null) {
-    approvedTokens.forEach(({ address }) => {
-      tokenAddresses.delete(address);
+  if (whitelistedTokens != null) {
+    tokenAddresses.forEach(address => {
+      const isWhitelisted = whitelistedTokens.some(
+        approvedToken => approvedToken.address.toLowerCase() === address.toLowerCase(),
+      );
+
+      if (!isWhitelisted) {
+        tokenAddresses.delete(address);
+      }
     });
   }
 
