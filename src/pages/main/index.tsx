@@ -13,6 +13,7 @@ import { ClaimProvider } from './auctions/claim/ClaimContext';
 
 import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 import AccountInfo from './side/AccountInfo';
+import NavMenu from './side/NavMenu';
 import WalletInfo from './side/WalletInfo';
 
 const EndedAuctions = Loadable({
@@ -94,6 +95,7 @@ class MainPage extends React.Component<Props> {
                 </NavLink>
               </Branding>
               <SideContent>
+                <NavMenu />
                 <AccountInfo />
                 <WalletInfo />
               </SideContent>
