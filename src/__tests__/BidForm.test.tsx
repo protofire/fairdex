@@ -7,7 +7,7 @@ import { cleanup, fireEvent, waitForElement, wait, getByText } from 'react-testi
 import { renderWithRedux } from './utils';
 import { toBigNumber } from '../contracts/utils';
 
-import BidForm from '../pages/main/auctions/BidForm';
+import BidForm from '../pages/main/auctions/bid/BidForm';
 import { getAvailableVolume } from '../contracts/utils/auctions';
 
 import tokens from '../__mocks__/tokens';
@@ -94,6 +94,7 @@ describe('in running auctions', () => {
       const { getByTestId } = renderWithRedux(<BidForm auction={data} />, {
         blockchain: {
           tokens,
+          buyOrders: [],
         },
       });
 
@@ -116,6 +117,7 @@ describe('in running auctions', () => {
       const { getByTestId, queryByTestId } = renderWithRedux(<BidForm auction={data} />, {
         blockchain: {
           tokens,
+          buyOrders: [],
         },
       });
 
@@ -161,6 +163,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              buyOrders: [],
             },
           },
         );
@@ -197,6 +200,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              buyOrders: [],
             },
           },
         );
@@ -233,6 +237,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              buyOrders: [],
             },
           },
         );
@@ -269,6 +274,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              buyOrders: [],
             },
           },
         );
@@ -308,6 +314,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              buyOrders: [],
             },
           },
         );
@@ -346,6 +353,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              buyOrders: [],
             },
           },
         );
@@ -384,6 +392,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              buyOrders: [],
             },
           },
         );
@@ -422,6 +431,7 @@ describe('in running auctions', () => {
           {
             blockchain: {
               tokens: stateTokens,
+              buyOrders: [],
             },
           },
         );

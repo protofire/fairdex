@@ -7,26 +7,26 @@ import styled from 'styled-components';
 import { history, pageview } from '../../analytics';
 import Spinner from '../../components/Spinner';
 import logo from '../../images/protofire.svg';
-import { getNetworkType } from '../../store/blockchain';
+import { fetchData, getNetworkType } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
-import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 
+import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 import AccountInfo from './side/AccountInfo';
 import WalletInfo from './side/WalletInfo';
 
 const EndedAuctions = Loadable({
-  loader: () => import('./auctions/containers/EndedAuctions'),
+  loader: () => import('./auctions/tabs/EndedAuctions'),
   loading: () => <Spinner size='large' />,
 });
 
 const RunningAuctions = Loadable({
-  loader: () => import('./auctions/containers/RunningAuctions'),
+  loader: () => import('./auctions/tabs/RunningAuctions'),
   loading: () => <Spinner size='large' />,
 });
 
 const ScheduledAuctions = Loadable({
-  loader: () => import('./auctions/containers/ScheduledAuctions'),
+  loader: () => import('./auctions/tabs/ScheduledAuctions'),
   loading: () => <Spinner size='large' />,
 });
 
@@ -41,8 +41,21 @@ interface MainPageStateProps {
   termsConditionsAccepted: boolean;
 }
 
-class MainPage extends React.Component<MainPageStateProps> {
+interface DispatchProps {
+  fetchData: () => void;
+}
+
+type Props = MainPageStateProps & DispatchProps;
+
+const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
+
+class MainPage extends React.Component<Props> {
   componentDidMount() {
+    const { wallet, network } = this.props;
+    if (wallet && network) {
+      this.props.fetchData();
+    }
+
     window.scrollTo({
       behavior: 'smooth',
       top: 0,
@@ -53,6 +66,12 @@ class MainPage extends React.Component<MainPageStateProps> {
     history.listen(location => pageview(location.pathname));
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.wallet !== this.props.wallet || prevProps.network !== this.props.network) {
+      this.props.fetchData();
+    }
+  }
+
   render() {
     const { termsConditionsAccepted, wallet, network } = this.props;
 
@@ -60,43 +79,45 @@ class MainPage extends React.Component<MainPageStateProps> {
       return <Redirect to='/terms-conditions' />;
     } else if (!wallet || !network) {
       return <Redirect to='/select-wallet' />;
-    } else if (network !== 'rinkeby') {
+    } else if (wallet && !network) {
+      return Spinner;
+    } else if (!AVAILABLE_NETWORKS.includes(network)) {
       return <Redirect to='/network-not-available' />;
+    } else {
+      return (
+        <Router history={history}>
+          <Layout>
+            <Sidebar>
+              <Branding>
+                <NavLink to='/auction'>
+                  <img src={logo} height={40} />
+                </NavLink>
+              </Branding>
+              <SideContent>
+                <AccountInfo />
+                <WalletInfo />
+              </SideContent>
+            </Sidebar>
+            <MessageHandler />
+            <Filters />
+            <Content>
+              <ClaimProvider>
+                <NavBar />
+                <Section>
+                  <Switch>
+                    <Route path='/auction/running' component={RunningAuctions} />
+                    <Route path='/auction/scheduled' component={ScheduledAuctions} />
+                    <Route path='/auction/ended' component={EndedAuctions} />
+                    <Route path='/wallet' component={WalletOverview} />
+                    <Redirect to='/auction/running' />
+                  </Switch>
+                </Section>
+              </ClaimProvider>
+            </Content>
+          </Layout>
+        </Router>
+      );
     }
-
-    return (
-      <Router history={history}>
-        <Layout>
-          <Sidebar>
-            <Branding>
-              <NavLink to='/auction'>
-                <img src={logo} height={40} />
-              </NavLink>
-            </Branding>
-            <SideContent>
-              <AccountInfo />
-              <WalletInfo />
-            </SideContent>
-          </Sidebar>
-          <MessageHandler />
-          <Filters />
-          <Content>
-            <ClaimProvider>
-              <NavBar />
-              <Section>
-                <Switch>
-                  <Route path='/auction/running' component={RunningAuctions} />
-                  <Route path='/auction/scheduled' component={ScheduledAuctions} />
-                  <Route path='/auction/ended' component={EndedAuctions} />
-                  <Route path='/wallet' component={WalletOverview} />
-                  <Redirect to='/auction/running' />
-                </Switch>
-              </Section>
-            </ClaimProvider>
-          </Content>
-        </Layout>
-      </Router>
-    );
   }
 }
 
@@ -140,4 +161,13 @@ function mapStateToProps(state: AppState): MainPageStateProps {
   };
 }
 
-export default connect(mapStateToProps)(MainPage);
+function mapDispatchToProps(dispatch: any): DispatchProps {
+  return {
+    fetchData: () => dispatch(fetchData()),
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(MainPage);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   differenceInDays,
@@ -10,7 +10,7 @@ import {
   subMonths,
 } from 'date-fns';
 
-type Timestamp = Date | string | number;
+type Timestamp = Date | number;
 
 interface Props {
   from?: Timestamp | null;
@@ -21,8 +21,18 @@ interface Props {
 }
 
 const Duration = ({ from, to, defaultValue = '-', prefix = '', postfix = '' }: Props) => {
-  const now = Date.now();
-  const formatted = duration(from || now, to || now);
+  const [now, setNow] = useState(Date.now());
+  const formatted = useMemo(() => duration(from || now, to || now), [from, to, now]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 30_000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   return <span>{formatted ? `${prefix} ${formatted} ${postfix}`.trim() : defaultValue}</span>;
 };

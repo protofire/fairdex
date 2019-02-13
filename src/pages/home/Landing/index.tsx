@@ -21,6 +21,8 @@ interface LandingStateProps {
 
 type Props = LandingStateProps & RouteComponentProps;
 
+const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
+
 const Landing: FunctionComponent<Props> = ({ network, wallet, termsConditionsAccepted, history }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [hidePrev, setHidePrev] = useState(true);
@@ -108,7 +110,7 @@ const Landing: FunctionComponent<Props> = ({ network, wallet, termsConditionsAcc
         history.push('/terms-conditions');
       } else if (!wallet || !network) {
         history.push('/select-wallet');
-      } else if (network && network !== 'rinkeby') {
+      } else if (network && !AVAILABLE_NETWORKS.includes(network)) {
         history.push('/network-not-available');
       } else {
         history.push('/auctions');

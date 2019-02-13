@@ -22,6 +22,8 @@ interface DispatchProps {
 
 type Props = TermsAndConditionsStateProps & DispatchProps;
 
+const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
+
 const TermsAndConditions: FunctionComponent<Props> = ({
   network,
   wallet,
@@ -70,9 +72,9 @@ const TermsAndConditions: FunctionComponent<Props> = ({
 
   if (termsConditionsAccepted && !wallet) {
     return <Redirect to='/select-wallet' />;
-  } else if (termsConditionsAccepted && network && network !== 'rinkeby') {
-    return <Redire ct to='/network-not-available' />;
-  } else if (termsConditionsAccepted && wallet && network === 'rinkeby') {
+  } else if (termsConditionsAccepted && network && !AVAILABLE_NETWORKS.includes(network)) {
+    return <Redirect to='/network-not-available' />;
+  } else if (termsConditionsAccepted && wallet && network && AVAILABLE_NETWORKS.includes(network)) {
     return <Redirect to='/auctions' />;
   } else {
     return (

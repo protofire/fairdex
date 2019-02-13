@@ -2,6 +2,7 @@ interface UiState {
   sidebarVisible: boolean;
   filtersVisible: boolean;
   infoMessage?: InfoMessage;
+  auctionDetail?: AuctionDetail;
 }
 
 type InfoMessageType = 'error' | 'success' | 'info';
@@ -15,4 +16,10 @@ interface InfoMessage {
 interface UiAction {
   type: string;
   payload?: Partial<UiState>;
+}
+
+interface AuctionDetail {
+  buyToken: Address;
+  sellToken: Address;
+  auctionIndex: string;
 }

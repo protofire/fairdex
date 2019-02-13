@@ -20,6 +20,7 @@ const token1: Token = {
   name: 'Token1',
   symbol: 'TK1',
   priceEth: toBigNumber(1),
+  tradeable: true,
 };
 
 const token2: Token = {
@@ -29,6 +30,7 @@ const token2: Token = {
   name: 'Token2',
   symbol: 'TK2',
   priceEth: toBigNumber(1),
+  tradeable: true,
 };
 
 const token3: Token = {
@@ -38,6 +40,7 @@ const token3: Token = {
   name: 'Token3',
   symbol: 'TK3',
   priceEth: toBigNumber(1),
+  tradeable: true,
 };
 
 const token4: Token = {
@@ -47,6 +50,7 @@ const token4: Token = {
   name: 'Token4',
   symbol: 'TK4',
   priceEth: toBigNumber(1),
+  tradeable: true,
 };
 
 const tokens: Map<Address, Token> = new Map([

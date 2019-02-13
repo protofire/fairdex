@@ -11,59 +11,66 @@ import DepositWithdrawForm from './DepositWithdrawForm';
 import EnableForTradingForm from './EnableForTradingForm';
 import WrapUnwrapForm from './WrapUnwrapForm';
 
-interface Props {
+interface TokenViewProps {
   data: Token;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const TokenView = ({ data: token }: Props) => (
-  <Card>
-    <Header>
-      <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
-        <span>{token.symbol}</span>
-      </Title>
-      {token.symbol === 'WETH' && <WrapUnwrapForm token={token} />}
-    </Header>
-    <Table>
-      <Row>
-        <Label>Wallet balance</Label>
-        <Value>
-          {token.balance === undefined ? (
-            <Loading />
-          ) : (
-            <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
-          )}
-        </Value>
-      </Row>
-      <Row>
-        <Label>DX balance</Label>
-        <Value>
-          {token.balance === undefined ? (
-            <Loading />
-          ) : (
-            <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
-          )}
-        </Value>
-      </Row>
-      <Row>
-        <Label>Total holdings</Label>
-        <Value>
-          {token.balance === undefined ? (
-            <Loading />
-          ) : (
-            <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
-          )}
-        </Value>
-      </Row>
-      <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
-    </Table>
-    <ButtonGroup>
-      {getWalletBalance(token).gt(ZERO) && <DepositWithdrawForm action={'Deposit'} token={token} />}
-      {getDxBalance(token).gt(ZERO) && <DepositWithdrawForm action={'Withdraw'} token={token} />}
-    </ButtonGroup>
-  </Card>
-);
+const TokenView = ({ data: token }: TokenViewProps) => {
+  return (
+    <Card>
+      <Header>
+        <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
+          <span>{token.symbol}</span>
+        </Title>
+        {token.symbol === 'WETH' && <WrapUnwrapForm token={token} />}
+      </Header>
+      <Table>
+        <Row>
+          <Label>Wallet balance</Label>
+          <Value>
+            {token.balance === undefined ? (
+              <Loading />
+            ) : (
+              <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
+            )}
+          </Value>
+        </Row>
+        <Row>
+          <Label>DX balance</Label>
+          <Value>
+            {token.balance === undefined ? (
+              <Loading />
+            ) : (
+              <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
+            )}
+          </Value>
+        </Row>
+        <Row>
+          <Label>Total holdings</Label>
+          <Value>
+            {token.balance === undefined ? (
+              <Loading />
+            ) : (
+              <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
+            )}
+          </Value>
+        </Row>
+        <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
+      </Table>
+      <ButtonGroup>
+        {token.tradeable && getWalletBalance(token).gt(ZERO) && (
+          <DepositWithdrawForm action={'Deposit'} token={token} />
+        )}
+
+        {token.tradeable && getDxBalance(token).gt(ZERO) && (
+          <DepositWithdrawForm action={'Withdraw'} token={token} />
+        )}
+      </ButtonGroup>
+    </Card>
+  );
+};
 
 const Label = styled.dt`
   position: relative;

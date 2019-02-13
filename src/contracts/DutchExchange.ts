@@ -2,10 +2,17 @@ import { abi } from '@gnosis.pm/dx-contracts/build/contracts/DutchExchange.json'
 import { DutchExchangeProxy as proxy } from '@gnosis.pm/dx-contracts/networks.json';
 
 import BaseContract from './BaseContract';
-import { getTokenContract, getWethContract } from './index';
+import { getErc20Contract, getWethContract } from './index';
 import { Decimal, fromDecimal, timeout, toBigNumber, toDecimal, toFractional, ZERO } from './utils';
 
-type Event = 'AuctionCleared' | 'NewBuyOrder' | 'NewTokenPair';
+type Event =
+  | 'AuctionCleared'
+  | 'Fee'
+  | 'NewBuyOrder'
+  | 'NewBuyerFundsClaim'
+  | 'NewDeposit'
+  | 'NewWithdrawal'
+  | 'NewTokenPair';
 
 interface Fraction {
   num: string | number;
@@ -31,7 +38,10 @@ class DutchExchange extends BaseContract<Event> {
   }
 
   toggleAllowance(token: Token) {
-    return getTokenContract(token).approve(this.address, token.allowance && token.allowance.gt(0) ? 0 : -1);
+    return getErc20Contract(token.address).approve(
+      this.address,
+      token.allowance && token.allowance.gt(0) ? 0 : -1,
+    );
   }
 
   wrapEther(token: Token) {
@@ -61,9 +71,9 @@ class DutchExchange extends BaseContract<Event> {
   }
 
   @timeout()
-  async getBuyOrders(account: Address) {
+  async getBuyOrders(account: Address, fromBlock = 0) {
     const buyOrders = await this.contract.getPastEvents('NewBuyOrder', {
-      fromBlock: 0,
+      fromBlock,
       filter: { user: account },
     });
 
@@ -73,8 +83,8 @@ class DutchExchange extends BaseContract<Event> {
 
         all[`${sellToken}-${buyToken}-${auctionIndex}`] = {
           blockNumber,
-          sellToken: sellToken.toLowerCase(),
-          buyToken: buyToken.toLowerCase(),
+          sellToken,
+          buyToken,
           auctionIndex,
         };
 
@@ -224,7 +234,7 @@ class DutchExchange extends BaseContract<Event> {
     const { tokens1, tokens2 } = await this.contract.methods.getRunningTokenPairs(tokens).call();
 
     return tokens1.map((_: void, i: number) => {
-      return [tokens1[i].toLowerCase(), tokens2[i].toLowerCase()];
+      return [tokens1[i], tokens2[i]];
     });
   }
 
@@ -233,6 +243,20 @@ class DutchExchange extends BaseContract<Event> {
     const frtAddress: Address = await this.contract.methods.frtToken().call();
 
     return frtAddress;
+  }
+
+  @timeout()
+  async getEthTokenAddress() {
+    const ethTokenAddress: Address = await this.contract.methods.ethToken().call();
+
+    return ethTokenAddress;
+  }
+
+  @timeout()
+  async getOwlAddress() {
+    const owlAddress: Address = await this.contract.methods.owlToken().call();
+
+    return owlAddress;
   }
 
   @timeout()

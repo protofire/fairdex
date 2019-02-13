@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Route, Router, Switch } from 'react-router-dom';
 import { history } from '../../analytics';
 
-import { getNetworkType } from '../../store/blockchain';
+import { getNetworkType, init } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import Landing from './Landing';
 import spinner from './spinner';
@@ -25,27 +25,38 @@ const SelectWallet = Loadable({
   loading: () => spinner,
 });
 
-interface Props {
+interface HomePageStateProps {
   network?: Network | null;
   wallet?: Wallet;
   termsConditionsAccepted: boolean;
 }
 
-const HomePage = React.memo(({ network, wallet, termsConditionsAccepted }: Props) => {
-  return (
-    <Router history={history}>
-      <Switch>
-        <Route exact path='/' component={Landing} />
-        <Route exact path='/terms-conditions' component={TermsAndConditions} />
-        <Route path='/select-wallet' exact component={SelectWallet} />
-        <Route path='/network-not-available' exact component={NetworkNotAvailable} />
-        <Route component={MainPage} />
-      </Switch>
-    </Router>
-  );
+interface DispatchProps {
+  initWallet: (wallet: Wallet) => void;
+}
+
+type Props = HomePageStateProps & DispatchProps;
+
+const HomePage = React.memo(({ network, wallet, initWallet }: Props) => {
+  if (wallet && !network) {
+    initWallet(wallet);
+    return spinner;
+  } else {
+    return (
+      <Router history={history}>
+        <Switch>
+          <Route exact path='/' component={Landing} />
+          <Route exact path='/terms-conditions' component={TermsAndConditions} />
+          <Route path='/select-wallet' exact component={SelectWallet} />
+          <Route path='/network-not-available' exact component={NetworkNotAvailable} />
+          <Route component={MainPage} />
+        </Switch>
+      </Router>
+    );
+  }
 });
 
-function mapStateToProps(state: AppState): Props {
+function mapStateToProps(state: AppState): HomePageStateProps {
   return {
     network: getNetworkType(state),
     wallet: state.blockchain.wallet,
@@ -53,4 +64,13 @@ function mapStateToProps(state: AppState): Props {
   };
 }
 
-export default connect(mapStateToProps)(HomePage);
+function mapDispatchToProps(dispatch: any): DispatchProps {
+  return {
+    initWallet: wallet => dispatch(init(wallet)),
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(HomePage);

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import Separator from '../../components/Separator';
 import * as images from '../../images';
-import { getNetworkType, initWallet } from '../../store/blockchain';
+import { getNetworkType, init } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import spinner from './spinner';
 import { Container, Content, Footer } from './utils';
@@ -21,6 +21,8 @@ interface AppStateProps {
 interface DispatchProps {
   onSelectWallet: (wallet: Wallet) => void;
 }
+
+const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
 
 const SelectWallet: FunctionComponent<Props> = ({
   network,
@@ -44,7 +46,7 @@ const SelectWallet: FunctionComponent<Props> = ({
   } else if (wallet && !network) {
     handleWalletSelection(wallet);
     return spinner;
-  } else if (wallet && network && network !== 'rinkeby') {
+  } else if (wallet && network && !AVAILABLE_NETWORKS.includes(network)) {
     return <Redirect to='/network-not-available' />;
   } else if (wallet && network) {
     return <Redirect to='/auction' />;
@@ -149,7 +151,7 @@ function mapStateToProps(state: AppState): AppStateProps {
 
 function mapDispatchToProps(dispatch: any): DispatchProps {
   return {
-    onSelectWallet: wallet => dispatch(initWallet(wallet)),
+    onSelectWallet: wallet => dispatch(init(wallet)),
   };
 }
 

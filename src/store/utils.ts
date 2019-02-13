@@ -8,17 +8,25 @@ interface PeriodicActionOptions {
   name: string;
   task: AsyncAction;
   interval?: number;
+  runImmediately?: boolean;
 }
 
 const DEFAULT_INTERVAL = 10_000; // 10 seconds
 
 const subscriptions = new Map<string, NodeJS.Timeout>();
 
-export function periodicAction({ name, task, interval = DEFAULT_INTERVAL }: PeriodicActionOptions) {
+export function periodicAction({
+  name,
+  task,
+  interval = DEFAULT_INTERVAL,
+  runImmediately = true,
+}: PeriodicActionOptions) {
   const subscription = subscriptions.get(name);
 
   return async (dispatch: Dispatch, getState: () => AppState) => {
-    await checkForUpdates();
+    if (runImmediately) {
+      await checkForUpdates();
+    }
 
     async function checkForUpdates() {
       try {

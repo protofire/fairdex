@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
-import { getNetworkType, initWallet } from '../../store/blockchain';
+import { getNetworkType, init } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 
 import Separator from '../../components/Separator';
@@ -62,7 +62,7 @@ function mapStateToProps(state: AppState): NetworkNotAvailableStateProps {
 
 function mapDispatchToProps(dispatch: any): DispatchProps {
   return {
-    initializeWallet: wallet => dispatch(initWallet(wallet)),
+    initializeWallet: wallet => dispatch(init(wallet)),
   };
 }
 

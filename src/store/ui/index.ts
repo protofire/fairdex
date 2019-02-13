@@ -51,6 +51,18 @@ const uiReducer: Reducer<UiState, UiAction> = (state = initialState, action) => 
         infoMessage: undefined,
       };
 
+    case actions.SHOW_AUCTION_DETAILS:
+      return {
+        ...state,
+        auctionDetail: action.payload && action.payload.auctionDetail,
+      };
+
+    case actions.HIDE_AUCTION_DETAILS:
+      return {
+        ...state,
+        auctionDetail: undefined,
+      };
+
     default:
       return state;
   }

@@ -7,6 +7,7 @@ const variables = css`
     --color-accent: #dbb82c;
     --color-accent-shadow: rgba(219, 184, 44, 0.7);
     --color-border: rgba(0, 0, 0, 0.05);
+    --color-connected: #adff30;
     --color-content-bg: #f4f6f8;
     --color-main-bg: #ffffff;
     --color-text-primary: #131f3e;

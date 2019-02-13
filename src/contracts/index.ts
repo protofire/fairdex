@@ -4,11 +4,11 @@ import Weth from './Weth';
 const cache = new Map<Address, Erc20Token>();
 let weth: Weth;
 
-export function getTokenContract(token: Token) {
-  const contract = cache.get(token.address) || new Erc20Token(token);
+export function getErc20Contract(tokenAddress: Address) {
+  const contract = cache.get(tokenAddress) || new Erc20Token(tokenAddress);
 
-  if (contract != null && !cache.has(token.address)) {
-    cache.set(token.address, contract);
+  if (contract != null && !cache.has(tokenAddress)) {
+    cache.set(tokenAddress, contract);
   }
 
   return contract;

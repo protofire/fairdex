@@ -12,7 +12,7 @@ import {
   getNetworkType,
 } from '../../../store/blockchain';
 import { getBidsCount } from '../../../store/blockchain/buy-orders';
-import { getFrt } from '../../../store/blockchain/frt';
+import { getFrt } from '../../../store/blockchain/fee';
 
 import TokenBalance from './TokenBalance';
 import WalletCard, { Content, Header, Item } from './WalletCard';
@@ -20,7 +20,7 @@ import WalletCard, { Content, Header, Item } from './WalletCard';
 export interface AccountProps {
   claimableCount?: number;
   currentAccount: Address;
-  currentNetwork: Address;
+  currentNetwork: Network | null;
   frt?: Token;
   liquidityContribution?: BigNumber;
   pastBids: number;
@@ -42,7 +42,9 @@ const AccountInfo = ({
         <img src={images.wallet.MetaMask} alt='MetaMask' />
       </Icon>
       <HeaderAddress address={currentAccount} />
-      <NetworkName>{currentNetwork}</NetworkName>
+      <NetworkName title={currentNetwork ? `Connected to ${currentNetwork} network` : ''}>
+        {currentNetwork}
+      </NetworkName>
     </Header>
     <Content>
       <Item>
@@ -103,10 +105,23 @@ const Icon = styled.div`
   padding-top: 15px;
   user-select: none;
 `;
-const NetworkName = styled.span`
+
+const NetworkName = styled.div`
+  position: relative;
   font-size: 12px;
   border-bottom: 1px dashed black;
   text-transform: capitalize;
+
+  &:before {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    bottom: calc(50% - 5px);
+    left: -15px;
+    content: '';
+    background: var(--color-connected);
+    border-radius: 50%;
+  }
 `;
 
 function mapStateToProps(state: AppState): AccountProps {
