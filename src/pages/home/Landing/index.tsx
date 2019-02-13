@@ -178,13 +178,14 @@ const Wrapper = styled.div`
   text-align: left;
 
   p {
-    font-size: 13px;
-    line-height: 1.23;
     color: #adadad;
-  }
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 25px 0;
 
-  @media (min-width: 1025px) {
-    height: 100vh;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 `;
 
@@ -206,35 +207,40 @@ const Header = styled.div`
   }
 
   h3 {
-    font-size: 17px;
     color: #626262;
-    font-weight: normal;
-    font-style: normal;
+    font-size: 17px;
     font-stretch: normal;
-    line-height: 1.12;
+    font-style: normal;
+    font-weight: normal;
     letter-spacing: normal;
+    line-height: 1.12;
   }
 `;
 
 const Main = styled.section`
-  flex: 1;
+  align-items: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  flex: 1;
   padding: var(--spacing-wide) 0;
 `;
 
 const Content = styled.section`
+  align-items: center;
   display: flex;
   justify-content: space-around;
-  align-items: center;
 `;
 
 const PrevNextStep = styled.img`
-  width: 16.5px;
-  height: 30px;
-  margin: var(--spacing-normal);
   cursor: pointer;
+  height: 20px;
+  margin: 10px;
+
+  @media (min-width: 768px) {
+    height: 30px;
+    margin: var(--spacing-normal);
+    width: 16.5px;
+  }
 
   ${({ hide }) => {
     if (hide) {
@@ -250,30 +256,32 @@ const StepWrapper = styled(Card)`
   flex-direction: column;
   max-width: 636px;
   min-height: 480px;
+  padding: 15px;
   position: relative;
 `;
 
 const StepContent = styled.div`
   flex: 1;
-
-  @media (max-width: 800px) {
-    width: 90%;
-  }
 `;
 
 const StepSwitcher = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding: var(--spacing-normal);
+  padding: 30px 0 40px;
+
+  @media (min-width: 768px) {
+    padding: 30px 0 20px;
+  }
 `;
 
 const StepButton = styled.div`
-  width: 32px;
-  height: 5px;
-  margin: 0 7px;
   background: var(--color-grey);
   cursor: pointer;
+  height: 5px;
+  margin: 0 7px;
+  transition: all 0.3s ease-out;
+  width: 32px;
 
   ${({ active }) => {
     if (active) {
@@ -287,25 +295,21 @@ const StepButton = styled.div`
 `;
 
 const Skip = styled.span`
-  font-size: 11px;
-  line-height: 1.36;
+  bottom: 15px;
   color: #dbb82c;
-  text-decoration: underline;
   cursor: pointer;
+  font-size: 11px;
+  line-height: 1.2;
   position: absolute;
-  bottom: var(--spacing-normal);
-  right: var(--spacing-normal);
+  right: 15px;
+  text-decoration: underline;
 `;
 
 const SuportedWallets = styled.section`
   display: flex;
   flex-flow: column;
-  padding-top: var(--spacing-normal);
-
-  @media (max-width: 800px) {
-    width: 60%;
-    text-align: center;
-  }
+  padding: var(--spacing-normal) 15px 0;
+  text-align: center;
 `;
 
 const WalletLogos = styled.div`
@@ -319,33 +323,28 @@ const WalletLogos = styled.div`
 `;
 
 const WalletDescription = styled.div`
-  font-size: 12px;
-  font-weight: normal;
-  font-style: normal;
-  font-stretch: normal;
-  line-height: 1.33;
-  letter-spacing: normal;
   color: #333333;
+  font-size: 12px;
+  font-stretch: normal;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: normal;
+  line-height: 1.33;
 `;
 
 const Footer = styled.footer`
-  padding: var(--spacing-normal) 0;
+  color: #303b3e;
   display: flex;
   flex-flow: row;
-  justify-content: center;
   font-size: 9px;
   font-weight: 600;
-  color: #303b3e;
-
-  @media (min-width: 1025px) {
-    position: fixed;
-    bottom: 0;
-  }
+  justify-content: center;
+  padding: 0 0 40px;
 `;
 
 const Protofire = styled.div`
-  display: flex;
   align-items: center;
+  display: flex;
 
   img {
     width: 144px;
@@ -353,7 +352,7 @@ const Protofire = styled.div`
     margin: 0 10px;
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 767px) {
     span {
       display: none;
     }
@@ -370,7 +369,7 @@ const Geco = styled.div`
     margin: 0 10px;
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 767px) {
     span {
       display: none;
     }

@@ -2,8 +2,9 @@ import styled from 'styled-components';
 import Separator from '../../../components/Separator';
 
 export const StepTitle = styled.div`
-  display: flex;
   border-bottom: 2px solid var(--color-content-bg);
+  display: flex;
+  padding-top: 10px;
 
   &:first-child {
     h3 {
@@ -26,12 +27,17 @@ export const Content = styled.div`
   margin-top: var(--spacing-wide);
 
   p {
-    font-size: 1em !important;
-    line-height: 1.38 !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    padding: 0 12px;
   }
 
   ol {
     color: #adadad;
+
+    li {
+      line-height: 1.7;
+    }
   }
 
   a {

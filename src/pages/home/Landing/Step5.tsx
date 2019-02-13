@@ -40,9 +40,9 @@ const Step5: FunctionComponent<StepProps> = ({ onGetStarted }) => (
 );
 
 const GetStarted = styled(Button)`
+  margin: var(--spacing-wide) auto;
+  transition: all 0.15s ease-out;
   width: 200px;
-  margin: auto;
-  margin-top: var(--spacing-wide);
 `;
 
 export default Step5;
