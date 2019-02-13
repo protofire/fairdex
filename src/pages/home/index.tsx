@@ -30,12 +30,14 @@ interface Props {
   termsConditionsAccepted: boolean;
 }
 
+const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
+
 const HomePage = React.memo(({ network, wallet, termsConditionsAccepted }: Props) => {
   let content = null;
 
   if (!wallet || !network) {
     content = <SelectWallet />;
-  } else if (network !== 'rinkeby') {
+  } else if (!AVAILABLE_NETWORKS.includes(network)) {
     content = <NetworkNotAvailable />;
   } else {
     return <MainPage />;

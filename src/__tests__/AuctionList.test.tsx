@@ -5,9 +5,9 @@ import { cleanup } from 'react-testing-library';
 
 import { renderWithRedux } from './utils';
 
-import EndedAuctions from '../pages/main/auctions/containers/EndedAuctions';
-import RunningAuctions from '../pages/main/auctions/containers/RunningAuctions';
-import ScheduledAuctions from '../pages/main/auctions/containers/ScheduledAuctions';
+import EndedAuctions from '../pages/main/auctions/tabs/EndedAuctions';
+import RunningAuctions from '../pages/main/auctions/tabs/RunningAuctions';
+import ScheduledAuctions from '../pages/main/auctions/tabs/ScheduledAuctions';
 
 import auctions from '../__mocks__/auctions';
 import frt from '../__mocks__/frt';
@@ -96,6 +96,7 @@ function renderList(Container: ReactElement<any>, auctionList?: Auction[]) {
       auctions: auctionList,
       frt,
       tokens,
+      buyOrders: [],
     },
   });
 }

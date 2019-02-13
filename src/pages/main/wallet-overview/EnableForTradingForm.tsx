@@ -4,12 +4,11 @@ import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
 
 import { updateTokenAllowance } from '../../../store/blockchain/tokens';
-import { getCurrentAccount } from '../../../store/blockchain/wallet';
+import { getCurrentAccount } from '../../../store/blockchain/web3';
 import { showNotification } from '../../../store/ui/actions';
 
 import CheckboxToggle from '../../../components/CheckboxToggle';
-import { ZERO } from '../../../contracts/utils';
-import { getWalletBalance } from '../../../contracts/utils/tokens';
+import ExplorerLink from '../../../components/ExplorerLink';
 
 interface OwnProps {
   token: Token;
@@ -31,7 +30,9 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
 
   const onChangeHandler = useCallback(
     () => {
-      const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for trading`;
+      const message = `${enabled ? 'Disable' : 'Enable'} ${token.symbol} for ${
+        token.symbol === 'OWL' && !token.tradeable ? 'paying LC' : 'trading'
+      }`;
 
       dx.toggleAllowance(token)
         .send({
@@ -47,9 +48,7 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
               `${message}`,
               <p>
                 {message} transaction has been sent.{' '}
-                <a href={`https://rinkeby.etherscan.io/tx/${transactionHash}`} target='_blank'>
-                  More info
-                </a>
+                <ExplorerLink hash={transactionHash}>More info</ExplorerLink>
               </p>,
             ),
           );
@@ -62,9 +61,7 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
               `${message}`,
               <p>
                 {message} transaction has been confirmed.{' '}
-                <a href={`https://rinkeby.etherscan.io/tx/${receipt.transactionHash}`} target='_blank'>
-                  More info
-                </a>
+                <ExplorerLink hash={receipt.transactionHash}>More info</ExplorerLink>
               </p>,
             ),
           );
@@ -92,7 +89,15 @@ const EnableForTradingForm = ({ token, enabled, currentAccount, dispatch }: Prop
 
   return (
     <Container>
-      <Label>Enable for trading</Label>
+      <Label>
+        {token.symbol === 'OWL' && !token.tradeable ? (
+          <>
+            Enable for paying <abbr title='Liquidity Contribution'>LC</abbr>
+          </>
+        ) : (
+          'Enable for trading'
+        )}
+      </Label>
       <dd>
         <TradingToggle
           onToggle={onChangeHandler}

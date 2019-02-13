@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 
 import { ZERO } from '../../../contracts/utils';
 import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contracts/utils/tokens';
-import { getFrt } from '../frt';
+import { getFrt } from '../fee';
 
 export const getToken = (state: AppState, address: Address) => state.blockchain.tokens.get(address);
 
@@ -45,11 +45,7 @@ export const getTopBalances = createSelector(
 
 export const getOwl = createSelector(
   getAllTokens,
-  tokens => {
-    return Array.from(tokens)
-      .map(([_, token]: [Address, Token]) => token)
-      .find((token: Token) => token.symbol === 'OWL');
-  },
+  tokens => Array.from(tokens.values()).find((token: Token) => token.symbol === 'OWL'),
 );
 
 export const getFilteredTokens = createSelector(

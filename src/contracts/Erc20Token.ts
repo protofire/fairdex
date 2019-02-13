@@ -1,32 +1,59 @@
-import { abi } from '@gnosis.pm/dx-contracts/build/contracts/Token.json';
+import { abi } from '@gnosis.pm/dx-contracts/build/contracts/EtherToken.json';
 
 import BaseContract from './BaseContract';
 import { timeout, toDecimal, ZERO } from './utils';
 
 class Erc20Token extends BaseContract {
-  constructor(readonly token: Token) {
-    super({
-      jsonInterface: abi,
-      address: token.address,
-    });
-  }
+  private name!: string;
+  private symbol!: string;
+  private decimals!: number;
 
-  approve(spender: Address, value: number) {
-    return this.contract.methods.approve(spender, value);
+  constructor(address: Address) {
+    super({ jsonInterface: abi, address });
   }
 
   @timeout()
   async getAllowance(owner: Address, spender: Address) {
-    const allowed = await this.contract.methods.allowance(owner, spender).call();
+    const [decimals, allowed] = await Promise.all([
+      this.decimals || this.contract.methods.decimals().call(),
+      this.contract.methods.allowance(owner, spender).call(),
+    ]);
 
-    return toDecimal(allowed, this.token.decimals) || ZERO;
+    return toDecimal(allowed, decimals) || ZERO;
   }
 
   @timeout()
   async getBalance(account: Address) {
-    const balance = await this.contract.methods.balanceOf(account).call();
+    const [decimals, balance] = await Promise.all([
+      this.decimals || this.contract.methods.decimals().call(),
+      this.contract.methods.balanceOf(account).call(),
+    ]);
 
-    return toDecimal(balance, this.token.decimals) || ZERO;
+    return toDecimal(balance, decimals) || ZERO;
+  }
+
+  @timeout()
+  async getTokenInfo(): Promise<Token> {
+    const [name, symbol, decimals] = await Promise.all([
+      this.name || this.contract.methods.name().call(),
+      this.symbol || this.contract.methods.symbol().call(),
+      this.decimals || this.contract.methods.decimals().call(),
+    ]);
+
+    this.name = name;
+    this.symbol = symbol;
+    this.decimals = Number(decimals) || 18;
+
+    return {
+      address: this.address,
+      name: this.name,
+      symbol: this.symbol,
+      decimals: this.decimals,
+    };
+  }
+
+  approve(spender: Address, value: number) {
+    return this.contract.methods.approve(spender, value);
   }
 }
 
