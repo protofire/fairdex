@@ -174,7 +174,6 @@ const Landing: FunctionComponent<Props> = ({ network, wallet, termsConditionsAcc
 const Wrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
-  height: 100vh;
   align-items: center;
   text-align: left;
 
@@ -182,6 +181,10 @@ const Wrapper = styled.div`
     font-size: 13px;
     line-height: 1.23;
     color: #adadad;
+  }
+
+  @media (min-width: 1025px) {
+    height: 100vh;
   }
 `;
 
@@ -245,19 +248,24 @@ const PrevNextStep = styled.img`
 const StepWrapper = styled(Card)`
   display: flex;
   flex-direction: column;
-  width: 636px;
+  max-width: 636px;
   min-height: 480px;
+  position: relative;
 `;
 
 const StepContent = styled.div`
   flex: 1;
+
+  @media (max-width: 800px) {
+    width: 90%;
+  }
 `;
 
 const StepSwitcher = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  padding-top: var(--spacing-narrow);
+  padding: var(--spacing-normal);
 `;
 
 const StepButton = styled.div`
@@ -283,14 +291,21 @@ const Skip = styled.span`
   line-height: 1.36;
   color: #dbb82c;
   text-decoration: underline;
-  align-self: flex-end;
   cursor: pointer;
+  position: absolute;
+  bottom: var(--spacing-normal);
+  right: var(--spacing-normal);
 `;
 
 const SuportedWallets = styled.section`
   display: flex;
   flex-flow: column;
   padding-top: var(--spacing-normal);
+
+  @media (max-width: 800px) {
+    width: 60%;
+    text-align: center;
+  }
 `;
 
 const WalletLogos = styled.div`
@@ -321,6 +336,11 @@ const Footer = styled.footer`
   font-size: 9px;
   font-weight: 600;
   color: #303b3e;
+
+  @media (min-width: 1025px) {
+    position: fixed;
+    bottom: 0;
+  }
 `;
 
 const Protofire = styled.div`
@@ -332,6 +352,12 @@ const Protofire = styled.div`
     height: 40px;
     margin: 0 10px;
   }
+
+  @media (max-width: 800px) {
+    span {
+      display: none;
+    }
+  }
 `;
 
 const Geco = styled.div`
@@ -342,6 +368,12 @@ const Geco = styled.div`
     width: 35px;
     height: 35px;
     margin: 0 10px;
+  }
+
+  @media (max-width: 800px) {
+    span {
+      display: none;
+    }
   }
 `;
 

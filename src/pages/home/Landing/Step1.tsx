@@ -1,25 +1,20 @@
 import React, { useCallback } from 'react';
+import styled, { css } from 'styled-components';
 
-import YouTube from 'react-youtube';
+import ResponsiveEmbed from 'react-responsive-embed';
 
 const Step1 = () => {
-  const onReady = useCallback(event => {
+  const handlePause = useCallback(event => {
     event.target.pauseVideo();
+  }, []);
+
+  const handlePlay = useCallback(event => {
+    event.target.playVideo();
   }, []);
 
   return (
     <>
-      <YouTube
-        videoId='_TBVXT6XIe0'
-        opts={{
-          width: '570',
-          playerVars: {
-            // https://developers.google.com/youtube/player_parameters
-            autoplay: 0,
-          },
-        }}
-        onReady={onReady}
-      />
+      <ResponsiveEmbed src='https://www.youtube.com/embed/_TBVXT6XIe0' />
       <p>
         The <b>DutchX</b> is a fully decentralized trading protocol that allows anyone to add any trading
         token pair.
@@ -32,5 +27,19 @@ const Step1 = () => {
     </>
   );
 };
+
+const PlayerWrapper = styled.div`
+  width: 100%;
+  height: 56.25%;
+
+  div {
+    height: 100%;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+  }
+`;
 
 export default Step1;
