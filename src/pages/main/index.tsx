@@ -6,12 +6,14 @@ import styled from 'styled-components';
 
 import { history, pageview } from '../../analytics';
 import Spinner from '../../components/Spinner';
-import logo from '../../images/protofire.svg';
-import { fetchData } from '../../store/blockchain';
+import fairdex from '../../images/fairdex.png';
+import { fetchData, getNetworkType } from '../../store/blockchain';
+import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
 
 import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 import AccountInfo from './side/AccountInfo';
+import NavMenu from './side/NavMenu';
 import WalletInfo from './side/WalletInfo';
 
 const EndedAuctions = Loadable({
@@ -34,13 +36,26 @@ const WalletOverview = Loadable({
   loading: () => <Spinner size='large' />,
 });
 
+interface MainPageStateProps {
+  network?: Network | null;
+  wallet?: Wallet;
+  termsConditionsAccepted: boolean;
+}
+
 interface DispatchProps {
   fetchData: () => void;
 }
 
-class MainPage extends React.Component<DispatchProps> {
+type Props = MainPageStateProps & DispatchProps;
+
+const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
+
+class MainPage extends React.Component<Props> {
   componentDidMount() {
-    this.props.fetchData();
+    const { wallet, network } = this.props;
+    if (wallet && network) {
+      this.props.fetchData();
+    }
 
     window.scrollTo({
       behavior: 'smooth',
@@ -52,40 +67,59 @@ class MainPage extends React.Component<DispatchProps> {
     history.listen(location => pageview(location.pathname));
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.wallet !== this.props.wallet || prevProps.network !== this.props.network) {
+      this.props.fetchData();
+    }
+  }
+
   render() {
-    return (
-      <Router history={history}>
-        <Layout>
-          <Sidebar>
-            <Branding>
-              <NavLink to='/'>
-                <img src={logo} height={40} />
-              </NavLink>
-            </Branding>
-            <SideContent>
-              <AccountInfo />
-              <WalletInfo />
-            </SideContent>
-          </Sidebar>
-          <MessageHandler />
-          <Filters />
-          <Content>
-            <ClaimProvider>
-              <NavBar />
-              <Section>
-                <Switch>
-                  <Route path='/running' component={RunningAuctions} />
-                  <Route path='/scheduled' component={ScheduledAuctions} />
-                  <Route path='/ended' component={EndedAuctions} />
-                  <Route path='/wallet' component={WalletOverview} />
-                  <Redirect to='/running' />
-                </Switch>
-              </Section>
-            </ClaimProvider>
-          </Content>
-        </Layout>
-      </Router>
-    );
+    const { termsConditionsAccepted, wallet, network } = this.props;
+
+    if (!termsConditionsAccepted) {
+      return <Redirect to='/terms-conditions' />;
+    } else if (!wallet || !network) {
+      return <Redirect to='/select-wallet' />;
+    } else if (wallet && !network) {
+      return Spinner;
+    } else if (!AVAILABLE_NETWORKS.includes(network)) {
+      return <Redirect to='/network-not-available' />;
+    } else {
+      return (
+        <Router history={history}>
+          <Layout>
+            <Sidebar>
+              <Branding>
+                <NavLink to='/auction'>
+                  <img src={fairdex} height={40} />
+                </NavLink>
+              </Branding>
+              <SideContent>
+                <NavMenu />
+                <AccountInfo />
+                <WalletInfo />
+              </SideContent>
+            </Sidebar>
+            <MessageHandler />
+            <Filters />
+            <Content>
+              <ClaimProvider>
+                <NavBar />
+                <Section>
+                  <Switch>
+                    <Route path='/auction/running' component={RunningAuctions} />
+                    <Route path='/auction/scheduled' component={ScheduledAuctions} />
+                    <Route path='/auction/ended' component={EndedAuctions} />
+                    <Route path='/wallet' component={WalletOverview} />
+                    <Redirect to='/auction/running' />
+                  </Switch>
+                </Section>
+              </ClaimProvider>
+            </Content>
+          </Layout>
+        </Router>
+      );
+    }
   }
 }
 
@@ -121,6 +155,14 @@ const SideContent = styled.div`
   gap: var(--spacing-normal);
 `;
 
+function mapStateToProps(state: AppState): MainPageStateProps {
+  return {
+    network: getNetworkType(state),
+    wallet: state.blockchain.wallet,
+    termsConditionsAccepted: isTermsConditionsAccepted(state),
+  };
+}
+
 function mapDispatchToProps(dispatch: any): DispatchProps {
   return {
     fetchData: () => dispatch(fetchData()),
@@ -128,6 +170,6 @@ function mapDispatchToProps(dispatch: any): DispatchProps {
 }
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(MainPage);

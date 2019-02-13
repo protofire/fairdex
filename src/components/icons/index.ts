@@ -1,3 +1,4 @@
+import { default as Auctions } from './Auctions';
 import { default as Back } from './Back';
 import { default as Close } from './Close';
 import { default as Menu } from './Menu';
@@ -8,4 +9,5 @@ export default {
   Close,
   Menu,
   Preferences,
+  Auctions,
 };

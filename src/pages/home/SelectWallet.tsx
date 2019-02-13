@@ -1,27 +1,35 @@
 import React, { FunctionComponent, useCallback } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { withPageview } from '../../analytics';
 import Separator from '../../components/Separator';
 import * as images from '../../images';
-import { getNetworkType, getPreviouslyUsedWallet, init } from '../../store/blockchain';
+import { getNetworkType, init } from '../../store/blockchain';
+import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import spinner from './spinner';
+import { Container, Content } from './utils';
 
 type Props = AppStateProps & DispatchProps;
 
 interface AppStateProps {
   network?: Network | null;
   wallet?: Wallet;
+  termsConditionsAccepted: boolean;
 }
 
 interface DispatchProps {
   onSelectWallet: (wallet: Wallet) => void;
 }
 
-const SelectWallet: FunctionComponent<Props> = ({ network, wallet, onSelectWallet }) => {
-  const previouslyUsedWallet = getPreviouslyUsedWallet();
+const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
 
+const SelectWallet: FunctionComponent<Props> = ({
+  network,
+  wallet,
+  termsConditionsAccepted,
+  onSelectWallet,
+}) => {
   const handleWalletSelection = useCallback(
     (selected: Wallet) => {
       if (onSelectWallet) {
@@ -33,41 +41,59 @@ const SelectWallet: FunctionComponent<Props> = ({ network, wallet, onSelectWalle
 
   const selectWallet = (selected: Wallet) => () => handleWalletSelection(selected);
 
-  if (wallet && !network) {
+  if (!termsConditionsAccepted) {
+    return <Redirect to='/terms-conditions' />;
+  } else if (wallet && !network) {
+    handleWalletSelection(wallet);
     return spinner;
+  } else if (wallet && network && !AVAILABLE_NETWORKS.includes(network)) {
+    return <Redirect to='/network-not-available' />;
+  } else if (wallet && network) {
+    return <Redirect to='/auction' />;
+  } else {
+    return (
+      <Container>
+        <Content>
+          <h2>Select Wallet</h2>
+          <Separator />
+          <WalletList>
+            <Wallet onClick={selectWallet('standard')}>
+              <Logos>
+                <img src={images.wallet.MetaMask} alt='MetaMask' />
+                <img src={images.wallet.Safe} alt='Gnosis Safe' />
+                {/* <img src={images.wallet.Cipher} alt='Cipher' /> */}
+              </Logos>
+              <h3>Standard Wallet</h3>
+              <p>MetaMask, Safe{/*, Cipher */}</p>
+            </Wallet>
+            {/*
+              <Wallet disabled={true} onClick={selectWallet('ledger')}>
+                <Logos>
+                  <img src={images.wallet.LedgerNano} alt='Ledger Nano' />
+                </Logos>
+                <h3>Ledger Nano</h3>
+                <p />
+              </Wallet>
+              */}
+          </WalletList>
+        </Content>
+        <Footer>
+          <Protofire>
+            <span>Built by </span>
+            <img src={images.logo} />
+          </Protofire>
+          <Geco>
+            <img src={images.geco} />
+            <span>
+              Grant by
+              <br />
+              the Gnosis Ecosystem Fund
+            </span>
+          </Geco>
+        </Footer>
+      </Container>
+    );
   }
-
-  if (previouslyUsedWallet) {
-    handleWalletSelection(previouslyUsedWallet);
-    return spinner;
-  }
-
-  return (
-    <>
-      <h2>Select Wallet</h2>
-      <Separator />
-      <WalletList>
-        <Wallet onClick={selectWallet('standard')}>
-          <Logos>
-            <img src={images.wallet.MetaMask} alt='MetaMask' />
-            <img src={images.wallet.Safe} alt='Gnosis Safe' />
-            {/* <img src={images.wallet.Cipher} alt='Cipher' /> */}
-          </Logos>
-          <h3>Standard Wallet</h3>
-          <p>MetaMask, Safe{/*, Cipher */}</p>
-        </Wallet>
-        {/*
-          <Wallet disabled={true} onClick={selectWallet('ledger')}>
-            <Logos>
-              <img src={images.wallet.LedgerNano} alt='Ledger Nano' />
-            </Logos>
-            <h3>Ledger Nano</h3>
-            <p />
-          </Wallet>
-          */}
-      </WalletList>
-    </>
-  );
 };
 
 const WalletList = styled.div`
@@ -126,10 +152,61 @@ const Logos = styled.div`
   }
 `;
 
+const Footer = styled.footer`
+  padding: var(--spacing-normal) 0;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 600;
+  color: #303b3e;
+
+  @media (min-width: 1025px) {
+    position: fixed;
+    bottom: 0;
+  }
+`;
+
+const Protofire = styled.div`
+  display: flex;
+  align-items: center;
+
+  img {
+    width: 144px;
+    height: 40px;
+    margin: 0 10px;
+  }
+
+  @media (max-width: 800px) {
+    span {
+      display: none;
+    }
+  }
+`;
+
+const Geco = styled.div`
+  display: flex;
+  align-items: center;
+  text-align: left;
+
+  img {
+    width: 35px;
+    height: 35px;
+    margin: 0 10px;
+  }
+
+  @media (max-width: 800px) {
+    span {
+      display: none;
+    }
+  }
+`;
+
 function mapStateToProps(state: AppState): AppStateProps {
   return {
     network: getNetworkType(state),
     wallet: state.blockchain.wallet,
+    termsConditionsAccepted: isTermsConditionsAccepted(state),
   };
 }
 
@@ -139,10 +216,7 @@ function mapDispatchToProps(dispatch: any): DispatchProps {
   };
 }
 
-export default withPageview(
-  '/',
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(SelectWallet),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SelectWallet);
