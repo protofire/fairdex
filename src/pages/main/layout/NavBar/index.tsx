@@ -6,9 +6,7 @@ import Wallet from './Wallet';
 
 const NavBar = () => (
   <Switch>
-    <Route path='/running' component={Auctions} />
-    <Route path='/scheduled' component={Auctions} />
-    <Route path='/ended' component={Auctions} />
+    <Route path='/auction' component={Auctions} />
     <Route path='/wallet' component={Wallet} />
   </Switch>
 );

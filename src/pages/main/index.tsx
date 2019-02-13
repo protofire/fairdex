@@ -1,11 +1,14 @@
 import React from 'react';
 import Loadable from 'react-loadable';
+import { connect } from 'react-redux';
 import { NavLink, Redirect, Route, Router, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { history, pageview } from '../../analytics';
 import Spinner from '../../components/Spinner';
 import logo from '../../images/protofire.svg';
+import { getNetworkType } from '../../store/blockchain';
+import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
 import { Content, Filters, Layout, MessageHandler, NavBar, Sidebar } from './layout';
 
@@ -32,7 +35,13 @@ const WalletOverview = Loadable({
   loading: () => <Spinner size='large' />,
 });
 
-class MainPage extends React.Component {
+interface MainPageStateProps {
+  network?: Network | null;
+  wallet?: Wallet;
+  termsConditionsAccepted: boolean;
+}
+
+class MainPage extends React.Component<MainPageStateProps> {
   componentDidMount() {
     window.scrollTo({
       behavior: 'smooth',
@@ -45,12 +54,22 @@ class MainPage extends React.Component {
   }
 
   render() {
+    const { termsConditionsAccepted, wallet, network } = this.props;
+
+    if (!termsConditionsAccepted) {
+      return <Redirect to='/terms-conditions' />;
+    } else if (!wallet || !network) {
+      return <Redirect to='/select-wallet' />;
+    } else if (network !== 'rinkeby') {
+      return <Redirect to='/network-not-available' />;
+    }
+
     return (
       <Router history={history}>
         <Layout>
           <Sidebar>
             <Branding>
-              <NavLink to='/'>
+              <NavLink to='/auction'>
                 <img src={logo} height={40} />
               </NavLink>
             </Branding>
@@ -66,11 +85,11 @@ class MainPage extends React.Component {
               <NavBar />
               <Section>
                 <Switch>
-                  <Route path='/running' component={RunningAuctions} />
-                  <Route path='/scheduled' component={ScheduledAuctions} />
-                  <Route path='/ended' component={EndedAuctions} />
+                  <Route path='/auction/running' component={RunningAuctions} />
+                  <Route path='/auction/scheduled' component={ScheduledAuctions} />
+                  <Route path='/auction/ended' component={EndedAuctions} />
                   <Route path='/wallet' component={WalletOverview} />
-                  <Redirect to='/running' />
+                  <Redirect to='/auction/running' />
                 </Switch>
               </Section>
             </ClaimProvider>
@@ -113,4 +132,12 @@ const SideContent = styled.div`
   gap: var(--spacing-normal);
 `;
 
-export default MainPage;
+function mapStateToProps(state: AppState): MainPageStateProps {
+  return {
+    network: getNetworkType(state),
+    wallet: state.blockchain.wallet,
+    termsConditionsAccepted: isTermsConditionsAccepted(state),
+  };
+}
+
+export default connect(mapStateToProps)(MainPage);

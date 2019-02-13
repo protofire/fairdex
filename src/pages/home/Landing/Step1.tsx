@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import styled from 'styled-components';
 
 import YouTube from 'react-youtube';
 
@@ -9,7 +8,7 @@ const Step1 = () => {
   }, []);
 
   return (
-    <div>
+    <>
       <YouTube
         videoId='_TBVXT6XIe0'
         opts={{
@@ -30,7 +29,8 @@ const Step1 = () => {
         (such as front running, issues with low liquidity, and third party risk),{' '}
         <b>creating a more fair ecosystem</b> for everyone to use.
       </p>
-    </div>
+    </>
   );
 };
+
 export default Step1;

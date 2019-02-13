@@ -29,13 +29,13 @@ const NavBar = ({ actions, filterIndicator }: NavBarProps) => (
     </ActionBar>
     <TabBar>
       <Tab>
-        <NavLink to='/running'>Running</NavLink>
+        <NavLink to='/auction/running'>Running</NavLink>
       </Tab>
       <Tab>
-        <NavLink to='/scheduled'>Scheduled</NavLink>
+        <NavLink to='/auction/scheduled'>Scheduled</NavLink>
       </Tab>
       <Tab>
-        <NavLink to='/ended'>Ended</NavLink>
+        <NavLink to='/auction/ended'>Ended</NavLink>
       </Tab>
     </TabBar>
     <ActionBar side='right'>

@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import styled from 'styled-components';
 
 import Button from '../../../components/Button';
 import Separator from '../../../components/Separator';
 import { Content, StepTitle } from './utils';
 
-const Step5 = () => (
+interface StepProps {
+  onGetStarted: () => void;
+}
+
+const Step5: FunctionComponent<StepProps> = ({ onGetStarted }) => (
   <>
     <StepTitle>
       <div>
@@ -31,7 +35,7 @@ const Step5 = () => (
         </a>
       </p>
     </Content>
-    <GetStarted>GET STARTED</GetStarted>
+    <GetStarted onClick={onGetStarted}>GET STARTED</GetStarted>
   </>
 );
 

@@ -1,27 +1,33 @@
 import React, { FunctionComponent, useCallback } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { withPageview } from '../../analytics';
 import Separator from '../../components/Separator';
 import * as images from '../../images';
-import { getNetworkType, getPreviouslyUsedWallet, initWallet } from '../../store/blockchain';
+import { getNetworkType, initWallet } from '../../store/blockchain';
+import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import spinner from './spinner';
+import { Container, Content, Footer } from './utils';
 
 type Props = AppStateProps & DispatchProps;
 
 interface AppStateProps {
   network?: Network | null;
   wallet?: Wallet;
+  termsConditionsAccepted: boolean;
 }
 
 interface DispatchProps {
   onSelectWallet: (wallet: Wallet) => void;
 }
 
-const SelectWallet: FunctionComponent<Props> = ({ network, wallet, onSelectWallet }) => {
-  const previouslyUsedWallet = getPreviouslyUsedWallet();
-
+const SelectWallet: FunctionComponent<Props> = ({
+  network,
+  wallet,
+  termsConditionsAccepted,
+  onSelectWallet,
+}) => {
   const handleWalletSelection = useCallback(
     (selected: Wallet) => {
       if (onSelectWallet) {
@@ -33,41 +39,48 @@ const SelectWallet: FunctionComponent<Props> = ({ network, wallet, onSelectWalle
 
   const selectWallet = (selected: Wallet) => () => handleWalletSelection(selected);
 
-  if (wallet && !network) {
+  if (!termsConditionsAccepted) {
+    return <Redirect to='/terms-conditions' />;
+  } else if (wallet && !network) {
+    handleWalletSelection(wallet);
     return spinner;
+  } else if (wallet && network && network !== 'rinkeby') {
+    return <Redirect to='/network-not-available' />;
+  } else if (wallet && network) {
+    return <Redirect to='/auction' />;
+  } else {
+    return (
+      <Container>
+        <Content>
+          <h2>Select Wallet</h2>
+          <Separator />
+          <WalletList>
+            <Wallet onClick={selectWallet('standard')}>
+              <Logos>
+                <img src={images.wallet.MetaMask} alt='MetaMask' />
+                <img src={images.wallet.Safe} alt='Gnosis Safe' />
+                {/* <img src={images.wallet.Cipher} alt='Cipher' /> */}
+              </Logos>
+              <h3>Standard Wallet</h3>
+              <p>MetaMask, Safe{/*, Cipher */}</p>
+            </Wallet>
+            {/*
+              <Wallet disabled={true} onClick={selectWallet('ledger')}>
+                <Logos>
+                  <img src={images.wallet.LedgerNano} alt='Ledger Nano' />
+                </Logos>
+                <h3>Ledger Nano</h3>
+                <p />
+              </Wallet>
+              */}
+          </WalletList>
+        </Content>
+        <Footer>
+          <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
+        </Footer>
+      </Container>
+    );
   }
-
-  if (previouslyUsedWallet) {
-    handleWalletSelection(previouslyUsedWallet);
-    return spinner;
-  }
-
-  return (
-    <>
-      <h2>Select Wallet</h2>
-      <Separator />
-      <WalletList>
-        <Wallet onClick={selectWallet('standard')}>
-          <Logos>
-            <img src={images.wallet.MetaMask} alt='MetaMask' />
-            <img src={images.wallet.Safe} alt='Gnosis Safe' />
-            {/* <img src={images.wallet.Cipher} alt='Cipher' /> */}
-          </Logos>
-          <h3>Standard Wallet</h3>
-          <p>MetaMask, Safe{/*, Cipher */}</p>
-        </Wallet>
-        {/*
-          <Wallet disabled={true} onClick={selectWallet('ledger')}>
-            <Logos>
-              <img src={images.wallet.LedgerNano} alt='Ledger Nano' />
-            </Logos>
-            <h3>Ledger Nano</h3>
-            <p />
-          </Wallet>
-          */}
-      </WalletList>
-    </>
-  );
 };
 
 const WalletList = styled.div`
@@ -130,6 +143,7 @@ function mapStateToProps(state: AppState): AppStateProps {
   return {
     network: getNetworkType(state),
     wallet: state.blockchain.wallet,
+    termsConditionsAccepted: isTermsConditionsAccepted(state),
   };
 }
 
@@ -139,10 +153,7 @@ function mapDispatchToProps(dispatch: any): DispatchProps {
   };
 }
 
-export default withPageview(
-  '/select-wallet',
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(SelectWallet),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SelectWallet);

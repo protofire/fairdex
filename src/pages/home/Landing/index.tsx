@@ -1,21 +1,27 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { withPageview } from '../../../analytics';
-import Button from '../../../components/Button';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import Card from '../../../components/Card';
-import Checkbox from '../../../components/Checkbox';
-import { PrivacyPolicy } from '../../../files';
-import * as images from '../../../images';
-import { acceptTermsConditions } from '../../../store/terms-conditions/actions';
 
+import { getNetworkType } from '../../../store/blockchain';
+import { isTermsConditionsAccepted } from '../../../store/terms-conditions';
 import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
 import Step5 from './Step5';
 
-const Landing = () => {
+interface LandingStateProps {
+  network?: Network | null;
+  wallet?: Wallet;
+  termsConditionsAccepted: boolean;
+}
+
+type Props = LandingStateProps & RouteComponentProps;
+
+const Landing: FunctionComponent<Props> = ({ network, wallet, termsConditionsAccepted, history }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [hidePrev, setHidePrev] = useState(true);
   const [hideNext, setHideNext] = useState(false);
@@ -81,7 +87,7 @@ const Landing = () => {
         case 5:
           setHidePrev(false);
           setHideNext(true);
-          setStepComponent(<Step5 />);
+          setStepComponent(<Step5 onGetStarted={handleGetStarted} />);
           break;
 
         default:
@@ -95,6 +101,21 @@ const Landing = () => {
   );
 
   const handleStepButtonClick = (step: number) => () => setCurrentStep(step);
+
+  const handleGetStarted = useCallback(
+    () => {
+      if (!termsConditionsAccepted) {
+        history.push('/terms-conditions');
+      } else if (!wallet || !network) {
+        history.push('/select-wallet');
+      } else if (network && network !== 'rinkeby') {
+        history.push('/network-not-available');
+      } else {
+        history.push('/auctions');
+      }
+    },
+    [termsConditionsAccepted, network, wallet, history],
+  );
 
   return (
     <Wrapper>
@@ -115,7 +136,7 @@ const Landing = () => {
             <StepButton active={currentStep === 4} onClick={handleStepButtonClick(4)} />
             <StepButton active={currentStep === 5} onClick={handleStepButtonClick(5)} />
           </StepSwitcher>
-          {currentStep !== 5 && <Skip>Skip and get started!</Skip>}
+          {currentStep !== 5 && <Skip onClick={handleGetStarted}>Skip and get started!</Skip>}
         </StepWrapper>
         <PrevNextStep src={images.landing.ChevronRight} onClick={handleNexStep} hide={hideNext} />
       </Content>
@@ -312,4 +333,12 @@ const Geco = styled.div`
   }
 `;
 
-export default withPageview('/', Landing);
+function mapStateToProps(state: AppState): LandingStateProps {
+  return {
+    network: getNetworkType(state),
+    wallet: state.blockchain.wallet,
+    termsConditionsAccepted: isTermsConditionsAccepted(state),
+  };
+}
+
+export default withRouter(connect(mapStateToProps)(Landing));

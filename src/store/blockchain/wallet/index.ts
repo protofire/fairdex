@@ -16,7 +16,13 @@ const INIT_WALLET = 'INIT_WALLET';
 const CHANGE_ACCOUNT = 'CHANGE_ACCOUNT';
 const CHANGE_NETWORK = 'CHANGE_NETWORK';
 
-const reducer: Reducer<WalletState> = (state = {}, action) => {
+const storage = localStorage.getItem(WALLET_STORAGE_KEY);
+
+const initialState: WalletState = {
+  wallet: storage ? storage : undefined,
+};
+
+const reducer: Reducer<WalletState> = (state = initialState, action) => {
   switch (action.type) {
     case INIT_WALLET:
       return {
@@ -47,6 +53,9 @@ export function initWallet(wallet: Wallet) {
     const web3 = await createEthereumClient();
 
     if (web3) {
+      // Save selected wallet
+      localStorage.setItem(WALLET_STORAGE_KEY, wallet);
+
       const ethereum: any = web3.currentProvider;
 
       // Save Web3 instance
@@ -54,15 +63,12 @@ export function initWallet(wallet: Wallet) {
 
       const [networkId, [accountAddress]] = await Promise.all([web3.eth.net.getId(), web3.eth.getAccounts()]);
 
+      dispatch(selectWallet(wallet, networkId, accountAddress));
+
       // Instantiate DutchX contract
       window.dx = new DutchExchange(networkId);
 
       dispatch(loadFrtData());
-
-      dispatch(selectWallet(wallet, networkId, accountAddress));
-
-      // Save selected wallet
-      localStorage.setItem(WALLET_STORAGE_KEY, wallet);
 
       // Load list of available tokens
       dispatch(loadAvailableTokens());
