@@ -8,7 +8,7 @@ import * as images from '../../images';
 import { getNetworkType, init } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import spinner from './spinner';
-import { Container, Content, Footer } from './utils';
+import { Container, Content } from './utils';
 
 type Props = AppStateProps & DispatchProps;
 
@@ -78,7 +78,18 @@ const SelectWallet: FunctionComponent<Props> = ({
           </WalletList>
         </Content>
         <Footer>
-          <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
+          <Protofire>
+            <span>Built by </span>
+            <img src={images.logo} />
+          </Protofire>
+          <Geco>
+            <img src={images.geco} />
+            <span>
+              Grant by
+              <br />
+              the Gnosis Ecosystem Fund
+            </span>
+          </Geco>
         </Footer>
       </Container>
     );
@@ -138,6 +149,56 @@ const Logos = styled.div`
     height: var(--spacing-normal);
     line-height: var(--spacing-normal);
     margin-bottom: var(--spacing-narrow);
+  }
+`;
+
+const Footer = styled.footer`
+  padding: var(--spacing-normal) 0;
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 600;
+  color: #303b3e;
+
+  @media (min-width: 1025px) {
+    position: fixed;
+    bottom: 0;
+  }
+`;
+
+const Protofire = styled.div`
+  display: flex;
+  align-items: center;
+
+  img {
+    width: 144px;
+    height: 40px;
+    margin: 0 10px;
+  }
+
+  @media (max-width: 800px) {
+    span {
+      display: none;
+    }
+  }
+`;
+
+const Geco = styled.div`
+  display: flex;
+  align-items: center;
+  text-align: left;
+
+  img {
+    width: 35px;
+    height: 35px;
+    margin: 0 10px;
+  }
+
+  @media (max-width: 800px) {
+    span {
+      display: none;
+    }
   }
 `;
 
