@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import Card from '../../../components/Card';
-
+import * as images from '../../../images';
 import { getNetworkType } from '../../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../../store/terms-conditions';
 import Step1 from './Step1';
@@ -125,30 +125,32 @@ const Landing: FunctionComponent<Props> = ({ network, wallet, termsConditionsAcc
         </h1>
         <h3>A trading interface to interact with the Gnosis DutchX open protocol.</h3>
       </Header>
-      <Content>
-        <PrevNextStep src={images.landing.ChevronLeft} onClick={handlePrevStep} hide={hidePrev} />
-        <StepWrapper>
-          <StepContent>{stepComponent}</StepContent>
-          <StepSwitcher>
-            <StepButton active={currentStep === 1} onClick={handleStepButtonClick(1)} />
-            <StepButton active={currentStep === 2} onClick={handleStepButtonClick(2)} />
-            <StepButton active={currentStep === 3} onClick={handleStepButtonClick(3)} />
-            <StepButton active={currentStep === 4} onClick={handleStepButtonClick(4)} />
-            <StepButton active={currentStep === 5} onClick={handleStepButtonClick(5)} />
-          </StepSwitcher>
-          {currentStep !== 5 && <Skip onClick={handleGetStarted}>Skip and get started!</Skip>}
-        </StepWrapper>
-        <PrevNextStep src={images.landing.ChevronRight} onClick={handleNexStep} hide={hideNext} />
-      </Content>
-      <SuportedWallets>
-        <WalletLogos>
-          <img src={images.landing.MetaMask} />
-          <img src={images.landing.Safe} />
-        </WalletLogos>
-        <WalletDescription>
-          Connect one of the supported wallets to automatically connect to the <b>Fairdex Portal.</b>
-        </WalletDescription>
-      </SuportedWallets>
+      <Main>
+        <Content>
+          <PrevNextStep src={images.landing.ChevronLeft} onClick={handlePrevStep} hide={hidePrev} />
+          <StepWrapper>
+            <StepContent>{stepComponent}</StepContent>
+            <StepSwitcher>
+              <StepButton active={currentStep === 1} onClick={handleStepButtonClick(1)} />
+              <StepButton active={currentStep === 2} onClick={handleStepButtonClick(2)} />
+              <StepButton active={currentStep === 3} onClick={handleStepButtonClick(3)} />
+              <StepButton active={currentStep === 4} onClick={handleStepButtonClick(4)} />
+              <StepButton active={currentStep === 5} onClick={handleStepButtonClick(5)} />
+            </StepSwitcher>
+            {currentStep !== 5 && <Skip onClick={handleGetStarted}>Skip and get started!</Skip>}
+          </StepWrapper>
+          <PrevNextStep src={images.landing.ChevronRight} onClick={handleNexStep} hide={hideNext} />
+        </Content>
+        <SuportedWallets>
+          <WalletLogos>
+            <img src={images.landing.MetaMask} />
+            <img src={images.landing.Safe} />
+          </WalletLogos>
+          <WalletDescription>
+            Connect one of the supported wallets to automatically connect to the <b>Fairdex Portal.</b>
+          </WalletDescription>
+        </SuportedWallets>
+      </Main>
       <Footer>
         <Protofire>
           <span>Built by </span>
@@ -209,8 +211,15 @@ const Header = styled.div`
   }
 `;
 
-const Content = styled.section`
+const Main = styled.section`
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-wide) 0;
+`;
+
+const Content = styled.section`
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -279,6 +288,7 @@ const Skip = styled.span`
 const SuportedWallets = styled.section`
   display: flex;
   flex-flow: column;
+  padding-top: var(--spacing-normal);
 `;
 
 const WalletLogos = styled.div`
