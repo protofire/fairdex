@@ -1,6 +1,6 @@
 {
   "linters": {
-    "*.{js,jsx,json,ts,tsx}": ["npm run format", "git add"]
+    "*.{js,jsx,json,ts,tsx}": ["npm run lint:fix", "npm run format", "git add"]
   },
   "ignore": ["**/dist/**", "**/.lintstagedrc.json"]
 }
