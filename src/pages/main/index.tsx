@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import { history, pageview } from '../../analytics';
 import Spinner from '../../components/Spinner';
-import logo from '../../images/protofire.svg';
+import fairdex from '../../images/fairdex.png';
 import { fetchData, getNetworkType } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
@@ -90,7 +90,7 @@ class MainPage extends React.Component<Props> {
             <Sidebar>
               <Branding>
                 <NavLink to='/auction'>
-                  <img src={logo} height={40} />
+                  <img src={fairdex} height={40} />
                 </NavLink>
               </Branding>
               <SideContent>
