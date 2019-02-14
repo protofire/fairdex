@@ -21,17 +21,17 @@ const Menu = styled.nav`
 `;
 
 const Item = styled(NavLink)`
-  display: flex;
   align-items: center;
-  width: 256px;
-  height: 48px;
   border-radius: 8px;
-
-  font-weight: 600;
-  font-style: normal;
+  display: flex;
   font-stretch: normal;
-  line-height: 2.14;
+  font-style: normal;
+  font-weight: 600;
+  height: 48px;
   letter-spacing: -0.4px;
+  line-height: 2.14;
+  transition: all 0.15s ease-out;
+  width: 256px;
 
   &:hover,
   &.active {
