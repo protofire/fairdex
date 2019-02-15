@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import Card from '../../../components/Card';
+import Logos from '../../../components/Logos';
 import * as images from '../../../images';
 import { getNetworkType } from '../../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../../store/terms-conditions';
@@ -153,20 +154,7 @@ const Landing: FunctionComponent<Props> = ({ network, wallet, termsConditionsAcc
           </WalletDescription>
         </SuportedWallets>
       </Main>
-      <Footer>
-        <Protofire>
-          <span>Built by </span>
-          <img src={images.logo} />
-        </Protofire>
-        <Geco>
-          <img src={images.geco} />
-          <span>
-            Grant by
-            <br />
-            the Gnosis Ecosystem Fund
-          </span>
-        </Geco>
-      </Footer>
+      <Logos />
     </Wrapper>
   );
 };
@@ -330,50 +318,6 @@ const WalletDescription = styled.div`
   font-weight: normal;
   letter-spacing: normal;
   line-height: 1.33;
-`;
-
-const Footer = styled.footer`
-  color: #303b3e;
-  display: flex;
-  flex-flow: row;
-  font-size: 9px;
-  font-weight: 600;
-  justify-content: center;
-  padding: 0 0 40px;
-`;
-
-const Protofire = styled.div`
-  align-items: center;
-  display: flex;
-
-  img {
-    width: 144px;
-    height: 40px;
-    margin: 0 10px;
-  }
-
-  @media (max-width: 767px) {
-    span {
-      display: none;
-    }
-  }
-`;
-
-const Geco = styled.div`
-  display: flex;
-  align-items: center;
-
-  img {
-    width: 35px;
-    height: 35px;
-    margin: 0 10px;
-  }
-
-  @media (max-width: 767px) {
-    span {
-      display: none;
-    }
-  }
 `;
 
 function mapStateToProps(state: AppState): LandingStateProps {

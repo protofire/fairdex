@@ -4,6 +4,7 @@ import { Redirect } from 'react-router-dom';
 import { getNetworkType, init } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 
+import Logos from '../../components/Logos';
 import Separator from '../../components/Separator';
 import * as images from '../../images';
 import spinner from './spinner';
@@ -45,9 +46,7 @@ const NetworkNotAvailable: FunctionComponent<Props> = ({
         <Separator />
         <p>Make sure you're connected to the Rinkeby Test Network</p>
       </Content>
-      <Footer>
-        <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
-      </Footer>
+      <Logos />
     </Container>
   );
 };

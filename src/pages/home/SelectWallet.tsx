@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 
+import Logos from '../../components/Logos';
 import Separator from '../../components/Separator';
 import * as images from '../../images';
 import { getNetworkType, init } from '../../store/blockchain';
@@ -58,11 +59,11 @@ const SelectWallet: FunctionComponent<Props> = ({
           <Separator />
           <WalletList>
             <Wallet onClick={selectWallet('standard')}>
-              <Logos>
+              <WalletLogos>
                 <img src={images.wallet.MetaMask} alt='MetaMask' />
                 <img src={images.wallet.Safe} alt='Gnosis Safe' />
                 {/* <img src={images.wallet.Cipher} alt='Cipher' /> */}
-              </Logos>
+              </WalletLogos>
               <h3>Standard Wallet</h3>
               <p>MetaMask, Safe{/*, Cipher */}</p>
             </Wallet>
@@ -77,20 +78,7 @@ const SelectWallet: FunctionComponent<Props> = ({
               */}
           </WalletList>
         </Content>
-        <Footer>
-          <Protofire>
-            <span>Built by </span>
-            <img src={images.logo} />
-          </Protofire>
-          <Geco>
-            <img src={images.geco} />
-            <span>
-              Grant by
-              <br />
-              the Gnosis Ecosystem Fund
-            </span>
-          </Geco>
-        </Footer>
+        <Logos />
       </Container>
     );
   }
@@ -133,7 +121,7 @@ const Wallet = styled.button`
   }
 `;
 
-const Logos = styled.div`
+const WalletLogos = styled.div`
   display: grid;
   grid-gap: var(--spacing-normal);
   grid-auto-flow: column;
@@ -149,56 +137,6 @@ const Logos = styled.div`
     height: var(--spacing-normal);
     line-height: var(--spacing-normal);
     margin-bottom: var(--spacing-narrow);
-  }
-`;
-
-const Footer = styled.footer`
-  padding: var(--spacing-normal) 0;
-  display: flex;
-  flex-flow: row;
-  justify-content: center;
-  font-size: 9px;
-  font-weight: 600;
-  color: #303b3e;
-
-  @media (min-width: 1025px) {
-    position: fixed;
-    bottom: 0;
-  }
-`;
-
-const Protofire = styled.div`
-  display: flex;
-  align-items: center;
-
-  img {
-    width: 144px;
-    height: 40px;
-    margin: 0 10px;
-  }
-
-  @media (max-width: 800px) {
-    span {
-      display: none;
-    }
-  }
-`;
-
-const Geco = styled.div`
-  display: flex;
-  align-items: center;
-  text-align: left;
-
-  img {
-    width: 35px;
-    height: 35px;
-    margin: 0 10px;
-  }
-
-  @media (max-width: 800px) {
-    span {
-      display: none;
-    }
   }
 `;
 
