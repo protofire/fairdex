@@ -111,6 +111,19 @@ const Content = ({ auction }: ContentProp) => (
             </Value>
           </Row>
           <Row>
+            <Label>Current bid volume</Label>
+            <Value>
+              {auction.buyVolume === undefined ? (
+                <Loading />
+              ) : (
+                <>
+                  <DecimalValue value={auction.buyVolume} decimals={DEFAULT_DECIMALS} />
+                  <small> {auction.buyToken}</small>
+                </>
+              )}
+            </Value>
+          </Row>
+          <Row>
             <Label>Volume needed to end</Label>
             <Value>
               {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
