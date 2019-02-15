@@ -65,6 +65,10 @@ const BidForm = React.memo(
     const [canUseOwlToPayFee, setCanUseOwlToPayFee] = useState(
       owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0),
     );
+    const isOwlAllowed = useMemo(
+      () => owl && owl.allowance && owl.allowance.gt(0) && getTotalBalance(owl).gt(0),
+      [owl],
+    );
 
     const hasBidded = useMemo(
       () => {
@@ -533,8 +537,16 @@ const BidForm = React.memo(
                     )
                   ) : (
                     <p>
-                      liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' />)
-                      included
+                      liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' /> /{' '}
+                      <DecimalValue value={bidAmount.times(feeRate).div(100)} decimals={2} />{' '}
+                      <span>{auction.buyToken}</span>) included
+                      {isOwlAllowed && (
+                        <>
+                          <br />
+                          Up to <DecimalValue value={bidAmount.div(2)} decimals={2} />{' '}
+                          <span>{auction.buyToken}</span> will be paid with OWL
+                        </>
+                      )}
                     </p>
                   )}
                   <Button
