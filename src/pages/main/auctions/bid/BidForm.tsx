@@ -449,7 +449,11 @@ const BidForm = React.memo(
                     Liquidity contribution
                   </h4>
                 </Step4Header>
-                <Step4 onSubmit={handleApprove} data-testid={'bid-lc-step'}>
+                <Step4
+                  onSubmit={handleApprove}
+                  data-testid={'bid-lc-step'}
+                  title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'
+                >
                   <p>You have the option to settle half of your liquidity contribution in OWL.</p>
                   <p>
                     Later you can choose to unsettle it back by disabling OWL token for trading within the
