@@ -24,7 +24,7 @@ class WalletSort extends React.Component<Props, State> {
     'token-name': 'Token name',
     'w-balance': 'Wallet balance',
     'dx-balance': 'DX balance',
-    'total-balance': 'Total holdings',
+    'total-balance': 'Total balance',
   };
 
   listRef = React.createRef<HTMLInputElement>();
