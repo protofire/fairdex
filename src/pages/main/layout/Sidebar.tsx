@@ -85,6 +85,7 @@ const Footer = styled(Logos)`
   div:last-of-type {
     img {
       height: 30px;
+      width: 100px;
     }
   }
 `;
