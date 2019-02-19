@@ -6,6 +6,7 @@ interface AuctionData {
   sellToken: TokenSymbol;
   sellTokenAddress: Address;
   sellVolume: BigNumber;
+  extraTokens: BigNumber;
   buyToken: TokenSymbol;
   buyTokenAddress: Address;
   buyVolume: BigNumber;
