@@ -4,7 +4,6 @@ import { Dispatch } from 'redux';
 import styled from 'styled-components';
 
 import Icon from '../../../components/icons';
-import Logos from '../../../components/Logos';
 import Overlay from '../../../components/Overlay';
 import { hideSidebar } from '../../../store/ui/actions';
 import ActionBar from './ActionBar';
@@ -30,7 +29,6 @@ const Sidebar = React.memo(({ actions, children, ...props }: SidebarProps) => (
     <Content {...props}>
       {children}
       <ActionBar>{props.isOpen && <CloseButton onClick={actions.hideSidebar} />}</ActionBar>
-      <Footer />
     </Content>
     {props.isOpen && <Overlay onClick={actions.hideSidebar} />}
   </Container>
@@ -46,12 +44,9 @@ const Container = styled.aside`
 
 const Content = styled.div`
   display: flex;
-  flex-direction: column;
-  float: left;
+  flex-flow: column nowrap;
   width: var(--sidebar-width);
-  height: 100%;
-  min-height: 100vh;
-  overflow-y: auto;
+  height: 100vh;
   z-index: 101;
   transition: transform var(--animation-duration) ease-in-out;
 
@@ -70,23 +65,6 @@ const Content = styled.div`
   ${ActionBar} {
     position: absolute;
     right: var(--spacing-normal);
-  }
-`;
-
-const Footer = styled(Logos)`
-  padding: var(--spacing-normal);
-
-  div:first-of-type {
-    img {
-      height: 30px;
-    }
-  }
-
-  div:last-of-type {
-    img {
-      height: 30px;
-      width: 100px;
-    }
   }
 `;
 

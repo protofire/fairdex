@@ -16,6 +16,8 @@ import AccountInfo from './side/AccountInfo';
 import NavMenu from './side/NavMenu';
 import WalletInfo from './side/WalletInfo';
 
+import Logos from '../../components/Logos';
+
 const EndedAuctions = Loadable({
   loader: () => import('./auctions/tabs/EndedAuctions'),
   loading: () => <Spinner size='large' />,
@@ -98,6 +100,7 @@ class MainPage extends React.Component<Props> {
                 <NavMenu />
                 <AccountInfo />
                 <WalletInfo />
+                <Footer />
               </SideContent>
             </Sidebar>
             <MessageHandler />
@@ -144,15 +147,26 @@ const Branding = styled.header`
 `;
 
 const Section = styled.section`
-  height: 100%;
-  min-height: calc(100vh - var(--header-height));
+  height: calc(100vh - var(--header-height));
   padding: var(--spacing-normal);
+  overflow: auto;
 `;
 
 const SideContent = styled.div`
   display: grid;
   padding: var(--spacing-normal);
   gap: var(--spacing-normal);
+
+  overflow: auto;
+  flex: 1;
+`;
+
+const Footer = styled(Logos)`
+  div:first-of-type {
+    img {
+      height: 30px;
+    }
+  }
 `;
 
 function mapStateToProps(state: AppState): MainPageStateProps {
