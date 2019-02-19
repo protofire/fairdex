@@ -92,7 +92,7 @@ class MainPage extends React.Component<Props> {
           <Layout>
             <Sidebar>
               <Branding>
-                <NavLink to='/auction'>
+                <NavLink to='/auctions'>
                   <img src={fairdex} height={40} />
                 </NavLink>
               </Branding>
@@ -110,11 +110,11 @@ class MainPage extends React.Component<Props> {
                 <NavBar />
                 <Section>
                   <Switch>
-                    <Route path='/auction/running' component={RunningAuctions} />
-                    <Route path='/auction/scheduled' component={ScheduledAuctions} />
-                    <Route path='/auction/ended' component={EndedAuctions} />
+                    <Route path='/auctions/running' component={RunningAuctions} />
+                    <Route path='/auctions/scheduled' component={ScheduledAuctions} />
+                    <Route path='/auctions/ended' component={EndedAuctions} />
                     <Route path='/wallet' component={WalletOverview} />
-                    <Redirect to='/auction/running' />
+                    <Redirect to='/auctions/running' />
                   </Switch>
                 </Section>
               </ClaimProvider>

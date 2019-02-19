@@ -50,7 +50,7 @@ const SelectWallet: FunctionComponent<Props> = ({
   } else if (wallet && network && !AVAILABLE_NETWORKS.includes(network)) {
     return <Redirect to='/network-not-available' />;
   } else if (wallet && network) {
-    return <Redirect to='/auction' />;
+    return <Redirect to='/auctions' />;
   } else {
     return (
       <Container>

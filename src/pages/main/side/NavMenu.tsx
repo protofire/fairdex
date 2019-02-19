@@ -7,7 +7,7 @@ import * as images from '../../../images';
 
 const NavBar = () => (
   <Menu>
-    <Item to='/auction'>
+    <Item to='/auctions'>
       <Icon.Auctions />
       Auctions
     </Item>
