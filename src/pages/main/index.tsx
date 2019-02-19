@@ -128,40 +128,37 @@ class MainPage extends React.Component<Props> {
 
 const Branding = styled.header`
   display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
   align-items: center;
-  text-align: left;
   height: var(--header-height);
   padding: 0 var(--spacing-normal);
+  background-color: var(--color-main-bg);
   border-bottom: 1px solid var(--color-border);
   user-select: none;
-
-  & > * {
-    width: 0;
-    transition: width var(--animation-duration) ease-in-out;
-
-    @media (min-width: 801px) {
-      width: 100%;
-      text-align: center;
-    }
-  }
 `;
 
 const Section = styled.section`
-  height: calc(100vh - var(--header-height));
+  height: 100%;
+  min-height: calc(100vh - var(--header-height));
   padding: var(--spacing-normal);
   overflow: auto;
 `;
 
 const SideContent = styled.div`
-  display: grid;
   padding: var(--spacing-normal);
-  gap: var(--spacing-normal);
-
   overflow: auto;
   flex: 1;
+
+  & > * {
+    margin-bottom: var(--spacing-normal);
+  }
 `;
 
 const Footer = styled(Logos)`
+  padding-bottom: 0;
+  margin-bottom: 0;
+
   div:first-of-type {
     img {
       height: 30px;

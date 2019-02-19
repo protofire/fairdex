@@ -43,13 +43,12 @@ const Container = styled.aside`
 `;
 
 const Content = styled.div`
+  height: 100%;
   display: flex;
   flex-flow: column nowrap;
   width: var(--sidebar-width);
-  height: 100vh;
   z-index: 101;
   transition: transform var(--animation-duration) ease-in-out;
-
   background: var(--color-main-bg);
 
   @media (max-width: 800px) {

@@ -41,7 +41,7 @@ const Item = styled(NavLink)`
   line-height: 2.14;
   transition: all 0.15s ease-out;
   width: 256px;
-  margin: var(--spacing-text);
+  margin: 0.25em 0;
 
   &:hover,
   &.active {
@@ -66,7 +66,7 @@ const Link = styled.a`
   line-height: 2.14;
   transition: all 0.15s ease-out;
   width: 256px;
-  margin: var(--spacing-text);
+  margin: 0.25em 0;
 
   &:hover,
   &.active {
