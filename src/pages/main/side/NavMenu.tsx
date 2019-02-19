@@ -15,10 +15,6 @@ const NavBar = () => (
       <Icon.Wallet />
       Wallet
     </Item>
-    <Item exact to='/'>
-      <Icon.Help />
-      Help
-    </Item>
     <Link href='https://t.me/dutchXprotocol' target='_blank' rel='noopener noreferrer'>
       <ImageIcon src={images.telegram} />
       Feedback/Questions

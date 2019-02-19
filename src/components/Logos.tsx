@@ -8,10 +8,6 @@ const Logos = (props: HTMLAttributes<HTMLDivElement>) => (
     <Dutchx>
       <img src={images.dutchx} />
     </Dutchx>
-    <Protofire>
-      <span> by </span>
-      <img src={images.logo} />
-    </Protofire>
   </Wrapper>
 );
 
@@ -23,23 +19,6 @@ const Wrapper = styled.footer`
   font-weight: 600;
   justify-content: center;
   padding: 0 0 40px;
-`;
-
-const Protofire = styled.div`
-  align-items: center;
-  display: flex;
-
-  img {
-    width: 144px;
-    height: 40px;
-    margin: 0 10px;
-  }
-
-  @media (max-width: 767px) {
-    span {
-      display: none;
-    }
-  }
 `;
 
 const Dutchx = styled.div`
