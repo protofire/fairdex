@@ -6,10 +6,11 @@ const AUCTION_DURATION = 6; // 6 hours
 const AUCTION_ABOVE_PRIOR_PRICE_THRESHOLD = 1.1; // 10% above prior price
 
 export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionIndex: string) {
-  const [auctionStart, sellVolume = ZERO, buyVolume = ZERO] = await Promise.all([
+  const [auctionStart, sellVolume = ZERO, buyVolume = ZERO, extraTokens = ZERO] = await Promise.all([
     dx.getAuctionStart(sellToken, buyToken),
     dx.getSellVolume(sellToken, buyToken),
     dx.getBuyVolume(sellToken, buyToken),
+    dx.getExtraTokens(sellToken, buyToken, auctionIndex),
   ]);
 
   if (auctionStart) {
@@ -18,6 +19,7 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
       sellToken: sellToken.symbol,
       sellTokenAddress: sellToken.address,
       sellVolume,
+      extraTokens,
       buyToken: buyToken.symbol,
       buyTokenAddress: buyToken.address,
       buyVolume,
