@@ -1,4 +1,5 @@
 import React from 'react';
+import Scrollbar from 'react-custom-scrollbars';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import { NavLink, Redirect, Route, Router, Switch } from 'react-router-dom';
@@ -96,12 +97,14 @@ class MainPage extends React.Component<Props> {
                   <img src={fairdex} height={40} />
                 </NavLink>
               </Branding>
-              <SideContent>
-                <NavMenu />
-                <AccountInfo />
-                <WalletInfo />
-                <Footer />
-              </SideContent>
+              <Scrollbar autoHide={true} autoHideTimeout={500}>
+                <SideContent>
+                  <NavMenu />
+                  <AccountInfo />
+                  <WalletInfo />
+                  <Footer />
+                </SideContent>
+              </Scrollbar>
             </Sidebar>
             <MessageHandler />
             <Filters />
@@ -131,7 +134,7 @@ const Branding = styled.header`
   flex-flow: row nowrap;
   justify-content: space-between;
   align-items: center;
-  height: var(--header-height);
+  min-height: var(--header-height);
   padding: 0 var(--spacing-normal);
   background-color: var(--color-main-bg);
   border-bottom: 1px solid var(--color-border);

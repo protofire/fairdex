@@ -40,7 +40,6 @@ const Item = styled(NavLink)`
   letter-spacing: -0.4px;
   line-height: 2.14;
   transition: all 0.15s ease-out;
-  width: 256px;
   margin: 0.25em 0;
 
   &:hover,
