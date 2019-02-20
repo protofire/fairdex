@@ -2,13 +2,13 @@ import React, { HTMLAttributes, MouseEvent, useCallback, useRef, useState } from
 import { connect } from 'react-redux';
 import styled, { css, StyledFunction } from 'styled-components';
 
-import { isAfter } from 'date-fns';
-
-import { DecimalValue, Duration, Timestamp } from '../../../components/formatters';
+import { DecimalValue, Timestamp } from '../../../components/formatters';
+import { TimeTo } from '../../../components/formatters/Duration';
 import { ZERO } from '../../../contracts/utils';
 import {
   getAvailableVolume,
   getClosingPriceRate,
+  getCounterCurrencyPrice,
   getCurrentPriceRate,
   getEstimatedEndTime,
 } from '../../../contracts/utils/auctions';
@@ -75,6 +75,8 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
     [isMouseDown],
   );
 
+  const timetimend = new Date().getTime() + 90 * 1000;
+
   return (
     <>
       <AuctionCard
@@ -109,7 +111,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   ) : (
                     <span title={getCurrentPriceRate(auction)}>
                       <DecimalValue
-                        value={auction.currentPrice}
+                        value={getCounterCurrencyPrice(auction.currentPrice)}
                         decimals={DEFAULT_DECIMALS}
                         hideTitle={true}
                       />
@@ -129,7 +131,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   ) : (
                     <span title={getClosingPriceRate(auction)}>
                       <DecimalValue
-                        value={auction.closingPrice}
+                        value={getCounterCurrencyPrice(auction.closingPrice)}
                         decimals={DEFAULT_DECIMALS}
                         hideTitle={true}
                       />
@@ -162,10 +164,8 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                 <Value>
                   {auction.auctionStart === undefined ? (
                     <Loading />
-                  ) : isAfter(getEstimatedEndTime(auction), Date.now()) ? (
-                    <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
                   ) : (
-                    <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
+                    <TimeTo to={getEstimatedEndTime(auction)} />
                   )}
                 </Value>
               </Row>
@@ -191,7 +191,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   ) : (
                     <span title={getClosingPriceRate(auction)}>
                       <DecimalValue
-                        value={auction.closingPrice}
+                        value={getCounterCurrencyPrice(auction.closingPrice)}
                         decimals={DEFAULT_DECIMALS}
                         hideTitle={true}
                       />
@@ -219,7 +219,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
               <Row>
                 <Label>Estimated time to start</Label>
                 <Value>
-                  {auction.auctionStart === undefined ? <Loading /> : <Duration to={auction.auctionStart} />}
+                  {auction.auctionStart === undefined ? <Loading /> : <TimeTo to={auction.auctionStart} />}
                 </Value>
               </Row>
             </Table>
@@ -237,7 +237,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   ) : (
                     <span title={getClosingPriceRate(auction)}>
                       <DecimalValue
-                        value={auction.closingPrice}
+                        value={getCounterCurrencyPrice(auction.closingPrice)}
                         decimals={DEFAULT_DECIMALS}
                         hideTitle={true}
                       />

@@ -18,5 +18,7 @@ declare global {
 
   interface EthereumProvider extends Provider {
     enable: () => Promise<any>;
+    isMetaMask?: boolean;
+    isSafe?: boolean;
   }
 }

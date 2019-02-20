@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { Address, DecimalValue } from '../../../components/formatters';
+import Icons from '../../../components/icons';
 import Spinner from '../../../components/Spinner';
 import * as images from '../../../images';
 import {
@@ -35,51 +36,59 @@ const AccountInfo = ({
   pastBids,
   liquidityContribution,
   claimableCount,
-}: AccountProps) => (
-  <Container data-testid='account-info-card'>
-    <Header>
-      <Icon>
-        <img src={images.wallet.MetaMask} alt='MetaMask' />
-      </Icon>
-      <HeaderAddress address={currentAccount} />
-      <NetworkName title={currentNetwork ? `Connected to ${currentNetwork} network` : ''}>
-        {currentNetwork}
-      </NetworkName>
-    </Header>
-    <Content>
-      <Item>
-        <TokenBalance
-          token={frt}
-          decimals={DEFAULT_DECIMALS}
-          description='Magnolia (MGN) tokens reduce your liquidity contribution.The more MGN you hold as a percentage of the total MGN market volume, the lower your liquidity contribution is (if within the relevant percentages).'
-        />
-      </Item>
-      <Item title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'>
-        {liquidityContribution != null ? (
-          <>
-            <DecimalValue
-              value={liquidityContribution}
-              decimals={DEFAULT_DECIMALS}
-              postfix='%'
-              data-testid='lc-percentage'
-            />
-            <small>Liquidity Contribution</small>
-          </>
-        ) : (
-          <Spinner size='small' inline />
-        )}
-      </Item>
-      <Item>
-        <div data-testid='past-bids-count'>{pastBids}</div>
-        <small>Past bids</small>
-      </Item>
-      <Item>
-        <div data-testid='to-claim-count'>{claimableCount}</div>
-        <small>To claim</small>
-      </Item>
-    </Content>
-  </Container>
-);
+}: AccountProps) => {
+  return (
+    <Container data-testid='account-info-card'>
+      <Header>
+        <Icon>
+          {window.ethereum.isSafe ? (
+            <img src={images.wallet.Safe} alt='Safe' />
+          ) : window.ethereum.isMetaMask ? (
+            <img src={images.wallet.MetaMask} alt='MetaMask' />
+          ) : (
+            <Icons.Wallet />
+          )}
+        </Icon>
+        <HeaderAddress address={currentAccount} />
+        <NetworkName title={currentNetwork ? `Connected to ${currentNetwork} network` : ''}>
+          {currentNetwork}
+        </NetworkName>
+      </Header>
+      <Content>
+        <Item>
+          <TokenBalance
+            token={frt}
+            decimals={DEFAULT_DECIMALS}
+            description='Magnolia (MGN) tokens reduce your liquidity contribution.The more MGN you hold as a percentage of the total MGN market volume, the lower your liquidity contribution is (if within the relevant percentages).'
+          />
+        </Item>
+        <Item title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'>
+          {liquidityContribution != null ? (
+            <>
+              <DecimalValue
+                value={liquidityContribution}
+                decimals={DEFAULT_DECIMALS}
+                postfix='%'
+                data-testid='lc-percentage'
+              />
+              <small>Liquidity Contribution</small>
+            </>
+          ) : (
+            <Spinner size='small' inline />
+          )}
+        </Item>
+        <Item>
+          <div data-testid='past-bids-count'>{pastBids}</div>
+          <small>Past bids</small>
+        </Item>
+        <Item>
+          <div data-testid='to-claim-count'>{claimableCount}</div>
+          <small>To claim</small>
+        </Item>
+      </Content>
+    </Container>
+  );
+};
 
 const Container = styled(WalletCard)`
   background-image: linear-gradient(37deg, #8bc6ec, #a8f6e4);
@@ -102,8 +111,11 @@ const Icon = styled.div`
   background-color: #ffffff;
   border-radius: 80px;
   text-align: center;
-  padding-top: 15px;
   user-select: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
 `;
 
 const NetworkName = styled.div`

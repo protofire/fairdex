@@ -2,13 +2,13 @@ import React, { HTMLAttributes } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-import { isAfter } from 'date-fns';
-
-import { DecimalValue, Duration, Timestamp } from '../../../components/formatters';
+import { DecimalValue, Timestamp } from '../../../components/formatters';
+import { TimeTo } from '../../../components/formatters/Duration';
 import { ZERO } from '../../../contracts/utils';
 import {
   getAvailableVolume,
   getClosingPriceRate,
+  getCounterCurrencyPrice,
   getCurrentPriceRate,
   getEstimatedEndTime,
 } from '../../../contracts/utils/auctions';
@@ -69,7 +69,11 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getCurrentPriceRate(auction)}>
-                  <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                  <DecimalValue
+                    value={getCounterCurrencyPrice(auction.currentPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                    hideTitle={true}
+                  />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
@@ -85,7 +89,11 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getClosingPriceRate(auction)}>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                  <DecimalValue
+                    value={getCounterCurrencyPrice(auction.closingPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                    hideTitle={true}
+                  />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
@@ -166,10 +174,8 @@ const Content = ({ auction }: ContentProp) => (
             <Value>
               {auction.auctionStart === undefined ? (
                 <Loading />
-              ) : isAfter(getEstimatedEndTime(auction), Date.now()) ? (
-                <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
               ) : (
-                <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
+                <TimeTo to={getEstimatedEndTime(auction)} />
               )}
             </Value>
           </Row>
@@ -194,7 +200,11 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getClosingPriceRate(auction)}>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                  <DecimalValue
+                    value={getCounterCurrencyPrice(auction.closingPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                    hideTitle={true}
+                  />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
@@ -234,7 +244,7 @@ const Content = ({ auction }: ContentProp) => (
           <Row>
             <Label>Estimated time to start</Label>
             <Value>
-              {auction.auctionStart === undefined ? <Loading /> : <Duration to={auction.auctionStart} />}
+              {auction.auctionStart === undefined ? <Loading /> : <TimeTo to={auction.auctionStart} />}
             </Value>
           </Row>
         </Table>
@@ -251,7 +261,11 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getClosingPriceRate(auction)}>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                  <DecimalValue
+                    value={getCounterCurrencyPrice(auction.closingPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                    hideTitle={true}
+                  />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
