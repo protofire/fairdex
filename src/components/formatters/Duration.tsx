@@ -27,7 +27,7 @@ const Duration = ({ from, to, defaultValue = '-', prefix = '', postfix = '' }: P
   useEffect(() => {
     const timer = setInterval(() => {
       setNow(Date.now());
-    }, 30_000);
+    }, 15_000);
 
     return () => {
       clearInterval(timer);
@@ -35,6 +35,27 @@ const Duration = ({ from, to, defaultValue = '-', prefix = '', postfix = '' }: P
   }, []);
 
   return <span>{formatted ? `${prefix} ${formatted} ${postfix}`.trim() : defaultValue}</span>;
+};
+
+const TimeTo = ({ to }: Props) => {
+  const [now, setNow] = useState(Date.now());
+  const formatted = useMemo(() => (to > now ? duration(now, to) : duration(to, now)), [to, now]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(Date.now());
+    }, 30_000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  return (
+    <span>
+      {formatted ? `${to > now ? 'in ' : ''} ${formatted} ${to < now ? ' ago' : ''}`.trim() : 'soon'}
+    </span>
+  );
 };
 
 function duration(from: Timestamp, to: Timestamp) {
@@ -71,5 +92,7 @@ function duration(from: Timestamp, to: Timestamp) {
 
   return result.join(' ');
 }
+
+export { TimeTo };
 
 export default Duration;

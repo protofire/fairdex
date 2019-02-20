@@ -52,12 +52,3 @@ export function renderWithRedux(ui: React.ReactElement<any>, state: StateOptions
     store,
   };
 }
-
-export function rerenderWithRedux(rerender, ui: React.ReactElement<any>, state: StateOptions = {}) {
-  const store = createStore(reducer, { ...initialState, ...state });
-
-  return {
-    ...rerender(<Provider store={store}>{ui}</Provider>),
-    store,
-  };
-}
