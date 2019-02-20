@@ -41,10 +41,10 @@ const AccountInfo = ({
     <Container data-testid='account-info-card'>
       <Header>
         <Icon>
-          {window.ethereum.isMetaMask ? (
-            <img src={images.wallet.MetaMask} alt='MetaMask' />
-          ) : window.ethereum.isSafe ? (
+          {window.ethereum.isSafe ? (
             <img src={images.wallet.Safe} alt='Safe' />
+          ) : window.ethereum.isMetaMask ? (
+            <img src={images.wallet.MetaMask} alt='MetaMask' />
           ) : (
             <Icons.Wallet />
           )}
