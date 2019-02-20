@@ -5,3 +5,5 @@ jest.mock('../contracts/Erc20Token');
 jest.mock('../contracts/Weth');
 
 window.dx = new DutchExchange(4);
+
+window.ethereum = { isMetaMask: true };
