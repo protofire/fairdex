@@ -24,6 +24,7 @@ const Wrapper = styled.footer`
 const Dutchx = styled.div`
   display: flex;
   align-items: center;
+  user-select: none;
 
   img {
     height: 40px;
