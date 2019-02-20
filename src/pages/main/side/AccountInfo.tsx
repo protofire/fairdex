@@ -24,7 +24,7 @@ export interface AccountProps {
   currentNetwork: Network | null;
   frt?: Token;
   liquidityContribution?: BigNumber;
-  pastBids: number;
+  pastBids?: number;
 }
 
 const DEFAULT_DECIMALS = 3;
@@ -78,12 +78,24 @@ const AccountInfo = ({
           )}
         </Item>
         <Item>
-          <div data-testid='past-bids-count'>{pastBids}</div>
-          <small>Past bids</small>
-        </Item>
-        <Item>
-          <div data-testid='to-claim-count'>{claimableCount}</div>
-          <small>To claim</small>
+          {pastBids != null ? (
+          <>
+            <div data-testid='past-bids-count'>{pastBids}</div>
+            <small>Past bids</small>
+          </>
+        ) : (
+          <Spinner size='small' inline />
+        )}
+      </Item>
+      <Item>
+        {claimableCount != null ? (
+          <>
+            <div data-testid='to-claim-count'>{claimableCount}</div>
+            <small>To claim</small>
+          </>
+        ) : (
+          <Spinner size='small' inline />
+        )}
         </Item>
       </Content>
     </Container>
@@ -138,7 +150,7 @@ const NetworkName = styled.div`
 
 function mapStateToProps(state: AppState): AccountProps {
   return {
-    claimableCount: getClaimableAuctionsCount(state),
+    claimableCount: state.blockchain.auctions && getClaimableAuctionsCount(state),
     currentAccount: getCurrentAccount(state),
     currentNetwork: getNetworkType(state),
     frt: getFrt(state),

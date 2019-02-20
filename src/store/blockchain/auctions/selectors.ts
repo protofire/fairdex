@@ -70,7 +70,7 @@ export const getFilteredClaimableAuctions = createSelector(
 
 export const getClaimableAuctionsCount = createSelector(
   getFilteredClaimableAuctions,
-  auctions => auctions.length || 0,
+  auctions => auctions.length,
 );
 
 export const getAuctionDetail = createSelector(
