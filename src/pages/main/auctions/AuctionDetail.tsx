@@ -144,9 +144,9 @@ const Content = ({ auction }: ContentProp) => (
               {auction.auctionStart === undefined ? (
                 <Loading />
               ) : isAfter(getEstimatedEndTime(auction), Date.now()) ? (
-                <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
+                <Duration to={getEstimatedEndTime(auction)} prefix={'in'} defaultValue={'Soon'} />
               ) : (
-                <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
+                <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} defaultValue={'Soon'} />
               )}
             </Value>
           </Row>

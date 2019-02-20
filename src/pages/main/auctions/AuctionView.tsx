@@ -164,9 +164,9 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   {auction.auctionStart === undefined ? (
                     <Loading />
                   ) : isAfter(getEstimatedEndTime(auction), Date.now()) ? (
-                    <Duration to={getEstimatedEndTime(auction)} prefix={'in'} />
+                    <Duration to={getEstimatedEndTime(auction)} prefix={'in'} defaultValue={'Soon'} />
                   ) : (
-                    <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} />
+                    <Duration from={getEstimatedEndTime(auction)} postfix={'ago'} defaultValue={'Soon'} />
                   )}
                 </Value>
               </Row>
