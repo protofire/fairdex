@@ -5,6 +5,7 @@ import { EventLog } from 'web3/types';
 export interface ContractOptions {
   jsonInterface: any[];
   address: Address;
+  initialBlock?: number;
   web3?: Web3;
 }
 
@@ -16,17 +17,19 @@ export interface SubscriptionOptions<EventType> {
 }
 
 abstract class BaseContract<EventType extends string = string> {
-  address: Address;
+  readonly address: Address;
+  readonly initialBlock: number;
 
   protected contract: Contract;
   private subscriptions = new Map<EventType, any>();
 
   protected constructor(options: ContractOptions) {
     const web3 = options.web3 || window.web3;
-    const { jsonInterface, address } = options;
+    const { jsonInterface, address, initialBlock = 0 } = options;
 
     this.contract = new web3.eth.Contract(jsonInterface, address);
     this.address = address;
+    this.initialBlock = initialBlock;
   }
 
   subscribe<T = any>(

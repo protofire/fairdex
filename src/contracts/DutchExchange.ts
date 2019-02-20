@@ -20,11 +20,19 @@ interface Fraction {
 }
 
 class DutchExchange extends BaseContract<Event> {
-  constructor(networkId: number) {
-    super({
-      jsonInterface: abi,
-      address: proxy[networkId].address,
-    });
+  static async create(networkId: number) {
+    if (!proxy[networkId]) {
+      throw Error(`DutchX is not available in network with id=${networkId}`);
+    }
+
+    const { address, transactionHash } = proxy[networkId];
+    const { blockNumber } = await web3.eth.getTransaction(transactionHash);
+
+    return new DutchExchange(address, blockNumber);
+  }
+
+  private constructor(address: Address, initialBlock?: number) {
+    super({ jsonInterface: abi, address, initialBlock });
   }
 
   postBid(sellToken: Address, buyToken: Address, auctionIndex: string, buyAmount: Decimal) {
@@ -60,7 +68,7 @@ class DutchExchange extends BaseContract<Event> {
     return this.contract.methods.withdraw(token.address, fromDecimal(amount, token.decimals));
   }
 
-  async getAvailableMarkets(fromBlock = 0) {
+  async getAvailableMarkets(fromBlock = this.initialBlock) {
     const markets = await this.contract.getPastEvents('NewTokenPair', { fromBlock });
 
     return markets.map<[Address, Address]>(log => {
@@ -70,7 +78,7 @@ class DutchExchange extends BaseContract<Event> {
     });
   }
 
-  async getBuyOrders(account: Address, fromBlock = 0) {
+  async getBuyOrders(account: Address, fromBlock = this.initialBlock) {
     const buyOrders = await this.contract.getPastEvents('NewBuyOrder', {
       fromBlock,
       filter: { user: account },
@@ -102,9 +110,14 @@ class DutchExchange extends BaseContract<Event> {
     return epoch ? (epoch > 1 ? epoch * 1_000 : epoch) : undefined;
   }
 
-  async getAuctionEnd(sellToken: Token, buyToken: Token, auctionIndex: string) {
+  async getAuctionEnd(
+    sellToken: Token,
+    buyToken: Token,
+    auctionIndex: string,
+    fromBlock = this.initialBlock,
+  ) {
     const [event] = await this.contract.getPastEvents('AuctionCleared', {
-      fromBlock: 0,
+      fromBlock,
       filter: { sellToken: sellToken.address, buyToken: buyToken.address, auctionIndex },
     });
 
@@ -157,10 +170,15 @@ class DutchExchange extends BaseContract<Event> {
     return toFractional(closingPrice);
   }
 
-  async getSellVolume(sellToken: Token, buyToken: Token, auctionIndex?: string) {
+  async getSellVolume(
+    sellToken: Token,
+    buyToken: Token,
+    auctionIndex?: string,
+    fromBlock = this.initialBlock,
+  ) {
     if (auctionIndex) {
       const [event] = await this.contract.getPastEvents('AuctionCleared', {
-        fromBlock: 0,
+        fromBlock,
         filter: {
           sellToken: sellToken.address,
           buyToken: buyToken.address,
@@ -188,10 +206,15 @@ class DutchExchange extends BaseContract<Event> {
     return extraTokensVolume ? toDecimal(extraTokensVolume, sellToken.decimals) : ZERO;
   }
 
-  async getBuyVolume(sellToken: Token, buyToken: Token, auctionIndex?: string) {
+  async getBuyVolume(
+    sellToken: Token,
+    buyToken: Token,
+    auctionIndex?: string,
+    fromBlock = this.initialBlock,
+  ) {
     if (auctionIndex) {
       const [event] = await this.contract.getPastEvents('AuctionCleared', {
-        fromBlock: 0,
+        fromBlock,
         filter: {
           sellToken: sellToken.address,
           buyToken: buyToken.address,

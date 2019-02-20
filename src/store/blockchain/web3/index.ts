@@ -2,6 +2,7 @@ import { Action, ActionCreator, Reducer } from 'redux';
 import Web3 from 'web3';
 
 import DutchExchange from '../../../contracts/DutchExchange';
+import { fetchData } from '../index';
 
 export * from './selectors';
 
@@ -54,7 +55,7 @@ export function init(wallet: Wallet) {
       window.web3 = web3;
 
       // Instantiate DutchX contract
-      window.dx = new DutchExchange(networkId);
+      window.dx = await DutchExchange.create(networkId);
 
       // Handle account/network change
       const ethereum: any = web3.currentProvider;
@@ -70,6 +71,9 @@ export function init(wallet: Wallet) {
         // besides MetaMask team is planning to change this behavior soon
         location.reload();
       });
+
+      // Load all data
+      dispatch(fetchData());
     }
   };
 }

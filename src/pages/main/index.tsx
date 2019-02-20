@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 import Spinner from '../../components/Spinner';
 import fairdex from '../../images/fairdex.png';
-import { fetchData, getNetworkType } from '../../store/blockchain';
+import { getNetworkType } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
 import { ClaimProvider } from './auctions/claim/ClaimContext';
 
@@ -38,37 +38,20 @@ const WalletOverview = Loadable({
   loading: () => <Spinner size='large' />,
 });
 
-interface MainPageStateProps {
+interface Props {
   network?: Network | null;
   wallet?: Wallet;
   termsConditionsAccepted: boolean;
 }
 
-interface DispatchProps {
-  fetchData: () => void;
-}
-
-type Props = MainPageStateProps & DispatchProps;
-
 const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
 
 class MainPage extends React.Component<Props> {
   componentDidMount() {
-    const { wallet, network } = this.props;
-    if (wallet && network) {
-      this.props.fetchData();
-    }
-
     window.scrollTo({
       behavior: 'smooth',
       top: 0,
     });
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.wallet !== this.props.wallet || prevProps.network !== this.props.network) {
-      this.props.fetchData();
-    }
   }
 
   render() {
@@ -163,7 +146,7 @@ const Footer = styled(Logos)`
   }
 `;
 
-function mapStateToProps(state: AppState): MainPageStateProps {
+function mapStateToProps(state: AppState): Props {
   return {
     network: getNetworkType(state),
     wallet: state.blockchain.wallet,
@@ -171,13 +154,4 @@ function mapStateToProps(state: AppState): MainPageStateProps {
   };
 }
 
-function mapDispatchToProps(dispatch: any): DispatchProps {
-  return {
-    fetchData: () => dispatch(fetchData()),
-  };
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(MainPage);
+export default connect(mapStateToProps)(MainPage);
