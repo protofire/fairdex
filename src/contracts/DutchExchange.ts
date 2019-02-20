@@ -190,6 +190,15 @@ class DutchExchange extends BaseContract<Event> {
   }
 
   @timeout()
+  async getExtraTokens(sellToken: Token, buyToken: Token, auctionIndex: string) {
+    const extraTokensVolume: string = await this.contract.methods
+      .extraTokens(sellToken.address, buyToken.address, auctionIndex)
+      .call();
+
+    return extraTokensVolume ? toDecimal(extraTokensVolume, sellToken.decimals) : ZERO;
+  }
+
+  @timeout()
   async getBuyVolume(sellToken: Token, buyToken: Token, auctionIndex?: string) {
     if (auctionIndex) {
       const [event] = await this.contract.getPastEvents('AuctionCleared', {

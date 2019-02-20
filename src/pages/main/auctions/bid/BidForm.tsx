@@ -65,6 +65,10 @@ const BidForm = React.memo(
     const [canUseOwlToPayFee, setCanUseOwlToPayFee] = useState(
       owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0),
     );
+    const isOwlAllowed = useMemo(
+      () => owl && owl.allowance && owl.allowance.gt(0) && getTotalBalance(owl).gt(0),
+      [owl],
+    );
 
     const hasBidded = useMemo(
       () => {
@@ -449,7 +453,11 @@ const BidForm = React.memo(
                     Liquidity contribution
                   </h4>
                 </Step4Header>
-                <Step4 onSubmit={handleApprove} data-testid={'bid-lc-step'}>
+                <Step4
+                  onSubmit={handleApprove}
+                  data-testid={'bid-lc-step'}
+                  title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'
+                >
                   <p>You have the option to settle half of your liquidity contribution in OWL.</p>
                   <p>
                     Later you can choose to unsettle it back by disabling OWL token for trading within the
@@ -529,8 +537,16 @@ const BidForm = React.memo(
                     )
                   ) : (
                     <p>
-                      liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' />)
-                      included
+                      liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' /> /{' '}
+                      <DecimalValue value={bidAmount.times(feeRate).div(100)} decimals={2} />{' '}
+                      <span>{auction.buyToken}</span>) included
+                      {isOwlAllowed && (
+                        <>
+                          <br />
+                          Up to <DecimalValue value={bidAmount.div(2)} decimals={2} />{' '}
+                          <span>{auction.buyToken}</span> will be paid with OWL
+                        </>
+                      )}
                     </p>
                   )}
                   <Button

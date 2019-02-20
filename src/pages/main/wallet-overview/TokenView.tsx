@@ -48,7 +48,7 @@ const TokenView = ({ data: token }: TokenViewProps) => {
           </Value>
         </Row>
         <Row>
-          <Label>Total holdings</Label>
+          <Label>Total balance</Label>
           <Value>
             {token.balance === undefined ? (
               <Loading />
