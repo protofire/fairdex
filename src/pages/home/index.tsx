@@ -1,11 +1,14 @@
 import React from 'react';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import styled from 'styled-components';
+import { Route, Router, Switch } from 'react-router-dom';
+import { history } from '../../analytics';
 
-import * as images from '../../images';
-import { getNetworkType } from '../../store/blockchain';
+import { getNetworkType, init } from '../../store/blockchain';
+import { isTermsConditionsAccepted } from '../../store/terms-conditions';
+import Landing from './Landing';
 import spinner from './spinner';
+import TermsAndConditions from './TermsAndConditions';
 
 const MainPage = Loadable({
   loader: () => import('../main'),
@@ -22,93 +25,52 @@ const SelectWallet = Loadable({
   loading: () => spinner,
 });
 
-interface Props {
+interface HomePageStateProps {
   network?: Network | null;
   wallet?: Wallet;
+  termsConditionsAccepted: boolean;
 }
 
-const AVAILABLE_NETWORKS = ['main', 'rinkeby'];
+interface DispatchProps {
+  initWallet: (wallet: Wallet) => void;
+}
 
-const HomePage = React.memo(({ network, wallet }: Props) => {
-  let content = null;
+type Props = HomePageStateProps & DispatchProps;
 
-  if (!wallet || !network) {
-    content = <SelectWallet />;
-  } else if (!AVAILABLE_NETWORKS.includes(network)) {
-    content = <NetworkNotAvailable />;
+const HomePage = React.memo(({ network, wallet, initWallet }: Props) => {
+  if (wallet && !network) {
+    initWallet(wallet);
+    return spinner;
   } else {
-    return <MainPage />;
+    return (
+      <Router history={history}>
+        <Switch>
+          <Route exact path='/' component={Landing} />
+          <Route exact path='/terms-conditions' component={TermsAndConditions} />
+          <Route path='/select-wallet' exact component={SelectWallet} />
+          <Route path='/network-not-available' exact component={NetworkNotAvailable} />
+          <Route component={MainPage} />
+        </Switch>
+      </Router>
+    );
   }
-
-  return (
-    <Container>
-      <Content>{content}</Content>
-      <Footer>
-        <img src={images.geco} /> <span>Grant by the Gnosis Ecosystem Fund</span>
-      </Footer>
-    </Container>
-  );
 });
 
-const Container = styled.section`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 100%;
-  min-height: 100vh;
-
-  h2 {
-    text-transform: uppercase;
-  }
-
-  h3 {
-    font-size: 32px;
-    font-weight: 800;
-    text-align: center;
-    color: var(--color-light-grey-blue);
-  }
-
-  p {
-    margin: 0;
-    font-size: 14px;
-    font-weight: normal;
-
-    color: var(--color-greyish);
-  }
-`;
-
-const Content = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-`;
-
-const Footer = styled.footer`
-  margin: var(--spacing-wide) 0;
-  user-select: none;
-
-  img {
-    width: 60px;
-    height: 60px;
-    vertical-align: middle;
-  }
-
-  span {
-    margin-left: 10px;
-    color: var(--color-greyish);
-  }
-`;
-
-function mapStateToProps(state: AppState): Props {
+function mapStateToProps(state: AppState): HomePageStateProps {
   return {
     network: getNetworkType(state),
     wallet: state.blockchain.wallet,
+    termsConditionsAccepted: isTermsConditionsAccepted(state),
   };
 }
 
-export default connect(mapStateToProps)(HomePage);
+function mapDispatchToProps(dispatch: any): DispatchProps {
+  return {
+    initWallet: wallet => dispatch(init(wallet)),
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(HomePage);

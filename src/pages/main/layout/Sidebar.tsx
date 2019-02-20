@@ -43,16 +43,12 @@ const Container = styled.aside`
 `;
 
 const Content = styled.div`
-  display: flex;
-  flex-direction: column;
-  float: left;
-  width: var(--sidebar-width);
   height: 100%;
-  min-height: 100vh;
-  overflow-y: auto;
+  display: flex;
+  flex-flow: column nowrap;
+  width: var(--sidebar-width);
   z-index: 101;
   transition: transform var(--animation-duration) ease-in-out;
-
   background: var(--color-main-bg);
 
   @media (max-width: 800px) {

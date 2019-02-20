@@ -95,7 +95,7 @@ const Content = ({ auction }: ContentProp) => (
             </Value>
           </Row>
           <Row>
-            <Label>Sell volume</Label>
+            <Label>Sell volume from deposits</Label>
             <Value>
               {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
                 <Loading />
@@ -105,6 +105,37 @@ const Content = ({ auction }: ContentProp) => (
                     value={auction.sellVolume.times(auction.currentPrice)}
                     decimals={DEFAULT_DECIMALS}
                   />
+                  <small> {auction.buyToken}</small>
+                </>
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'>
+              Sell volume from <abbr>LC</abbr>
+            </Label>
+            <Value>
+              {auction.extraTokens === undefined ? (
+                <Loading />
+              ) : (
+                <>
+                  <DecimalValue
+                    value={auction.extraTokens.times(auction.currentPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                  />
+                  <small> {auction.buyToken}</small>
+                </>
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label>Current bid volume</Label>
+            <Value>
+              {auction.buyVolume === undefined ? (
+                <Loading />
+              ) : (
+                <>
+                  <DecimalValue value={auction.buyVolume} decimals={DEFAULT_DECIMALS} />
                   <small> {auction.buyToken}</small>
                 </>
               )}
@@ -186,6 +217,21 @@ const Content = ({ auction }: ContentProp) => (
             </Value>
           </Row>
           <Row>
+            <Label title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'>
+              Sell volume from <abbr>LC</abbr>
+            </Label>
+            <Value>
+              {auction.extraTokens === undefined ? (
+                <Loading />
+              ) : (
+                <>
+                  <DecimalValue value={auction.extraTokens} decimals={DEFAULT_DECIMALS} />
+                  <small> {auction.sellToken}</small>
+                </>
+              )}
+            </Value>
+          </Row>
+          <Row>
             <Label>Estimated time to start</Label>
             <Value>
               {auction.auctionStart === undefined ? <Loading /> : <Duration to={auction.auctionStart} />}
@@ -222,6 +268,21 @@ const Content = ({ auction }: ContentProp) => (
               ) : (
                 <>
                   <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
+                  <small> {auction.sellToken}</small>
+                </>
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Label title='On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'>
+              Sell volume from <abbr>LC</abbr>
+            </Label>
+            <Value>
+              {auction.extraTokens === undefined ? (
+                <Loading />
+              ) : (
+                <>
+                  <DecimalValue value={auction.extraTokens} decimals={DEFAULT_DECIMALS} />
                   <small> {auction.sellToken}</small>
                 </>
               )}

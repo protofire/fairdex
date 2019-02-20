@@ -11,7 +11,13 @@ const WALLET_STORAGE_KEY = 'wallet';
 const INIT_WEB3_PROVIDER = 'INIT_WEB3_PROVIDER';
 const CHANGE_ACCOUNT = 'CHANGE_ACCOUNT';
 
-const reducer: Reducer<WalletState> = (state = {}, action) => {
+const storage = localStorage.getItem(WALLET_STORAGE_KEY);
+
+const initialState: WalletState = {
+  wallet: storage ? storage : undefined,
+};
+
+const reducer: Reducer<WalletState> = (state = initialState, action) => {
   switch (action.type) {
     case INIT_WEB3_PROVIDER:
       return {
@@ -37,12 +43,12 @@ export function init(wallet: Wallet) {
     const web3 = await createEthereumClient();
 
     if (web3) {
+      // Save selected wallet
+      localStorage.setItem(WALLET_STORAGE_KEY, wallet);
+
       const [networkId, [accountAddress]] = await Promise.all([web3.eth.net.getId(), web3.eth.getAccounts()]);
 
       dispatch(initWeb3Provider(wallet, networkId, accountAddress));
-
-      // Save selected wallet
-      localStorage.setItem(WALLET_STORAGE_KEY, wallet);
 
       // Save Web3 instance
       window.web3 = web3;

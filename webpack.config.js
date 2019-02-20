@@ -44,6 +44,17 @@ module.exports = (env, { mode }) => ({
           },
         ],
       },
+      {
+        test: /\.(pdf)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: 'files/[name]-[hash].[ext]',
+            },
+          },
+        ],
+      },
     ],
   },
 

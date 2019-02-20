@@ -1,0 +1,48 @@
+import React, { FunctionComponent } from 'react';
+import styled from 'styled-components';
+
+import Button from '../../../components/Button';
+import Separator from '../../../components/Separator';
+import { Content, StepTitle } from './utils';
+
+interface StepProps {
+  onGetStarted: () => void;
+}
+
+const Step5: FunctionComponent<StepProps> = ({ onGetStarted }) => (
+  <>
+    <StepTitle>
+      <div>
+        <h3>4. What is required?</h3>
+        <Separator />
+      </div>
+    </StepTitle>
+    <Content>
+      <p>
+        <b>No account needed.</b> Direct trades between peers through the Gnosis DutchX trading protocol smart
+        contracts.
+      </p>
+      <ol>
+        <li>Choose the tokens you would like to bid on.</li>
+        <li>Specify the amount to buy.</li>
+        <li>Submit the order via your wallet provider.</li>
+        <li>Claim your tokens.</li>
+      </ol>
+      <p>
+        For more information check out{' '}
+        <a href='https:\/\/dutchx.readthedocs.io/en/latest' target='_blank' rel='noopener noreferrer'>
+          {'https://dutchx.readthedocs.io/en/latest'}
+        </a>
+      </p>
+    </Content>
+    <GetStarted onClick={onGetStarted}>GET STARTED</GetStarted>
+  </>
+);
+
+const GetStarted = styled(Button)`
+  margin: var(--spacing-wide) auto;
+  transition: all 0.15s ease-out;
+  width: 200px;
+`;
+
+export default Step5;
