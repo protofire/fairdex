@@ -1,7 +1,7 @@
 import { abi } from '@gnosis.pm/dx-contracts/build/contracts/EtherToken.json';
 
 import BaseContract from './BaseContract';
-import { fromDecimal, timeout, toDecimal, ZERO } from './utils';
+import { fromDecimal } from './utils';
 
 class Weth extends BaseContract {
   constructor(readonly token: Token) {

@@ -3,7 +3,7 @@ import { DutchExchangeProxy as proxy } from '@gnosis.pm/dx-contracts/networks.js
 
 import BaseContract from './BaseContract';
 import { getErc20Contract, getWethContract } from './index';
-import { Decimal, fromDecimal, timeout, toBigNumber, toDecimal, toFractional, ZERO } from './utils';
+import { Decimal, fromDecimal, toBigNumber, toDecimal, toFractional, ZERO } from './utils';
 
 type Event =
   | 'AuctionCleared'
@@ -70,7 +70,6 @@ class DutchExchange extends BaseContract<Event> {
     });
   }
 
-  @timeout()
   async getBuyOrders(account: Address, fromBlock = 0) {
     const buyOrders = await this.contract.getPastEvents('NewBuyOrder', {
       fromBlock,
@@ -93,7 +92,6 @@ class DutchExchange extends BaseContract<Event> {
     );
   }
 
-  @timeout()
   async getAuctionStart(sellToken: Token, buyToken: Token) {
     const auctionStart: string = await this.contract.methods
       .getAuctionStart(sellToken.address, buyToken.address)
@@ -104,7 +102,6 @@ class DutchExchange extends BaseContract<Event> {
     return epoch ? (epoch > 1 ? epoch * 1_000 : epoch) : undefined;
   }
 
-  @timeout()
   async getAuctionEnd(sellToken: Token, buyToken: Token, auctionIndex: string) {
     const [event] = await this.contract.getPastEvents('AuctionCleared', {
       fromBlock: 0,
@@ -122,14 +119,12 @@ class DutchExchange extends BaseContract<Event> {
     return 0;
   }
 
-  @timeout()
   async getBalance(token: Token, accountAddress: Address) {
     const balance = await this.contract.methods.balances(token.address, accountAddress).call();
 
     return toDecimal(balance, token.decimals) || ZERO;
   }
 
-  @timeout()
   async getUnclaimedFunds(sellToken: Token, buyToken: Token, auctionIndex: string, accountAddress: Address) {
     const { unclaimedBuyerFunds } = await this.contract.methods
       .getUnclaimedBuyerFunds(sellToken.address, buyToken.address, accountAddress, auctionIndex)
@@ -138,7 +133,6 @@ class DutchExchange extends BaseContract<Event> {
     return toDecimal(unclaimedBuyerFunds, sellToken.decimals) || ZERO;
   }
 
-  @timeout()
   async getCurrentPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
     const currentPrice: Fraction = await this.contract.methods
       .getCurrentAuctionPrice(sellToken.address, buyToken.address, auctionIndex)
@@ -147,7 +141,6 @@ class DutchExchange extends BaseContract<Event> {
     return toFractional(currentPrice);
   }
 
-  @timeout()
   async getClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
     const closingPrice: Fraction = await this.contract.methods
       .closingPrices(sellToken.address, buyToken.address, auctionIndex)
@@ -156,7 +149,6 @@ class DutchExchange extends BaseContract<Event> {
     return toFractional(closingPrice);
   }
 
-  @timeout()
   async getPreviousClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
     const closingPrice: Fraction = await this.contract.methods
       .getPriceInPastAuction(sellToken.address, buyToken.address, auctionIndex)
@@ -165,7 +157,6 @@ class DutchExchange extends BaseContract<Event> {
     return toFractional(closingPrice);
   }
 
-  @timeout()
   async getSellVolume(sellToken: Token, buyToken: Token, auctionIndex?: string) {
     if (auctionIndex) {
       const [event] = await this.contract.getPastEvents('AuctionCleared', {
@@ -189,7 +180,6 @@ class DutchExchange extends BaseContract<Event> {
     }
   }
 
-  @timeout()
   async getExtraTokens(sellToken: Token, buyToken: Token, auctionIndex: string) {
     const extraTokensVolume: string = await this.contract.methods
       .extraTokens(sellToken.address, buyToken.address, auctionIndex)
@@ -198,7 +188,6 @@ class DutchExchange extends BaseContract<Event> {
     return extraTokensVolume ? toDecimal(extraTokensVolume, sellToken.decimals) : ZERO;
   }
 
-  @timeout()
   async getBuyVolume(sellToken: Token, buyToken: Token, auctionIndex?: string) {
     if (auctionIndex) {
       const [event] = await this.contract.getPastEvents('AuctionCleared', {
@@ -222,14 +211,12 @@ class DutchExchange extends BaseContract<Event> {
     }
   }
 
-  @timeout()
   async getFeeRatio(accountAddress: Address) {
     const currentFeeRatio: Fraction = await this.contract.methods.getFeeRatio(accountAddress).call();
 
     return toFractional(currentFeeRatio);
   }
 
-  @timeout()
   async getLatestAuctionIndex(sellToken: Token, buyToken: Token) {
     const auctionIndex: string = await this.contract.methods
       .getAuctionIndex(sellToken.address, buyToken.address)
@@ -238,7 +225,6 @@ class DutchExchange extends BaseContract<Event> {
     return auctionIndex;
   }
 
-  @timeout()
   async getRunningTokenPairs(tokens: Address[]): Promise<Array<[Address, Address]>> {
     const { tokens1, tokens2 } = await this.contract.methods.getRunningTokenPairs(tokens).call();
 
@@ -247,28 +233,24 @@ class DutchExchange extends BaseContract<Event> {
     });
   }
 
-  @timeout()
   async getFrtAddress() {
     const frtAddress: Address = await this.contract.methods.frtToken().call();
 
     return frtAddress;
   }
 
-  @timeout()
   async getEthTokenAddress() {
     const ethTokenAddress: Address = await this.contract.methods.ethToken().call();
 
     return ethTokenAddress;
   }
 
-  @timeout()
   async getOwlAddress() {
     const owlAddress: Address = await this.contract.methods.owlToken().call();
 
     return owlAddress;
   }
 
-  @timeout()
   async getPriceOfTokenInLastAuction(token: Token) {
     try {
       // in case whe call getPriceOfTokenInLastAuction for a token without market (like we do with OWL)
@@ -280,7 +262,6 @@ class DutchExchange extends BaseContract<Event> {
     }
   }
 
-  @timeout()
   async getBuyerBalance(sellToken: Token, buyToken: Token, auctionIndex: string, accountAddress: Address) {
     const buyerBalance = await this.contract.methods
       .buyerBalances(sellToken.address, buyToken.address, auctionIndex, accountAddress)

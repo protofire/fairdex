@@ -1,7 +1,7 @@
 import { abi } from '@gnosis.pm/dx-contracts/build/contracts/TokenFRT.json';
 
 import BaseContract from './BaseContract';
-import { timeout, toDecimal, ZERO } from './utils';
+import { toDecimal, ZERO } from './utils';
 
 class FeeReductionToken extends BaseContract implements Token {
   name!: string;
@@ -16,7 +16,6 @@ class FeeReductionToken extends BaseContract implements Token {
     });
   }
 
-  @timeout()
   async initialise(account?: Address) {
     const [decimals, name, symbol, balance] = await Promise.all([
       this.contract.methods.decimals().call(),
@@ -33,7 +32,6 @@ class FeeReductionToken extends BaseContract implements Token {
     return this;
   }
 
-  @timeout()
   async getLockedTokenBalances(account: Address) {
     const balance = await this.contract.methods.lockedTokenBalances(account).call();
 

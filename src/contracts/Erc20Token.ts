@@ -1,7 +1,7 @@
 import { abi } from '@gnosis.pm/dx-contracts/build/contracts/EtherToken.json';
 
 import BaseContract from './BaseContract';
-import { timeout, toDecimal, ZERO } from './utils';
+import { toDecimal, ZERO } from './utils';
 
 class Erc20Token extends BaseContract {
   private name!: string;
@@ -12,7 +12,6 @@ class Erc20Token extends BaseContract {
     super({ jsonInterface: abi, address });
   }
 
-  @timeout()
   async getAllowance(owner: Address, spender: Address) {
     const [decimals, allowed] = await Promise.all([
       this.decimals || this.contract.methods.decimals().call(),
@@ -22,7 +21,6 @@ class Erc20Token extends BaseContract {
     return toDecimal(allowed, decimals) || ZERO;
   }
 
-  @timeout()
   async getBalance(account: Address) {
     const [decimals, balance] = await Promise.all([
       this.decimals || this.contract.methods.decimals().call(),
@@ -32,7 +30,6 @@ class Erc20Token extends BaseContract {
     return toDecimal(balance, decimals) || ZERO;
   }
 
-  @timeout()
   async getTokenInfo(): Promise<Token> {
     const [name, symbol, decimals] = await Promise.all([
       this.name || this.contract.methods.name().call(),
