@@ -162,6 +162,14 @@ export function getClosingPriceRate(auction: Auction, decimals?: number) {
   return getPriceRate(auction.closingPrice, auction.sellToken, auction.buyToken, decimals);
 }
 
+export function getCounterCurrencyPrice(value: BigNumber) {
+  if (!value || !value.isFinite()) {
+    return value;
+  }
+
+  return value.pow(-1);
+}
+
 export async function getBuyerBalance(
   sellToken: Token,
   buyToken: Token,

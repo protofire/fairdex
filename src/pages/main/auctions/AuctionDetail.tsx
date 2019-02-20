@@ -69,7 +69,11 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getCurrentPriceRate(auction)}>
-                  <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                  <DecimalValue
+                    value={getCounterCurrencyPrice(auction.currentPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                    hideTitle={true}
+                  />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
@@ -85,7 +89,11 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getClosingPriceRate(auction)}>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                  <DecimalValue
+                    value={getCounterCurrencyPrice(auction.closingPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                    hideTitle={true}
+                  />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
@@ -163,7 +171,11 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getClosingPriceRate(auction)}>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                  <DecimalValue
+                    value={getCounterCurrencyPrice(auction.closingPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                    hideTitle={true}
+                  />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
@@ -205,7 +217,11 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getClosingPriceRate(auction)}>
-                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                  <DecimalValue
+                    value={getCounterCurrencyPrice(auction.closingPrice)}
+                    decimals={DEFAULT_DECIMALS}
+                    hideTitle={true}
+                  />
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}

@@ -9,6 +9,7 @@ import { ZERO } from '../../../contracts/utils';
 import {
   getAvailableVolume,
   getClosingPriceRate,
+  getCounterCurrencyPrice,
   getCurrentPriceRate,
   getEstimatedEndTime,
 } from '../../../contracts/utils/auctions';
@@ -109,7 +110,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   ) : (
                     <span title={getCurrentPriceRate(auction)}>
                       <DecimalValue
-                        value={auction.currentPrice}
+                        value={getCounterCurrencyPrice(auction.currentPrice)}
                         decimals={DEFAULT_DECIMALS}
                         hideTitle={true}
                       />
@@ -129,7 +130,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   ) : (
                     <span title={getClosingPriceRate(auction)}>
                       <DecimalValue
-                        value={auction.closingPrice}
+                        value={getCounterCurrencyPrice(auction.closingPrice)}
                         decimals={DEFAULT_DECIMALS}
                         hideTitle={true}
                       />
@@ -191,7 +192,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   ) : (
                     <span title={getClosingPriceRate(auction)}>
                       <DecimalValue
-                        value={auction.closingPrice}
+                        value={getCounterCurrencyPrice(auction.closingPrice)}
                         decimals={DEFAULT_DECIMALS}
                         hideTitle={true}
                       />
@@ -237,7 +238,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   ) : (
                     <span title={getClosingPriceRate(auction)}>
                       <DecimalValue
-                        value={auction.closingPrice}
+                        value={getCounterCurrencyPrice(auction.closingPrice)}
                         decimals={DEFAULT_DECIMALS}
                         hideTitle={true}
                       />
