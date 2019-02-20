@@ -34,6 +34,7 @@ const TermsAndConditions: FunctionComponent<Props> = ({
   const [disclaimer1, setDisclaimer1] = useState(false);
   const [disclaimer2, setDisclaimer2] = useState(false);
   const [disclaimer3, setDisclaimer3] = useState(false);
+  const [acceptAnalitycs, setAcceptAnalitycs] = useState(false);
 
   const handleDisclaimer1Toggle = useCallback(
     () => {
@@ -63,12 +64,17 @@ const TermsAndConditions: FunctionComponent<Props> = ({
     [readAndUnderstood],
   );
 
-  const isAcceptDisabled = useMemo(() => !disclaimer1 || !disclaimer2 || !disclaimer3 || !readAndUnderstood, [
-    disclaimer1,
-    disclaimer2,
-    disclaimer3,
-    readAndUnderstood,
-  ]);
+  const handleAcceptAnalitycs = useCallback(
+    () => {
+      setAcceptAnalitycs(prevState => !prevState);
+    },
+    [acceptAnalitycs],
+  );
+
+  const isAcceptDisabled = useMemo(
+    () => !disclaimer1 || !disclaimer2 || !disclaimer3 || !readAndUnderstood || !acceptAnalitycs,
+    [disclaimer1, disclaimer2, disclaimer3, readAndUnderstood, acceptAnalitycs],
+  );
 
   if (termsConditionsAccepted && !wallet) {
     return <Redirect to='/select-wallet' />;
@@ -179,6 +185,20 @@ const TermsAndConditions: FunctionComponent<Props> = ({
               Privacy Policy
             </Link>
           </Label>
+          <br />
+          <br />
+          <Label>
+            <Checkbox name='acceptAnalitycs' checked={acceptAnalitycs} onToggle={handleAcceptAnalitycs} />I
+            understand and accept that this website uses cookies for tracking and analytics purposes (Google
+            Analytics).{' '}
+            <Link
+              href='https://developers.google.com/analytics/devguides/collection/gajs/cookie-usage'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              (Read More)
+            </Link>
+          </Label>
           <Footer>
             <Button disabled={isAcceptDisabled} onClick={onAcceptTermsConditions}>
               Accept
@@ -256,6 +276,11 @@ const Footer = styled.footer`
 const Label = styled.label`
   flex: 1 1 auto;
   cursor: pointer;
+  line-height: 1.5;
+
+  ${Checkbox} {
+    vertical-align: unset;
+  }
 `;
 
 const Link = styled.a`
