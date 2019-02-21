@@ -2,10 +2,9 @@ import React from 'react';
 import Scrollbar from 'react-custom-scrollbars';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { NavLink, Redirect, Route, Router, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, NavLink, Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { history, pageview } from '../../analytics';
 import Spinner from '../../components/Spinner';
 import fairdex from '../../images/fairdex.png';
 import { fetchData, getNetworkType } from '../../store/blockchain';
@@ -64,10 +63,6 @@ class MainPage extends React.Component<Props> {
       behavior: 'smooth',
       top: 0,
     });
-
-    pageview(history.location.pathname);
-
-    history.listen(location => pageview(location.pathname));
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -89,7 +84,7 @@ class MainPage extends React.Component<Props> {
       return <Redirect to='/network-not-available' />;
     } else {
       return (
-        <Router history={history}>
+        <Router>
           <Layout>
             <Sidebar>
               <Branding>

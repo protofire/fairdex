@@ -185,20 +185,6 @@ const TermsAndConditions: FunctionComponent<Props> = ({
               Privacy Policy
             </Link>
           </Label>
-          <br />
-          <br />
-          <Label>
-            <Checkbox name='acceptAnalitycs' checked={acceptAnalitycs} onToggle={handleAcceptAnalitycs} />I
-            understand and accept that this website uses cookies for tracking and analytics purposes (Google
-            Analytics).{' '}
-            <Link
-              href='https://developers.google.com/analytics/devguides/collection/gajs/cookie-usage'
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              (Read More)
-            </Link>
-          </Label>
           <Footer>
             <Button disabled={isAcceptDisabled} onClick={onAcceptTermsConditions}>
               Accept

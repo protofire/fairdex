@@ -1,8 +1,7 @@
 import React from 'react';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { Route, Router, Switch } from 'react-router-dom';
-import { history } from '../../analytics';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import { getNetworkType, init } from '../../store/blockchain';
 import { isTermsConditionsAccepted } from '../../store/terms-conditions';
@@ -43,7 +42,7 @@ const HomePage = React.memo(({ network, wallet, initWallet }: Props) => {
     return spinner;
   } else {
     return (
-      <Router history={history}>
+      <Router>
         <Switch>
           <Route exact path='/' component={Landing} />
           <Route exact path='/terms-conditions' component={TermsAndConditions} />
