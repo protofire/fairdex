@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { ellipsis } from 'polished';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -26,7 +26,7 @@ import Icon from '../../../../components/icons';
 import Popup from '../../../../components/Popup';
 import Tooltip from '../../../../components/Tooltip';
 
-import { getTotalBalance } from '../../../../contracts/utils/tokens';
+import { getTotalBalance, isWeth } from '../../../../contracts/utils/tokens';
 import { updateTokenAllowance } from '../../../../store/blockchain/tokens';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
@@ -65,6 +65,21 @@ const BidForm = React.memo(
     const [canUseOwlToPayFee, setCanUseOwlToPayFee] = useState(
       owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0),
     );
+    const [ethBalance, setEthBalance] = useState<BigNumber | undefined>(undefined);
+
+    if (isWeth(bidToken)) {
+      useEffect(
+        () => {
+          if (currentAccount) {
+            window.web3.eth.getBalance(currentAccount).then(balance => {
+              setEthBalance(utils.toDecimal(balance.toString(), 18) || ZERO);
+            });
+          }
+        },
+        [currentAccount],
+      );
+    }
+
     const isOwlAllowed = useMemo(
       () => owl && owl.allowance && owl.allowance.gt(0) && getTotalBalance(owl).gt(0),
       [owl],
@@ -132,9 +147,12 @@ const BidForm = React.memo(
 
     const bidTokenTotalBalance = useMemo(
       () => {
+        if (isWeth(bidToken)) {
+          return utils.token.getTotalBalance(bidToken).plus(ethBalance);
+        }
         return utils.token.getTotalBalance(bidToken);
       },
-      [bidToken],
+      [bidToken, ethBalance],
     );
 
     const setMaxAvailableVolume = useCallback(
@@ -512,7 +530,14 @@ const BidForm = React.memo(
                           roundingMode={BigNumber.ROUND_UP}
                           value={bidAmount.minus(bidTokenBalance)}
                         />{' '}
-                        in DX.
+                        in DX.{' '}
+                        {isWeth(bidToken) && (
+                          <>
+                            <br />
+                            You may also need to <Link to='/wallet'>wrap</Link> ETH before depositing it in
+                            DX.
+                          </>
+                        )}
                       </ErrorMessage>
                     ) : (
                       <ErrorMessage data-testid={'bid-confirm-not-total-balance'}>

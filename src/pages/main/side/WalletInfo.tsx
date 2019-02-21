@@ -5,12 +5,11 @@ import styled from 'styled-components';
 
 import { DecimalValue } from '../../../components/formatters';
 import { toDecimal, ZERO } from '../../../contracts/utils';
-import { getTokensWithBalance, getTopBalances } from '../../../store/blockchain';
+import { getTopBalances } from '../../../store/blockchain';
 import TokenBalance from './TokenBalance';
 import WalletCard, { Content, Header, Item } from './WalletCard';
 
 interface StateProps {
-  tokens: Token[];
   topBalances: TokenWithBalance[];
   currentAccount?: Address;
 }
@@ -19,7 +18,7 @@ type WalletProps = StateProps & RouteComponentProps;
 
 const DEFAULT_DECIMALS = 3;
 
-const WalletInfo = ({ tokens, topBalances, currentAccount }: WalletProps) => {
+const WalletInfo = ({ topBalances, currentAccount }: WalletProps) => {
   const [ethBalance, setEthBalance] = useState<BigNumber | undefined>(undefined);
 
   useEffect(() => {
@@ -91,7 +90,6 @@ const WalletHeader = styled(Header)`
 
 function mapStateToProps(state: AppState): StateProps {
   return {
-    tokens: getTokensWithBalance(state),
     topBalances: getTopBalances(state),
     currentAccount: state.blockchain.currentAccount,
   };

@@ -23,3 +23,7 @@ export function getWalletBalance(token?: Token) {
 
   return token.balance[1];
 }
+
+export function isWeth(token: Token) {
+  return token.symbol === 'WETH';
+}

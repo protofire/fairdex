@@ -79,23 +79,23 @@ const AccountInfo = ({
         </Item>
         <Item>
           {pastBids != null ? (
-          <>
-            <div data-testid='past-bids-count'>{pastBids}</div>
-            <small>Past bids</small>
-          </>
-        ) : (
-          <Spinner size='small' inline />
-        )}
-      </Item>
-      <Item>
-        {claimableCount != null ? (
-          <>
-            <div data-testid='to-claim-count'>{claimableCount}</div>
-            <small>To claim</small>
-          </>
-        ) : (
-          <Spinner size='small' inline />
-        )}
+            <>
+              <div data-testid='past-bids-count'>{pastBids}</div>
+              <small>Past bids</small>
+            </>
+          ) : (
+            <Spinner size='small' inline />
+          )}
+        </Item>
+        <Item>
+          {claimableCount != null ? (
+            <>
+              <div data-testid='to-claim-count'>{claimableCount}</div>
+              <small>To claim</small>
+            </>
+          ) : (
+            <Spinner size='small' inline />
+          )}
         </Item>
       </Content>
     </Container>
