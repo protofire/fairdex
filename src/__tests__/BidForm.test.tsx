@@ -16,6 +16,18 @@ beforeEach(jest.clearAllMocks);
 
 afterEach(cleanup);
 
+beforeAll(() => {
+  const web3Mock: any = {
+    eth: {
+      getBalance() {
+        return Promise.resolve(toBigNumber('20000000000000000000'));
+      },
+    },
+  };
+
+  window.web3 = web3Mock;
+});
+
 jest.spyOn(dx, 'postBid').mockImplementation((sellToken, buyToken, auctionIndex, buyAmount) => {
   return {
     send() {
@@ -46,8 +58,8 @@ describe('in running auctions', () => {
     sellToken: 'OMG',
     sellTokenAddress: '0x00df91984582e6e96288307e9c2f20b38c8fece9',
     sellVolume: toBigNumber(100),
-    buyToken: 'WETH',
-    buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
+    buyToken: 'DAI',
+    buyTokenAddress: '0x62f25065ba60ca3a2044344955a3b2530e355111',
     buyVolume: toBigNumber(0),
     currentPrice: toBigNumber(0.0123456789),
     closingPrice: toBigNumber(0.0123456789 * 2),
@@ -55,7 +67,12 @@ describe('in running auctions', () => {
   };
 
   test('bid button should be visible', () => {
-    const { getByTestId } = renderWithRedux(<BidForm auction={data} />);
+    const { getByTestId } = renderWithRedux(<BidForm auction={data} />, {
+      blockchain: {
+        tokens,
+        buyOrders: [],
+      },
+    });
 
     const bidButton = getByTestId('bid-button');
 
@@ -65,7 +82,12 @@ describe('in running auctions', () => {
 
   describe('bid dialog', () => {
     test('should display cancel button', async () => {
-      const { getByTestId } = renderWithRedux(<BidForm auction={data} />);
+      const { getByTestId } = renderWithRedux(<BidForm auction={data} />, {
+        blockchain: {
+          tokens,
+          buyOrders: [],
+        },
+      });
 
       fireEvent.click(getByTestId('bid-button'));
 
@@ -80,13 +102,18 @@ describe('in running auctions', () => {
       aboveAuction.closingPrice = toBigNumber(1);
       aboveAuction.currentPrice = toBigNumber(1.2);
 
-      const { getByTestId, getByText } = renderWithRedux(<BidForm auction={aboveAuction} />);
+      const { getByTestId, getByText } = renderWithRedux(<BidForm auction={aboveAuction} />, {
+        blockchain: {
+          tokens,
+          buyOrders: [],
+        },
+      });
       fireEvent.click(getByTestId('bid-button'));
 
       const proceedButton = await waitForElement(() => getByTestId('cancel-bid-button'));
 
       expect(proceedButton).toBeVisible();
-      expect(getByText('You are bidding above the previous closing price for OMG/WETH')).toBeDefined();
+      expect(getByText('You are bidding above the previous closing price for OMG/DAI')).toBeDefined();
       expect(getByText('1 OMG')).toBeDefined();
     });
 
@@ -110,7 +137,7 @@ describe('in running auctions', () => {
       fireEvent.change(bidInput, { target: { value: bidAmount.toString() } });
 
       const message = await waitForElement(() => getByTestId('close-auction-message'));
-      expect(getByText(message, '1.2345 WETH')).toBeDefined();
+      expect(getByText(message, '1.2345 DAI')).toBeDefined();
     });
 
     test('should show the amount the user will buy at least', async () => {
@@ -346,7 +373,7 @@ describe('in running auctions', () => {
         const stateTokens = new Map(tokens);
         stateTokens.set('0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d', owl);
 
-        const { queryByTestId, getByTestId } = renderWithRedux(
+        const { queryByTestId, getByTestId, debug } = renderWithRedux(
           <Router>
             <BidForm auction={data} />
           </Router>,

@@ -30,7 +30,7 @@ describe('Auction list filtering', () => {
 
       const cards = getAllByTestId(/auction-card-*./);
 
-      expect(cards.length).toEqual(16);
+      expect(cards.length).toEqual(8);
     });
   });
 

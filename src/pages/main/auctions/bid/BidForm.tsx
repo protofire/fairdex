@@ -147,7 +147,7 @@ const BidForm = React.memo(
 
     const bidTokenTotalBalance = useMemo(
       () => {
-        if (isWeth(bidToken)) {
+        if (isWeth(bidToken) && ethBalance) {
           return utils.token.getTotalBalance(bidToken).plus(ethBalance);
         }
         return utils.token.getTotalBalance(bidToken);
