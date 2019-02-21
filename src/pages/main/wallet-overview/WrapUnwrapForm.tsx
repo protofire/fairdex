@@ -124,7 +124,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
 
       const request = sendRequest();
       if (request) {
-        const action = isWrapping ? 'Wrap' : 'Unwrap';
+        const action = isWrapping ? 'Wrap ETH' : 'Unwrap WETH';
 
         request
           .once('transactionHash', (transactionHash: TransactionHash) => {
@@ -200,7 +200,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
               disabled={loading || amount.lte(ZERO) || amount.gt(maxAllowed)}
               data-testid={'confirm-button'}
             >
-              {loading ? `${isWrapping ? 'Wrap' : 'Unwrap'} in progress...` : 'Confirm'}
+              {loading ? `${isWrapping ? 'Wrap ETH' : 'Unwrap WETH'} in progress...` : 'Confirm'}
             </Button>
           </Form>
         </Content>
@@ -213,13 +213,13 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
         <>
           {showWrapForm && (
             <Action onClick={handleWrap} data-testid={'wrap-button'}>
-              Wrap
+              Wrap ETH
             </Action>
           )}
           {showWrapForm && showUnwrapForm && ' | '}
           {showUnwrapForm && (
             <Action onClick={handleUnwrap} data-testid={'unwrap-button'}>
-              Unwrap
+              Unwrap WETH
             </Action>
           )}
         </>

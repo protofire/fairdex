@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import styled from 'styled-components';
 
 import { DecimalValue } from '../../../components/formatters';
-import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contracts/utils/tokens';
+import { getDxBalance, getTotalBalance, getWalletBalance, isWeth } from '../../../contracts/utils/tokens';
 
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
-import { ZERO } from '../../../contracts/utils';
+import { toDecimal, ZERO } from '../../../contracts/utils';
+import { getCurrentAccount } from '../../../store/blockchain';
 import DepositWithdrawForm from './DepositWithdrawForm';
 import EnableForTradingForm from './EnableForTradingForm';
 import WrapUnwrapForm from './WrapUnwrapForm';
@@ -15,18 +17,49 @@ interface TokenViewProps {
   data: Token;
 }
 
+interface AppStateProps {
+  currentAccount: Address;
+}
+
 const DEFAULT_DECIMALS = 3;
 
-const TokenView = ({ data: token }: TokenViewProps) => {
+const TokenView = ({ data: token, currentAccount }: TokenViewProps & AppStateProps) => {
+  const [ethBalance, setEthBalance] = useState<BigNumber | undefined>(undefined);
+
+  if (isWeth(token)) {
+    useEffect(
+      () => {
+        if (currentAccount) {
+          window.web3.eth.getBalance(currentAccount).then(balance => {
+            setEthBalance(toDecimal(balance.toString(), 18) || ZERO);
+          });
+        }
+      },
+      [currentAccount],
+    );
+  }
+
   return (
     <Card>
       <Header>
         <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
           <span>{token.symbol}</span>
         </Title>
-        {token.symbol === 'WETH' && <WrapUnwrapForm token={token} />}
+        {isWeth(token) && <WrapUnwrapForm token={token} />}
       </Header>
       <Table>
+        {isWeth(token) && (
+          <Row>
+            <Label>ETH balance</Label>
+            <Value>
+              {ethBalance === undefined ? (
+                <Loading />
+              ) : (
+                <DecimalValue value={ethBalance} decimals={DEFAULT_DECIMALS} />
+              )}
+            </Value>
+          </Row>
+        )}
         <Row>
           <Label>Wallet balance</Label>
           <Value>
@@ -133,4 +166,12 @@ const Title = styled.h3`
   color: var(--color-light-grey-blue);
 `;
 
-export default TokenView;
+function mapStateToProps(state: AppState): AppStateProps {
+  return {
+    currentAccount: getCurrentAccount(state),
+  };
+}
+
+export default connect(mapStateToProps)(TokenView);
+
+// export default TokenView;
