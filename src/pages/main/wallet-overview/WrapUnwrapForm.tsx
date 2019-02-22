@@ -200,7 +200,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
               disabled={loading || amount.lte(ZERO) || amount.gt(maxAllowed)}
               data-testid={'confirm-button'}
             >
-              {loading ? `${isWrapping ? 'Wrap ETH' : 'Unwrap WETH'} in progress...` : 'Confirm'}
+              {`${isWrapping ? 'Wrap ETH' : 'Unwrap WETH'} ${loading ? 'in progress...' : ''}`}
             </Button>
           </Form>
         </Content>
@@ -219,7 +219,7 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
           {showWrapForm && showUnwrapForm && ' | '}
           {showUnwrapForm && (
             <Action onClick={handleUnwrap} data-testid={'unwrap-button'}>
-              Unwrap WETH
+              Unwrap
             </Action>
           )}
         </>
@@ -268,6 +268,7 @@ const Action = styled.span`
   text-decoration: underline;
   font-weight: 600;
   cursor: pointer;
+  font-size: 12px;
 `;
 
 const Form = styled.form`
