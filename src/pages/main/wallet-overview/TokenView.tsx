@@ -173,5 +173,3 @@ function mapStateToProps(state: AppState): AppStateProps {
 }
 
 export default connect(mapStateToProps)(TokenView);
-
-// export default TokenView;
