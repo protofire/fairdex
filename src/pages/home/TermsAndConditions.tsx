@@ -34,7 +34,6 @@ const TermsAndConditions: FunctionComponent<Props> = ({
   const [disclaimer1, setDisclaimer1] = useState(false);
   const [disclaimer2, setDisclaimer2] = useState(false);
   const [disclaimer3, setDisclaimer3] = useState(false);
-  const [acceptAnalitycs, setAcceptAnalitycs] = useState(false);
 
   const handleDisclaimer1Toggle = useCallback(
     () => {
@@ -64,17 +63,12 @@ const TermsAndConditions: FunctionComponent<Props> = ({
     [readAndUnderstood],
   );
 
-  const handleAcceptAnalitycs = useCallback(
-    () => {
-      setAcceptAnalitycs(prevState => !prevState);
-    },
-    [acceptAnalitycs],
-  );
-
-  const isAcceptDisabled = useMemo(
-    () => !disclaimer1 || !disclaimer2 || !disclaimer3 || !readAndUnderstood || !acceptAnalitycs,
-    [disclaimer1, disclaimer2, disclaimer3, readAndUnderstood, acceptAnalitycs],
-  );
+  const isAcceptDisabled = useMemo(() => !disclaimer1 || !disclaimer2 || !disclaimer3 || !readAndUnderstood, [
+    disclaimer1,
+    disclaimer2,
+    disclaimer3,
+    readAndUnderstood,
+  ]);
 
   if (termsConditionsAccepted && !wallet) {
     return <Redirect to='/select-wallet' />;
