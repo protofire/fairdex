@@ -228,10 +228,32 @@ const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Pro
   );
 });
 
+const Content = styled(Popup.Content)`
+  padding: var(--spacing-narrow);
+  width: var(--card-width);
+  right: 0;
+  transform: translateX(var(--spacing-normal));
+
+  &:after {
+    left: calc(85% - var(--box-arrow-height));
+    top: calc(var(--box-arrow-height) * -1);
+    bottom: unset;
+    border-width: 0 calc(var(--box-arrow-height) * 1) var(--box-arrow-height);
+  }
+`;
+
 const Container = styled(Popup.Container)`
   color: var(--color-text-primary);
   font-size: 0.875rem;
   letter-spacing: -0.4px;
+
+  ${Content} {
+    position: absolute;
+    top: calc(100% + var(--box-arrow-height) * 1.1);
+    right: var(--box-arrow-height);
+    bottom: unset;
+    z-index: 10001;
+  }
 `;
 
 const Action = styled.span`
@@ -246,17 +268,6 @@ const Action = styled.span`
   text-decoration: underline;
   font-weight: 600;
   cursor: pointer;
-`;
-
-const Content = styled(Popup.Content)`
-  padding: var(--spacing-narrow);
-  width: var(--card-width);
-  right: 0;
-  transform: translateX(var(--spacing-normal));
-
-  &:after {
-    left: calc(80% - var(--box-arrow-height));
-  }
 `;
 
 const Form = styled.form`

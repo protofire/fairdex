@@ -140,7 +140,6 @@ const Section = styled.section`
   height: 100%;
   min-height: calc(100vh - var(--header-height));
   padding: var(--spacing-normal);
-  overflow: auto;
 `;
 
 const SideContent = styled.div`

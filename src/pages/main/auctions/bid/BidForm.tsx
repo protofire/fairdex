@@ -561,27 +561,29 @@ const BidForm = React.memo(
                       </ErrorMessage>
                     )
                   ) : (
-                    <p>
-                      liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' /> /{' '}
-                      <DecimalValue value={bidAmount.times(feeRate).div(100)} decimals={2} />{' '}
-                      <span>{auction.buyToken}</span>) included
-                      {isOwlAllowed && (
-                        <>
-                          <br />
-                          Up to <DecimalValue value={bidAmount.div(2)} decimals={2} />{' '}
-                          <span>{auction.buyToken}</span> will be paid with OWL
-                        </>
-                      )}
-                    </p>
+                    <>
+                      <p>
+                        liquidity contribution (<DecimalValue value={feeRate} decimals={2} postfix='%' /> /{' '}
+                        <DecimalValue value={bidAmount.times(feeRate).div(100)} decimals={2} />{' '}
+                        <span>{auction.buyToken}</span>) included
+                        {isOwlAllowed && (
+                          <>
+                            <br />
+                            Up to <DecimalValue value={bidAmount.div(2)} decimals={2} />{' '}
+                            <span>{auction.buyToken}</span> will be paid with OWL
+                          </>
+                        )}
+                      </p>
+                      <Button
+                        type='submit'
+                        disabled={bidding || bidAmount.lte(ZERO)}
+                        autoFocus
+                        data-testid='confirm-bid-button'
+                      >
+                        {bidding ? 'Bid in progress...' : 'Confirm'}
+                      </Button>
+                    </>
                   )}
-                  <Button
-                    type='submit'
-                    disabled={bidding || bidAmount.lte(ZERO) || bidTokenBalance.lt(bidAmount)}
-                    autoFocus
-                    data-testid='confirm-bid-button'
-                  >
-                    {bidding ? 'Bid in progress...' : 'Confirm'}
-                  </Button>
                 </Step3>
               </>
             )}
