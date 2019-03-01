@@ -116,14 +116,14 @@ const TermsAndConditions: FunctionComponent<Props> = ({
 
             <h3>1. Who we are and how to contact us</h3>
             <p>
-              1.1. Slow.trade is operated by d.ex OÜ (”We”). We are a private limited company registered in
-              Estonia under registry No. 14553524 at Ahtri 12, Kesklinna District, 10151 Tallinn, Harju
-              County, Estonia. To contact us, please email us at info@slow.trade.
+              1.1. FairDex.net is operated by Fairdex Global OÜ (”We”). We are a private limited company
+              registered in Estonia under registry No. 14672401 at Harju maakond, Tallinn, Lasnamäe linnaosa,
+              Peterburi tee 47, 11415, Estonia. To contact us, please email us at admin@fairdex.net.
             </p>
 
             <h3>2. Our Services</h3>
             <p>
-              2.1. We provide a graphical user interface on the site https://slow.trade (the “Platform”) to
+              2.1. We provide a graphical user interface on the site https://fairdex.net (the “Platform”) to
               facilitate you interacting via a digital wallet, vault or storage mechanism (a “Wallet”) with
               the DutchX decentralized trading protocol for ERC 20 tokens (the “Protocol”).
               <br />
