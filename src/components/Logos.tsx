@@ -5,6 +5,9 @@ import * as images from '../images';
 
 const Logos = (props: HTMLAttributes<HTMLDivElement>) => (
   <Wrapper {...props}>
+    <Geco>
+      <img src={images.geco} />
+    </Geco>
     <Dutchx>
       <img src={images.dutchx} />
     </Dutchx>
@@ -37,5 +40,7 @@ const Dutchx = styled.div`
     }
   }
 `;
+
+const Geco = styled(Dutchx)``;
 
 export default Logos;
