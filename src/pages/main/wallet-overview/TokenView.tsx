@@ -40,7 +40,13 @@ const TokenView = ({ data: token, currentAccount }: TokenViewProps & AppStatePro
   }
 
   return (
-    <Card>
+    <Card
+      title={
+        token.symbol === 'OWL'
+          ? 'On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'
+          : ''
+      }
+    >
       <Header>
         <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
           <span>{token.symbol}</span>
