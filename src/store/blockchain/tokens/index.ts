@@ -139,6 +139,12 @@ async function getAvailableTokens(network: Network | null) {
     Array.from(tokenAddresses.values()).map<Promise<Token>>(async tokenAddress => {
       const token = await getErc20Contract(tokenAddress).getTokenInfo();
 
+      if (!token.name || !token.symbol) {
+        const whitelisted = getTokenDataFromWhitelist(whitelistedTokens, tokenAddress);
+        token.name = whitelisted.name;
+        token.symbol = whitelisted.symbol;
+      }
+
       // Tokens are tradeable by default
       token.tradeable = true;
 
@@ -153,6 +159,10 @@ async function getAvailableTokens(network: Network | null) {
   );
 
   return tokens.filter((token: Token) => !token.symbol.startsWith('test'));
+}
+
+function getTokenDataFromWhitelist(whitelistedTokens, tokenAddress: Address) {
+  return whitelistedTokens.filter(t => t.address.toLowerCase() === tokenAddress.toLowerCase())[0];
 }
 
 async function getTokenBalances(token: Token, account: Address) {

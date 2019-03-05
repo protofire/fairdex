@@ -31,15 +31,21 @@ class Erc20Token extends BaseContract {
   }
 
   async getTokenInfo(): Promise<Token> {
-    const [name, symbol, decimals] = await Promise.all([
-      this.name || this.contract.methods.name().call(),
-      this.symbol || this.contract.methods.symbol().call(),
-      this.decimals || this.contract.methods.decimals().call(),
-    ]);
+    try {
+      const [name, symbol, decimals] = await Promise.all([
+        this.name || this.contract.methods.name().call(),
+        this.symbol || this.contract.methods.symbol().call(),
+        this.decimals || this.contract.methods.decimals().call(),
+      ]);
 
-    this.name = name;
-    this.symbol = symbol;
-    this.decimals = Number(decimals) || 18;
+      this.name = name;
+      this.symbol = symbol;
+      this.decimals = Number(decimals) || 18;
+    } catch (error) {
+      this.name = '';
+      this.symbol = '';
+      this.decimals = 18;
+    }
 
     return {
       address: this.address,
