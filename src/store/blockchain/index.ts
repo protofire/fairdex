@@ -6,7 +6,7 @@ import { periodicAction } from '../utils';
 import auctions, { loadAuctions } from './auctions';
 import buyOrders, { loadBidHistory } from './buy-orders';
 import frt, { loadFeeRatio, loadFeeReductionToken } from './fee';
-import tokens, { loadTokens, updateBalances } from './tokens';
+import tokens, { loadTokens, updateBalances, updateEthBalance } from './tokens';
 import wallet, { getCurrentAccount } from './web3';
 
 export * from './auctions';
@@ -25,6 +25,18 @@ export function fetchData() {
       // Load token list
       dispatch(loadTokens());
     }
+
+    // Update ETH balance
+    dispatch(
+      periodicAction({
+        name: 'update-eth-balance',
+        interval: 10_000, // check for ETH balance every 10 seconds
+
+        async task() {
+          dispatch(updateEthBalance());
+        },
+      }),
+    );
 
     // Load fee rate (a.k.a. liquidity contribution))
     dispatch(

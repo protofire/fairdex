@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-import { DecimalValue } from '../../../components/formatters';
-import { getDxBalance, getTotalBalance, getWalletBalance, isWeth } from '../../../contracts/utils/tokens';
-
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
-import { toDecimal, ZERO } from '../../../contracts/utils';
-import { getCurrentAccount } from '../../../store/blockchain';
+import { DecimalValue } from '../../../components/formatters';
+import { ZERO } from '../../../contracts/utils';
+import { getDxBalance, getTotalBalance, getWalletBalance, isWeth } from '../../../contracts/utils/tokens';
+import { getEthBalance } from '../../../store/blockchain';
+
 import DepositWithdrawForm from './DepositWithdrawForm';
 import EnableForTradingForm from './EnableForTradingForm';
 import WrapUnwrapForm from './WrapUnwrapForm';
@@ -18,98 +18,81 @@ interface TokenViewProps {
 }
 
 interface AppStateProps {
-  currentAccount: Address;
+  ethBalance?: BigNumber;
 }
 
 const DEFAULT_DECIMALS = 3;
 
-const TokenView = ({ data: token, currentAccount }: TokenViewProps & AppStateProps) => {
-  const [ethBalance, setEthBalance] = useState<BigNumber | undefined>(undefined);
-
-  if (isWeth(token)) {
-    useEffect(
-      () => {
-        if (currentAccount) {
-          window.web3.eth.getBalance(currentAccount).then(balance => {
-            setEthBalance(toDecimal(balance.toString(), 18) || ZERO);
-          });
-        }
-      },
-      [currentAccount],
-    );
-  }
-
-  return (
-    <Card
-      title={
-        token.symbol === 'OWL'
-          ? 'On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'
-          : ''
-      }
-    >
-      <Header>
-        <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
-          <span>{token.symbol}</span>
-        </Title>
-        {isWeth(token) && <WrapUnwrapForm token={token} />}
-      </Header>
-      <Table>
-        {isWeth(token) && (
-          <Row>
-            <Label>ETH balance</Label>
-            <Value>
-              {ethBalance === undefined ? (
-                <Loading />
-              ) : (
-                <DecimalValue value={ethBalance} decimals={DEFAULT_DECIMALS} />
-              )}
-            </Value>
-          </Row>
-        )}
+const TokenView = ({ data: token, ethBalance }: TokenViewProps & AppStateProps) => (
+  <Card
+    title={
+      token.symbol === 'OWL'
+        ? 'On the DutchX Protocol, a liquidity contribution is levied on users in place of traditional fees. These do not go to us or an operator. Liquidity contributions are committed to the next running auction for the respective auction pair and are thus redistributed to you and all other users of the DutchX Protocol! This incentivises volume and use of the Protocol.'
+        : ''
+    }
+  >
+    <Header>
+      <Title title={token.symbol} data-testid={`token-card-title-${token.address}`}>
+        <span>{token.symbol}</span>
+      </Title>
+      {isWeth(token) && <WrapUnwrapForm token={token} />}
+    </Header>
+    <Table>
+      {isWeth(token) && (
         <Row>
-          <Label>Wallet balance</Label>
+          <Label>ETH balance</Label>
           <Value>
-            {token.balance === undefined ? (
+            {ethBalance === undefined ? (
               <Loading />
             ) : (
-              <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
+              <DecimalValue value={ethBalance} decimals={DEFAULT_DECIMALS} />
             )}
           </Value>
         </Row>
-        <Row>
-          <Label>DX balance</Label>
-          <Value>
-            {token.balance === undefined ? (
-              <Loading />
-            ) : (
-              <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
-            )}
-          </Value>
-        </Row>
-        <Row>
-          <Label>Total balance</Label>
-          <Value>
-            {token.balance === undefined ? (
-              <Loading />
-            ) : (
-              <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
-            )}
-          </Value>
-        </Row>
-        <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
-      </Table>
-      <ButtonGroup>
-        {token.tradeable && getWalletBalance(token).gt(ZERO) && (
-          <DepositWithdrawForm action={'Deposit'} token={token} />
-        )}
+      )}
+      <Row>
+        <Label>Wallet balance</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getWalletBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <Row>
+        <Label>DX balance</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getDxBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <Row>
+        <Label>Total balance</Label>
+        <Value>
+          {token.balance === undefined ? (
+            <Loading />
+          ) : (
+            <DecimalValue value={getTotalBalance(token)} decimals={DEFAULT_DECIMALS} />
+          )}
+        </Value>
+      </Row>
+      <EnableForTradingForm token={token} enabled={token.allowance ? token.allowance.gt(0) : false} />
+    </Table>
+    <ButtonGroup>
+      {token.tradeable && getWalletBalance(token).gt(ZERO) && (
+        <DepositWithdrawForm action={'Deposit'} token={token} />
+      )}
 
-        {token.tradeable && getDxBalance(token).gt(ZERO) && (
-          <DepositWithdrawForm action={'Withdraw'} token={token} />
-        )}
-      </ButtonGroup>
-    </Card>
-  );
-};
+      {token.tradeable && getDxBalance(token).gt(ZERO) && (
+        <DepositWithdrawForm action={'Withdraw'} token={token} />
+      )}
+    </ButtonGroup>
+  </Card>
+);
 
 const Label = styled.dt`
   position: relative;
@@ -174,7 +157,7 @@ const Title = styled.h3`
 
 function mapStateToProps(state: AppState): AppStateProps {
   return {
-    currentAccount: getCurrentAccount(state),
+    ethBalance: getEthBalance(state),
   };
 }
 

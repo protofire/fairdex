@@ -3,17 +3,16 @@ import { connect } from 'react-redux';
 import styled, { css } from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
 
-import { fromDecimal, toDecimal, ZERO } from '../../../contracts/utils';
-import { getCurrentAccount, loadTokens } from '../../../store/blockchain';
-import { showNotification } from '../../../store/ui/actions';
-
-import { DecimalValue } from '../../../components/formatters';
-
 import Button from '../../../components/Button';
 import DecimalInput from '../../../components/DecimalInput';
 import ExplorerLink from '../../../components/ExplorerLink';
+import { DecimalValue } from '../../../components/formatters';
 import Popup from '../../../components/Popup';
+import { fromDecimal, ZERO } from '../../../contracts/utils';
 import { getWalletBalance } from '../../../contracts/utils/tokens';
+
+import { getCurrentAccount, getEthBalance, loadTokens } from '../../../store/blockchain';
+import { showNotification } from '../../../store/ui/actions';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
@@ -23,6 +22,7 @@ interface OwnProps {
 
 interface AppStateProps {
   currentAccount: Address;
+  ethBalance?: BigNumber;
 }
 
 interface DispatchProps {
@@ -31,34 +31,26 @@ interface DispatchProps {
 
 const DEFAULT_DECIMALS = 3;
 
-const DepositWithdrawForm = React.memo(({ token, currentAccount, dispatch }: Props) => {
+const DepositWithdrawForm = React.memo(({ token, currentAccount, ethBalance = ZERO, dispatch }: Props) => {
   const [amount, setAmount] = useState(ZERO);
   const [loading, setLoading] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [showWrapForm, setShowWrapForm] = useState(false);
   const [showUnwrapForm, setShowUnwrapForm] = useState(false);
-  const [ethBalance, setEthBalance] = useState(ZERO);
   const [isWrapping, setIsWrapping] = useState(false);
   const [maxAllowed, setMaxAllowed] = useState(ZERO);
 
   useEffect(
     () => {
-      if (currentAccount) {
-        window.web3.eth.getBalance(currentAccount).then(balance => {
-          const ethB = toDecimal(balance.toString(), 18) || ZERO;
-          setEthBalance(ethB);
-
-          if (ethB.gt(ZERO)) {
-            setShowWrapForm(true);
-          }
-        });
+      if (ethBalance.gt(ZERO)) {
+        setShowWrapForm(true);
       }
 
       if (getWalletBalance(token).gt(ZERO)) {
         setShowUnwrapForm(true);
       }
     },
-    [token],
+    [token, ethBalance],
   );
 
   const inputRef = useRef(null);
@@ -307,6 +299,7 @@ const Form = styled.form`
 function mapStateToProps(state: AppState): AppStateProps {
   return {
     currentAccount: getCurrentAccount(state),
+    ethBalance: getEthBalance(state),
   };
 }
 

@@ -5,6 +5,7 @@ interface AuctionsState {
 }
 
 interface TokensState {
+  ethBalance?: BigNumber;
   feeRatio?: BigNumber;
   markets: Market[];
   tokens: Map<Address, Token>;

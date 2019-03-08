@@ -1,21 +1,10 @@
 import BigNumber from 'bignumber.js';
 import { ellipsis } from 'polished';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { TransactionReceipt } from 'web3/types';
-
-import * as utils from '../../../../contracts/utils';
-
-import {
-  getAllBuyOrders,
-  getCurrentAccount,
-  getLiqContribPercentage,
-  getOwl,
-  getToken,
-} from '../../../../store/blockchain';
-import { showNotification } from '../../../../store/ui/actions';
 
 import Button from '../../../../components/Button';
 import ButtonGroup from '../../../../components/ButtonGroup';
@@ -25,9 +14,12 @@ import { DecimalValue } from '../../../../components/formatters';
 import Icon from '../../../../components/icons';
 import Popup from '../../../../components/Popup';
 import Tooltip from '../../../../components/Tooltip';
-
+import * as utils from '../../../../contracts/utils';
 import { getTotalBalance, isWeth } from '../../../../contracts/utils/tokens';
-import { updateTokenAllowance } from '../../../../store/blockchain/tokens';
+
+import { getAllBuyOrders, getCurrentAccount, getLiqContribPercentage } from '../../../../store/blockchain';
+import { getEthBalance, getOwl, getToken, updateTokenAllowance } from '../../../../store/blockchain/tokens';
+import { showNotification } from '../../../../store/ui/actions';
 
 type Props = OwnProps & AppStateProps & DispatchProps;
 
@@ -36,8 +28,9 @@ interface OwnProps {
 }
 
 interface AppStateProps {
-  currentAccount: Address;
   bidToken: Token;
+  currentAccount: Address;
+  ethBalance?: BigNumber;
   feeRate: BigNumber;
   owl?: Token;
   buyOrders?: BuyOrder[];
@@ -50,7 +43,7 @@ interface DispatchProps {
 const { ZERO } = utils;
 
 const BidForm = React.memo(
-  ({ auction, bidToken, currentAccount, feeRate, owl, buyOrders, dispatch }: Props) => {
+  ({ auction, bidToken, currentAccount, ethBalance, feeRate, owl, buyOrders, dispatch }: Props) => {
     if (auction.state !== 'running') {
       return null;
     }
@@ -65,20 +58,6 @@ const BidForm = React.memo(
     const [canUseOwlToPayFee, setCanUseOwlToPayFee] = useState(
       owl && owl.allowance && owl.allowance.eq(0) && getTotalBalance(owl).gt(0),
     );
-    const [ethBalance, setEthBalance] = useState<BigNumber | undefined>(undefined);
-
-    if (isWeth(bidToken)) {
-      useEffect(
-        () => {
-          if (currentAccount) {
-            window.web3.eth.getBalance(currentAccount).then(balance => {
-              setEthBalance(utils.toDecimal(balance.toString(), 18) || ZERO);
-            });
-          }
-        },
-        [currentAccount],
-      );
-    }
 
     const isOwlAllowed = useMemo(
       () => owl && owl.allowance && owl.allowance.gt(0) && getTotalBalance(owl).gt(0),
@@ -772,6 +751,7 @@ function mapStateToProps(state: AppState, props: OwnProps): AppStateProps {
   return {
     bidToken: getToken(state, props.auction.buyTokenAddress) as Token,
     currentAccount: getCurrentAccount(state),
+    ethBalance: getEthBalance(state),
     feeRate: getLiqContribPercentage(state) || ZERO,
     owl: getOwl(state),
     buyOrders: getAllBuyOrders(state),

@@ -1,6 +1,7 @@
 import { Action, ActionCreator, AnyAction, Reducer } from 'redux';
 
 import { getErc20Contract } from '../../../contracts';
+import { toDecimal, ZERO } from '../../../contracts/utils';
 import { loadAuctions } from '../auctions';
 import { getCurrentAccount, getNetworkType } from '../web3';
 
@@ -10,6 +11,7 @@ import TokenWhitelist from './whitelist';
 export * from './selectors';
 
 // Actions
+const UPDATE_ETH_BALANCE = 'UPDATE_ETH_BALANCE';
 const SET_MARKETS = 'SET_MARKETS';
 const SET_TOKENS = 'SET_TOKENS';
 const UPDATE_BALANCES = 'UPDATE_BALANCES';
@@ -33,6 +35,12 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
       return {
         ...state,
         tokens: new Map<Address, Token>(action.payload.map((token: Token) => [token.address, token])),
+      };
+
+    case UPDATE_ETH_BALANCE:
+      return {
+        ...state,
+        ethBalance: action.payload,
       };
 
     case SET_TOKEN_ALLOWANCE:
@@ -164,6 +172,24 @@ export function updateBalances() {
   };
 }
 
+export function updateEthBalance() {
+  return async (dispatch: any, getState: () => AppState) => {
+    if (web3) {
+      const currentAccount = getCurrentAccount(getState());
+
+      if (currentAccount) {
+        const balance = await web3.eth.getBalance(currentAccount);
+
+        if (balance) {
+          const ethBalance = toDecimal(balance, 18) || ZERO;
+
+          dispatch(setEthBalance(ethBalance));
+        }
+      }
+    }
+  };
+}
+
 export const updateTokenAllowance = (token: Token) => {
   return async (dispatch: any, getState: () => AppState) => {
     const currentAccount = getCurrentAccount(getState());
@@ -193,6 +219,13 @@ const setBalances: ActionCreator<AnyAction> = (tokensWithBalances: Token[]) => {
   return {
     type: UPDATE_BALANCES,
     payload: tokensWithBalances,
+  };
+};
+
+const setEthBalance: ActionCreator<AnyAction> = (balance: BigNumber) => {
+  return {
+    type: UPDATE_ETH_BALANCE,
+    payload: balance,
   };
 };
 

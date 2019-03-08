@@ -6,6 +6,8 @@ import { getFrt } from '../fee';
 
 export const getAvailableMarkets = (state: AppState) => state.blockchain.markets || [];
 
+export const getEthBalance = (state: AppState) => state.blockchain.ethBalance;
+
 export const getToken = (state: AppState, address: Address) => state.blockchain.tokens.get(address);
 
 export const getAllTokens = (state: AppState) => state.blockchain.tokens || new Map();
