@@ -2,8 +2,7 @@ import React, { HTMLAttributes } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 
-import { DecimalValue, Timestamp } from '../../../components/formatters';
-import { TimeTo } from '../../../components/formatters/Duration';
+import { DecimalValue, Timestamp, TimeTo } from '../../../components/formatters';
 import { ZERO } from '../../../contracts/utils';
 import {
   getAvailableVolume,

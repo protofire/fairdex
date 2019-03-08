@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { FunctionComponent, useContext, useEffect, useMemo, useState } from 'react';
 
 import {
   differenceInDays,
@@ -20,36 +20,34 @@ interface Props {
   postfix?: string;
 }
 
-const Duration = ({ from, to, defaultValue = '-', prefix = '', postfix = '' }: Props) => {
-  const [now, setNow] = useState(Date.now());
-  const formatted = useMemo(() => duration(from || now, to || now), [from, to, now]);
+const TimerContext = React.createContext(Date.now());
+
+export const TimerProvider: FunctionComponent = ({ children }) => {
+  const [tick, setTick] = useState(Date.now());
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setNow(Date.now());
-    }, 15_000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
-
-  return <span>{formatted ? `${prefix} ${formatted} ${postfix}`.trim() : defaultValue}</span>;
-};
-
-const TimeTo = ({ to }: Props) => {
-  const [now, setNow] = useState(Date.now());
-  const formatted = useMemo(() => (to > now ? duration(now, to) : duration(to, now)), [to, now]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(Date.now());
+      setTick(Date.now());
     }, 30_000);
 
     return () => {
       clearInterval(timer);
     };
   }, []);
+
+  return <TimerContext.Provider value={tick}>{children}</TimerContext.Provider>;
+};
+
+export const Duration = ({ from, to, defaultValue = '-', prefix = '', postfix = '' }: Props) => {
+  const now = useContext(TimerContext);
+  const formatted = useMemo(() => duration(from || now, to || now), [from, to, now]);
+
+  return <span>{formatted ? `${prefix} ${formatted} ${postfix}`.trim() : defaultValue}</span>;
+};
+
+export const TimeTo = ({ to }: Props) => {
+  const now = useContext(TimerContext);
+  const formatted = useMemo(() => (to > now ? duration(now, to) : duration(to, now)), [to, now]);
 
   return (
     <span>
@@ -92,7 +90,5 @@ function duration(from: Timestamp, to: Timestamp) {
 
   return result.join(' ');
 }
-
-export { TimeTo };
 
 export default Duration;

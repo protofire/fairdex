@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { BrowserRouter as Router, NavLink, Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { TimerProvider } from '../../components/formatters';
 import Spinner from '../../components/Spinner';
 import fairdex from '../../images/fairdex.png';
 import { getNetworkType } from '../../store/blockchain';
@@ -68,39 +69,41 @@ class MainPage extends React.Component<Props> {
     } else {
       return (
         <Router>
-          <Layout>
-            <Sidebar>
-              <Branding>
-                <NavLink to='/auctions'>
-                  <img src={fairdex} height={40} />
-                </NavLink>
-              </Branding>
-              <Scrollbar autoHide={true} autoHideTimeout={500}>
-                <SideContent>
-                  <NavMenu />
-                  <AccountInfo />
-                  <WalletInfo />
-                  <Footer />
-                </SideContent>
-              </Scrollbar>
-            </Sidebar>
-            <MessageHandler />
-            <Filters />
-            <Content>
-              <ClaimProvider>
-                <NavBar />
-                <Section>
-                  <Switch>
-                    <Route path='/auctions/running' component={RunningAuctions} />
-                    <Route path='/auctions/scheduled' component={ScheduledAuctions} />
-                    <Route path='/auctions/ended' component={EndedAuctions} />
-                    <Route path='/wallet' component={WalletOverview} />
-                    <Redirect to='/auctions/running' />
-                  </Switch>
-                </Section>
-              </ClaimProvider>
-            </Content>
-          </Layout>
+          <TimerProvider>
+            <Layout>
+              <Sidebar>
+                <Branding>
+                  <NavLink to='/auctions'>
+                    <img src={fairdex} height={40} />
+                  </NavLink>
+                </Branding>
+                <Scrollbar autoHide={true} autoHideTimeout={500}>
+                  <SideContent>
+                    <NavMenu />
+                    <AccountInfo />
+                    <WalletInfo />
+                    <Footer />
+                  </SideContent>
+                </Scrollbar>
+              </Sidebar>
+              <MessageHandler />
+              <Filters />
+              <Content>
+                <ClaimProvider>
+                  <NavBar />
+                  <Section>
+                    <Switch>
+                      <Route path='/auctions/running' component={RunningAuctions} />
+                      <Route path='/auctions/scheduled' component={ScheduledAuctions} />
+                      <Route path='/auctions/ended' component={EndedAuctions} />
+                      <Route path='/wallet' component={WalletOverview} />
+                      <Redirect to='/auctions/running' />
+                    </Switch>
+                  </Section>
+                </ClaimProvider>
+              </Content>
+            </Layout>
+          </TimerProvider>
         </Router>
       );
     }

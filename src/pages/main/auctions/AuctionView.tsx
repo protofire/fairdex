@@ -1,9 +1,8 @@
 import React, { HTMLAttributes, MouseEvent, useCallback, useRef, useState } from 'react';
 import { connect } from 'react-redux';
-import styled, { css, StyledFunction } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { DecimalValue, Timestamp } from '../../../components/formatters';
-import { TimeTo } from '../../../components/formatters/Duration';
+import { DecimalValue, Timestamp, TimeTo } from '../../../components/formatters';
 import { ZERO } from '../../../contracts/utils';
 import {
   getAvailableVolume,
