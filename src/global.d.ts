@@ -14,6 +14,9 @@ declare global {
     ethereum: EthereumProvider;
     web3: Web3;
     dx: DutchExchange;
+
+    // Redux DevTools Extension
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
   }
 
   interface EthereumProvider extends Provider {
