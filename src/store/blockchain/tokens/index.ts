@@ -4,21 +4,32 @@ import { getErc20Contract } from '../../../contracts';
 import { loadAuctions } from '../auctions';
 import { getCurrentAccount, getNetworkType } from '../web3';
 
-import whitelist from './whitelist';
+import { getAllTokens } from './selectors';
+import TokenWhitelist from './whitelist';
 
 export * from './selectors';
 
 // Actions
+const SET_MARKETS = 'SET_MARKETS';
 const SET_TOKENS = 'SET_TOKENS';
+const UPDATE_BALANCES = 'UPDATE_BALANCES';
 const SET_TOKEN_ALLOWANCE = 'SET_TOKEN_ALLOWANCE';
 
 const initialState: TokensState = {
+  markets: [],
   tokens: new Map<Address, Token>(),
 };
 
 const reducer: Reducer<TokensState> = (state = initialState, action) => {
   switch (action.type) {
+    case SET_MARKETS:
+      return {
+        ...state,
+        markets: Array.from(action.payload),
+      };
+
     case SET_TOKENS:
+    case UPDATE_BALANCES:
       return {
         ...state,
         tokens: new Map<Address, Token>(action.payload.map((token: Token) => [token.address, token])),
@@ -50,16 +61,66 @@ const reducer: Reducer<TokensState> = (state = initialState, action) => {
 export function loadTokens() {
   return async (dispatch: any, getState: () => AppState) => {
     const accountAddress = getCurrentAccount(getState());
+    const network = getNetworkType(getState());
+
+    const whitelist = new TokenWhitelist(network);
 
     if (accountAddress) {
-      const tokens = await getAvailableTokens(getNetworkType(getState()));
+      const markets: Market[] = (await dx.getAvailableMarkets()).filter(([token1, token2]) => {
+        return whitelist.isWhitelisted(token1) && whitelist.isWhitelisted(token2);
+      });
+
+      dispatch(setMarkets(markets));
+
+      const tokenAddresses = markets.reduce<Set<Address>>(
+        (addresses, [token1, token2]) => addresses.add(token1).add(token2),
+        new Set(),
+      );
+
+      // Load tokens that require special treatment
+      const [wethAddress, owlAddress] = await Promise.all([dx.getEthTokenAddress(), dx.getOwlAddress()]);
+      const [isWethListed, isOwlListed] = [tokenAddresses.has(wethAddress), tokenAddresses.has(owlAddress)];
+
+      if (!isWethListed) {
+        tokenAddresses.add(wethAddress);
+      }
+
+      if (!isOwlListed) {
+        tokenAddresses.add(owlAddress);
+      }
+
+      // Create contract instance for each whitelisted token
+      const tokens = await Promise.all(
+        Array.from(tokenAddresses.values()).map<Promise<Token>>(async tokenAddress => {
+          const token = await getErc20Contract(tokenAddress).getTokenInfo();
+
+          // Get token data from whitelist if needed
+          if (!token.name || !token.symbol) {
+            const whitelisted = whitelist.getTokenData(tokenAddress);
+
+            if (whitelisted) {
+              token.name = token.name || whitelisted.name;
+              token.symbol = token.symbol || whitelisted.symbol;
+            }
+          }
+
+          // Tokens are tradeable by default
+          token.tradeable = true;
+
+          if (tokenAddress === owlAddress) {
+            token.tradeable = isOwlListed;
+          } else if (tokenAddress === wethAddress) {
+            token.tradeable = isWethListed;
+          }
+
+          return token;
+        }),
+      );
+
+      dispatch(setTokens(tokens));
 
       if (tokens.length > 0) {
-        const tokensWithBalances = await Promise.all(
-          Array.from(tokens).map(token => getTokenBalances(token, accountAddress)),
-        );
-
-        dispatch(setTokens(tokensWithBalances));
+        dispatch(updateBalances());
 
         // Load auctions if needed
         const { blockchain } = getState();
@@ -68,6 +129,37 @@ export function loadTokens() {
           dispatch(loadAuctions());
         }
       }
+    }
+  };
+}
+
+export function updateBalances() {
+  return async (dispatch: any, getState: () => AppState) => {
+    const accountAddress = getCurrentAccount(getState());
+    const tokens = Array.from(getAllTokens(getState()).values());
+
+    if (tokens.length) {
+      const tokensWithBalances = await Promise.all(
+        tokens.map(async token => {
+          const tokenContract = getErc20Contract(token.address);
+
+          const [contractBalance, walletBalance, priceEth, allowance] = await Promise.all([
+            dx.getBalance(token, accountAddress),
+            tokenContract.getBalance(accountAddress),
+            dx.getPriceOfTokenInLastAuction(token),
+            tokenContract.getAllowance(accountAddress, dx.address),
+          ]);
+
+          return {
+            ...token,
+            balance: [contractBalance, walletBalance],
+            priceEth: priceEth.value,
+            allowance,
+          };
+        }),
+      );
+
+      dispatch(setBalances(tokensWithBalances));
     }
   };
 }
@@ -83,10 +175,24 @@ export const updateTokenAllowance = (token: Token) => {
   };
 };
 
+const setMarkets: ActionCreator<AnyAction> = (markets: Market[]) => {
+  return {
+    type: SET_MARKETS,
+    payload: markets,
+  };
+};
+
 const setTokens: ActionCreator<AnyAction> = (tokens: Token[]) => {
   return {
     type: SET_TOKENS,
     payload: tokens,
+  };
+};
+
+const setBalances: ActionCreator<AnyAction> = (tokensWithBalances: Token[]) => {
+  return {
+    type: UPDATE_BALANCES,
+    payload: tokensWithBalances,
   };
 };
 
@@ -96,90 +202,5 @@ const setTokenAllowance: ActionCreator<Action> = (address: Address, allowance: B
     payload: { address, allowance },
   };
 };
-
-async function getAvailableTokens(network: Network | null) {
-  const markets = await dx.getAvailableMarkets();
-
-  const tokenAddresses = markets.reduce<Set<Address>>(
-    (addresses, market) => addresses.add(market[0]).add(market[1]),
-    new Set(),
-  );
-
-  // Filter non-whitelisted token
-  const whitelistedTokens = network && whitelist[network];
-
-  if (whitelistedTokens != null) {
-    tokenAddresses.forEach(address => {
-      const isWhitelisted = whitelistedTokens.some(
-        approvedToken => approvedToken.address.toLowerCase() === address.toLowerCase(),
-      );
-
-      if (!isWhitelisted) {
-        tokenAddresses.delete(address);
-      }
-    });
-  }
-
-  // Load tokens that require special treatment
-  const [wethAddress, owlAddress] = await Promise.all([dx.getEthTokenAddress(), dx.getOwlAddress()]);
-
-  const isWethListed = tokenAddresses.has(wethAddress);
-  const isOwlListed = tokenAddresses.has(owlAddress);
-
-  if (!isWethListed) {
-    tokenAddresses.add(wethAddress);
-  }
-
-  if (!isOwlListed) {
-    tokenAddresses.add(owlAddress);
-  }
-
-  // Create contract instance for each token
-  const tokens = await Promise.all(
-    Array.from(tokenAddresses.values()).map<Promise<Token>>(async tokenAddress => {
-      const token = await getErc20Contract(tokenAddress).getTokenInfo();
-
-      if (!token.name || !token.symbol) {
-        const whitelisted = getTokenDataFromWhitelist(whitelistedTokens, tokenAddress);
-        token.name = whitelisted.name;
-        token.symbol = whitelisted.symbol;
-      }
-
-      // Tokens are tradeable by default
-      token.tradeable = true;
-
-      if (tokenAddress === owlAddress) {
-        token.tradeable = isOwlListed;
-      } else if (tokenAddress === wethAddress) {
-        token.tradeable = isWethListed;
-      }
-
-      return token;
-    }),
-  );
-
-  return tokens.filter((token: Token) => !token.symbol.startsWith('test'));
-}
-
-function getTokenDataFromWhitelist(whitelistedTokens, tokenAddress: Address) {
-  return whitelistedTokens.filter(t => t.address.toLowerCase() === tokenAddress.toLowerCase())[0];
-}
-
-async function getTokenBalances(token: Token, account: Address) {
-  const tokenContract = getErc20Contract(token.address);
-
-  const [contractBalance, walletBalance, priceEth, allowance] = await Promise.all([
-    dx.getBalance(token, account),
-    tokenContract.getBalance(account),
-    dx.getPriceOfTokenInLastAuction(token),
-    tokenContract.getAllowance(account, dx.address),
-  ]);
-
-  token.balance = [contractBalance, walletBalance];
-  token.priceEth = priceEth.value;
-  token.allowance = allowance;
-
-  return token;
-}
 
 export default reducer;

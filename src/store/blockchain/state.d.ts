@@ -6,6 +6,7 @@ interface AuctionsState {
 
 interface TokensState {
   feeRatio?: BigNumber;
+  markets: Market[];
   tokens: Map<Address, Token>;
 }
 

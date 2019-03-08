@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import { ZERO } from '../../../contracts/utils';
 import { getSellVolumeInEth } from '../../../contracts/utils/auctions';
 import { getDxBalance, getWalletBalance } from '../../../contracts/utils/tokens';
-import { getAllTokens, getOwlAddress } from '../tokens';
+import { getAllTokens } from '../tokens';
 
 export const getAllAuctions = (state: AppState) => state.blockchain.auctions || [];
 

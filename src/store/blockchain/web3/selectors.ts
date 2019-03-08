@@ -2,11 +2,11 @@ import { createSelector } from 'reselect';
 
 export const getCurrentAccount = (state: AppState): Address => state.blockchain.currentAccount || '';
 
-export const getNetworkType = (state: AppState): Network | null => {
+export const getNetworkType = (state: AppState): Network | undefined => {
   const { networkId } = state.blockchain;
 
   if (!networkId) {
-    return null;
+    return undefined;
   }
 
   switch (networkId) {

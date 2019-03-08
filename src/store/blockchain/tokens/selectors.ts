@@ -4,6 +4,8 @@ import { ZERO } from '../../../contracts/utils';
 import { getDxBalance, getTotalBalance, getWalletBalance } from '../../../contracts/utils/tokens';
 import { getFrt } from '../fee';
 
+export const getAvailableMarkets = (state: AppState) => state.blockchain.markets || [];
+
 export const getToken = (state: AppState, address: Address) => state.blockchain.tokens.get(address);
 
 export const getAllTokens = (state: AppState) => state.blockchain.tokens || new Map();

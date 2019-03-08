@@ -4,7 +4,7 @@ import { toBigNumber } from '../../../contracts/utils';
 import { getAuctionInfo, getBuyerBalance, getUnclaimedFunds } from '../../../contracts/utils/auctions';
 
 import { getAllBuyOrders } from '../buy-orders';
-import { getAllTokens, getToken } from '../tokens';
+import { getAllTokens, getAvailableMarkets, getToken } from '../tokens';
 import { getCurrentAccount } from '../web3';
 
 export * from './selectors';
@@ -29,7 +29,7 @@ export function loadAuctions() {
   return async (dispatch: any, getState: () => AppState) => {
     const auctions: Auction[] = [];
 
-    const markets = await dx.getAvailableMarkets();
+    const markets = getAvailableMarkets(getState());
     const tokens = getAllTokens(getState());
 
     if (markets.length && tokens.size) {

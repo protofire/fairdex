@@ -1,4 +1,4 @@
-type TokenSymbol = string;
+type Market = [Address, Address];
 
 interface Token {
   address: Address;
@@ -14,3 +14,5 @@ interface Token {
 interface TokenWithBalance extends Token {
   totalBalance: BigNumber;
 }
+
+type TokenSymbol = string;

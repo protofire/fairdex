@@ -6,7 +6,7 @@ import { periodicAction } from '../utils';
 import auctions, { loadAuctions } from './auctions';
 import buyOrders, { loadBidHistory } from './buy-orders';
 import frt, { loadFeeRatio, loadFeeReductionToken } from './fee';
-import tokens, { loadTokens } from './tokens';
+import tokens, { loadTokens, updateBalances } from './tokens';
 import wallet, { getCurrentAccount } from './web3';
 
 export * from './auctions';
@@ -20,6 +20,11 @@ const reducer = reduceReducers<BlockchainState>(wallet, tokens, auctions, buyOrd
 export function fetchData() {
   return async (dispatch: any, getState: () => AppState) => {
     const account = getCurrentAccount(getState());
+
+    if (account) {
+      // Load token list
+      dispatch(loadTokens());
+    }
 
     // Load fee rate (a.k.a. liquidity contribution))
     dispatch(
@@ -45,14 +50,15 @@ export function fetchData() {
       }),
     );
 
-    // Update tokens
+    // Update balances of tokens
     dispatch(
       periodicAction({
-        name: 'update-tokens',
-        interval: 15_000, // check for tokens every 15 seconds
+        name: 'update-balances',
+        interval: 10_000, // check for balances of tokens every 10 seconds
+        runImmediately: false,
 
         async task() {
-          dispatch(loadTokens());
+          dispatch(updateBalances());
         },
       }),
     );
@@ -113,15 +119,15 @@ export function fetchData() {
 
     dx.subscribe({ event: 'NewBuyerFundsClaim', filter: { user: account } }, () => {
       dispatch(loadAuctions());
-      dispatch(loadTokens());
+      dispatch(updateBalances());
     });
 
     dx.subscribe({ event: 'NewDeposit', filter: { user: account } }, () => {
-      dispatch(loadTokens());
+      dispatch(updateBalances());
     });
 
     dx.subscribe({ event: 'NewWithdrawal', filter: { user: account } }, () => {
-      dispatch(loadTokens());
+      dispatch(updateBalances());
     });
   };
 }

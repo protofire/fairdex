@@ -1,6 +1,6 @@
 interface TokenStatus {
   address: Address;
-  name?: string;
+  name: string;
   symbol: string;
   etherScanLink?: string;
 }
@@ -40,7 +40,6 @@ const whitelist: { [network in Network]?: TokenStatus[] } = {
     {
       name: 'district0x',
       symbol: 'DNT',
-
       etherScanLink: 'https://etherscan.io/token/0x0abdace70d3790235af448c88547603b945604ea',
       address: '0x0abdace70d3790235af448c88547603b945604ea',
     },
@@ -65,7 +64,6 @@ const whitelist: { [network in Network]?: TokenStatus[] } = {
     {
       name: 'Golem',
       symbol: 'GNT',
-
       etherScanLink: 'https://etherscan.io/token/0xa74476443119A942dE498590Fe1f2454d7D4aC0d',
       address: '0xa74476443119A942dE498590Fe1f2454d7D4aC0d',
     },
@@ -78,7 +76,6 @@ const whitelist: { [network in Network]?: TokenStatus[] } = {
     {
       name: 'Livepeer',
       symbol: 'LPT',
-
       etherScanLink: 'https://etherscan.io/token/0x58b6a8a3302369daec383334672404ee733ab239',
       address: '0x58b6a8a3302369daec383334672404ee733ab239',
     },
@@ -259,4 +256,30 @@ const whitelist: { [network in Network]?: TokenStatus[] } = {
   ],
 };
 
-export default whitelist;
+class TokenWhitelist {
+  readonly whitelist?: TokenStatus[];
+
+  constructor(readonly network?: Network | null) {
+    if (network) {
+      this.whitelist = whitelist[network];
+    }
+  }
+
+  isWhitelisted(token: Address) {
+    if (!this.whitelist) {
+      return true;
+    }
+
+    return this.whitelist.some(({ address }) => token.toLowerCase() === address.toLowerCase());
+  }
+
+  getTokenData(token: Address) {
+    if (!this.whitelist) {
+      return undefined;
+    }
+
+    return this.whitelist.find(t => t.address.toLowerCase() === token.toLowerCase());
+  }
+}
+
+export default TokenWhitelist;
