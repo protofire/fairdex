@@ -37,9 +37,13 @@ const WalletInfo = ({ topBalances, currentAccount }: WalletProps) => {
   // TODO: This should be a periodic action
   useEffect(
     () => {
-      setInterval(() => {
+      const timer = setInterval(() => {
         setTick(Date.now());
       }, 10_000);
+
+      return () => {
+        clearInterval(timer);
+      };
     },
     [currentAccount],
   );
