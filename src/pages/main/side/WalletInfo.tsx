@@ -20,14 +20,29 @@ const DEFAULT_DECIMALS = 3;
 
 const WalletInfo = ({ topBalances, currentAccount }: WalletProps) => {
   const [ethBalance, setEthBalance] = useState<BigNumber | undefined>(undefined);
+  const [tick, setTick] = useState(Date.now());
 
-  useEffect(() => {
-    if (currentAccount) {
-      window.web3.eth.getBalance(currentAccount).then(balance => {
-        setEthBalance(toDecimal(balance.toString(), 18) || ZERO);
-      });
-    }
-  });
+  // TODO: ETH balance should be in app state
+  useEffect(
+    () => {
+      if (currentAccount) {
+        window.web3.eth.getBalance(currentAccount).then(balance => {
+          setEthBalance(toDecimal(balance.toString(), 18) || ZERO);
+        });
+      }
+    },
+    [currentAccount, tick],
+  );
+
+  // TODO: This should be a periodic action
+  useEffect(
+    () => {
+      setInterval(() => {
+        setTick(Date.now());
+      }, 10_000);
+    },
+    [currentAccount],
+  );
 
   return (
     <Container>
