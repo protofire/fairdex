@@ -34,18 +34,6 @@ jest.spyOn(dx, 'unwrapEther').mockImplementation((token, amount) => {
   };
 });
 
-beforeEach(() => {
-  const web3Mock = {
-    eth: {
-      getBalance() {
-        return Promise.resolve(toBigNumber('20000000000000000000'));
-      },
-    },
-  };
-
-  window.web3 = web3Mock;
-});
-
 const wethWithBalance: Token = {
   address: '0x1',
   balance: [toBigNumber(100), toBigNumber(200)],
@@ -71,44 +59,36 @@ const wethNoBalance: Token = {
 describe('Despoit and Withdraw functionality', () => {
   describe('buttons', () => {
     test('should show Wrap button', async () => {
-      const { queryByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
+      const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
-      await wait(() => {
-        const button = queryByTestId('wrap-button');
-        expect(queryByTestId('wrap-button')).not.toBeNull();
-      });
+      const wrapButton = await waitForElement(() => getByTestId('wrap-button'));
+
+      expect(wrapButton).not.toBeNull();
     });
 
     test('should show Unwrap button', async () => {
-      const { queryByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
+      const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
-      await wait(() => {
-        expect(queryByTestId('unwrap-button')).not.toBeNull();
-      });
+      const unwrapButton = await waitForElement(() => getByTestId('unwrap-button'));
+
+      expect(unwrapButton).not.toBeNull();
     });
 
     test('should not show Wrap button', async () => {
-      const web3Mock = {
-        eth: {
-          getBalance() {
-            return Promise.resolve(toBigNumber('0'));
-          },
-        },
-      };
-
-      window.web3 = web3Mock;
-
       const { queryByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(0),
         },
       });
 
@@ -118,9 +98,10 @@ describe('Despoit and Withdraw functionality', () => {
     });
 
     test('should not show Unwrap button', async () => {
-      const { queryByTestId, debug } = renderWithRedux(<WrapUnwrapForm token={wethNoBalance} />, {
+      const { queryByTestId } = renderWithRedux(<WrapUnwrapForm token={wethNoBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(0),
         },
       });
 
@@ -132,9 +113,10 @@ describe('Despoit and Withdraw functionality', () => {
 
   describe('Wrap dialog', () => {
     test('should display cancel button', async () => {
-      const { getByTestId, queryByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
+      const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
@@ -147,9 +129,10 @@ describe('Despoit and Withdraw functionality', () => {
     });
 
     test('should display max allowed amount', async () => {
-      const { getByTestId, debug } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
+      const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
@@ -164,6 +147,7 @@ describe('Despoit and Withdraw functionality', () => {
       const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
@@ -180,6 +164,7 @@ describe('Despoit and Withdraw functionality', () => {
       const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
@@ -201,6 +186,7 @@ describe('Despoit and Withdraw functionality', () => {
       const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
@@ -222,6 +208,7 @@ describe('Despoit and Withdraw functionality', () => {
       const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
@@ -243,6 +230,7 @@ describe('Despoit and Withdraw functionality', () => {
       const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
+          ethBalance: toBigNumber(20),
         },
       });
 
@@ -264,7 +252,7 @@ describe('Despoit and Withdraw functionality', () => {
 
   describe('Unwrap dialog', () => {
     test('should display cancel button', async () => {
-      const { getByTestId, queryByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
+      const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
         },
@@ -279,7 +267,7 @@ describe('Despoit and Withdraw functionality', () => {
     });
 
     test('should display max allowed amount', async () => {
-      const { getByTestId, debug } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
+      const { getByTestId } = renderWithRedux(<WrapUnwrapForm token={wethWithBalance} />, {
         blockchain: {
           currentAccount: '0xb4124cEB3451635DAcedd11767f004d8a28c6eE7',
         },

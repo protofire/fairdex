@@ -15,20 +15,6 @@ import tokens from '../__mocks__/tokens';
 import buyOrders from '../__mocks__/buyOrders';
 import { toBigNumber } from '../contracts/utils';
 
-beforeAll(() => {
-  const web3Mock: any = {
-    eth: {
-      getBalance() {
-        return Promise.resolve(toBigNumber('20000000000000000000'));
-      },
-    },
-  };
-
-  window.web3 = web3Mock;
-});
-
-beforeEach(jest.resetAllMocks);
-
 afterEach(cleanup);
 
 describe('Left Sidebar', () => {
@@ -199,11 +185,12 @@ function renderPage(Component: ReactElement<any>, overrideTokens?: Map<string, T
   return renderWithRedux(Component, {
     blockchain: {
       auctions,
+      buyOrders,
+      currentAccount: '0x0313Df45e5B9125333a2437eB91d72685E882A0A',
+      ethBalance: toBigNumber(20),
+      feeRatio: toBigNumber(0.005),
       frt,
       tokens: overrideTokens || tokens,
-      buyOrders,
-      feeRatio: toBigNumber(0.005),
-      currentAccount: '0x0313Df45e5B9125333a2437eB91d72685E882A0A',
     },
   });
 }
