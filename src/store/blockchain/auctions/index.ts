@@ -1,6 +1,6 @@
 import { ActionCreator, AnyAction, Reducer } from 'redux';
 
-import { toBigNumber } from '../../../contracts/utils';
+import { toBigNumber, ZERO } from '../../../contracts/utils';
 import { getAuctionInfo, getBuyerBalance, getUnclaimedFunds } from '../../../contracts/utils/auctions';
 
 import { getAllBuyOrders } from '../buy-orders';
@@ -11,6 +11,7 @@ export * from './selectors';
 
 // Actions
 const SET_AUCTION_LIST = 'SET_AUCTION_LIST';
+const UPDATE_AUCTION_DATA = 'UPDATE_AUCTION_DATA';
 
 const reducer: Reducer<AuctionsState> = (state = {}, action) => {
   switch (action.type) {
@@ -18,6 +19,30 @@ const reducer: Reducer<AuctionsState> = (state = {}, action) => {
       return {
         ...state,
         auctions: action.payload,
+      };
+
+    case UPDATE_AUCTION_DATA:
+      return {
+        ...state,
+        auctions:
+          state.auctions &&
+          state.auctions.map(auction => {
+            const { sellTokenAddress, buyTokenAddress, auctionIndex } = action.payload.auction;
+
+            if (
+              auction.sellTokenAddress.toLowerCase() === sellTokenAddress.toLowerCase() &&
+              auction.buyTokenAddress.toLowerCase() === buyTokenAddress.toLowerCase() &&
+              auction.auctionIndex === auctionIndex
+            ) {
+              return {
+                ...auction,
+                buyVolume: action.payload.buyVolume,
+                currentPrice: action.payload.currentPrice,
+              };
+            }
+
+            return auction;
+          }),
       };
 
     default:
@@ -121,10 +146,43 @@ export function loadAuctions() {
   };
 }
 
+export function updateAuction(auction: Auction) {
+  return async (dispatch: any, getState: () => AppState) => {
+    if (auction) {
+      const sellToken = getToken(getState(), auction.sellTokenAddress);
+      const buyToken = getToken(getState(), auction.buyTokenAddress);
+
+      if (sellToken && buyToken) {
+        const [currentPrice, buyVolume = ZERO] = await Promise.all([
+          dx.getCurrentPrice(sellToken, buyToken, auction.auctionIndex),
+          dx.getBuyVolume(sellToken, buyToken),
+        ]);
+
+        dispatch(updateAuctionData(auction, currentPrice.value, buyVolume));
+      }
+    }
+  };
+}
+
 const setAuctionList: ActionCreator<AnyAction> = (auctions: Auction[]) => {
   return {
     type: SET_AUCTION_LIST,
     payload: auctions,
+  };
+};
+
+const updateAuctionData: ActionCreator<AnyAction> = (
+  auction: Auction,
+  currentPrice: BigNumber,
+  buyVolume: BigNumber,
+) => {
+  return {
+    type: UPDATE_AUCTION_DATA,
+    payload: {
+      auction,
+      buyVolume,
+      currentPrice,
+    },
   };
 };
 

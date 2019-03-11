@@ -1,8 +1,7 @@
-import React, { HTMLAttributes, MouseEvent, useCallback, useRef, useState } from 'react';
+import React, { HTMLAttributes, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { DecimalValue, Timestamp, TimeTo } from '../../../components/formatters';
 import { ZERO } from '../../../contracts/utils';
 import {
   getAvailableVolume,
@@ -15,7 +14,10 @@ import {
 import Button from '../../../components/Button';
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
+import { DecimalValue, Timestamp, TimeTo } from '../../../components/formatters';
+import { updateAuction } from '../../../store/blockchain/auctions';
 import { showAuctionDetail } from '../../../store/ui/actions';
+
 import BidForm from './bid/BidForm';
 import ClaimForm from './claim/ClaimForm';
 
@@ -41,7 +43,7 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
   const buttonGroup = useRef(null);
 
   const handleCardClick = useCallback((event: MouseEvent) => {
-    if (event && root && title && table) {
+    if (event && root && title && title.current && table && table.current) {
       if (
         event.target === root.current ||
         event.target === title.current ||
@@ -74,223 +76,241 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
     [isMouseDown],
   );
 
-  const timetimend = new Date().getTime() + 90 * 1000;
+  // Reload auction data
+  useEffect(
+    () => {
+      let subscription: NodeJS.Timeout;
+
+      if (auction && auction.state === 'running') {
+        const interval = getRandomInt(5_000, 9_000); // Random interval between 5-9 seconds
+
+        subscription = setInterval(() => {
+          dispatch(updateAuction(auction));
+        }, interval);
+      }
+
+      return () => {
+        if (subscription) {
+          clearInterval(subscription);
+        }
+      };
+    },
+    [auction.state],
+  );
 
   return (
-    <>
-      <AuctionCard
-        ref={root}
-        data-testid={`auction-card-${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}
-        onClick={handleCardClick}
-        onMouseDown={handleActive}
-        onMouseUp={handleActive}
-        active={isMouseDown}
-        {...props}
-      >
-        <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`} ref={title}>
-          <div>
-            <small>bid with</small>
-            <h3>{auction.buyToken}</h3>
-          </div>
-          <Separator>▶</Separator>
-          <div>
-            <small>to buy</small>
-            <h3>{auction.sellToken}</h3>
-          </div>
-        </Title>
+    <AuctionCard
+      ref={root}
+      data-testid={`auction-card-${auction.sellToken}-${auction.buyToken}-${auction.auctionIndex}`}
+      onClick={handleCardClick}
+      onMouseDown={handleActive}
+      onMouseUp={handleActive}
+      active={isMouseDown}
+      {...props}
+    >
+      <Title title={`Bid with ${auction.buyToken} to buy ${auction.sellToken}`} ref={title}>
+        <div>
+          <small>bid with</small>
+          <h3>{auction.buyToken}</h3>
+        </div>
+        <Separator>▶</Separator>
+        <div>
+          <small>to buy</small>
+          <h3>{auction.sellToken}</h3>
+        </div>
+      </Title>
 
-        {auction.state === 'running' && (
-          <>
-            <Table ref={table}>
-              <Row>
-                <Label>Current price</Label>
-                <Value>
-                  {auction.currentPrice === undefined ? (
-                    <Loading />
-                  ) : (
-                    <span title={getCurrentPriceRate(auction)}>
-                      <DecimalValue
-                        value={getCounterCurrencyPrice(auction.currentPrice)}
-                        decimals={DEFAULT_DECIMALS}
-                        hideTitle={true}
-                      />
-                      <small>
-                        {' '}
-                        {auction.buyToken}/{auction.sellToken}
-                      </small>
-                    </span>
-                  )}
-                </Value>
-              </Row>
-              <Row>
-                <Label>Previous closing price</Label>
-                <Value>
-                  {auction.closingPrice === undefined ? (
-                    <Loading />
-                  ) : (
-                    <span title={getClosingPriceRate(auction)}>
-                      <DecimalValue
-                        value={getCounterCurrencyPrice(auction.closingPrice)}
-                        decimals={DEFAULT_DECIMALS}
-                        hideTitle={true}
-                      />
-                      <small>
-                        {' '}
-                        {auction.buyToken}/{auction.sellToken}
-                      </small>
-                    </span>
-                  )}
-                </Value>
-              </Row>
-              <Row>
-                <Label>Volume needed to end</Label>
-                <Value>
-                  {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
-                    <Loading />
-                  ) : (
-                    <>
-                      <DecimalValue
-                        value={getAvailableVolume(auction).times(auction.currentPrice)}
-                        decimals={DEFAULT_DECIMALS}
-                      />
-                      <small> {auction.buyToken}</small>
-                    </>
-                  )}
-                </Value>
-              </Row>
-              <Row helpText='Any auction reaches the last auction price of the previous auction after 6h'>
-                <Label>Estimated time to end</Label>
-                <Value>
-                  {auction.auctionStart === undefined ? (
-                    <Loading />
-                  ) : (
-                    <TimeTo to={getEstimatedEndTime(auction)} />
-                  )}
-                </Value>
-              </Row>
-            </Table>
+      {auction.state === 'running' && (
+        <>
+          <Table ref={table}>
+            <Row>
+              <Label>Current price</Label>
+              <Value>
+                {auction.currentPrice === undefined ? (
+                  <Loading />
+                ) : (
+                  <span title={getCurrentPriceRate(auction)}>
+                    <DecimalValue
+                      value={getCounterCurrencyPrice(auction.currentPrice)}
+                      decimals={DEFAULT_DECIMALS}
+                      hideTitle={true}
+                    />
+                    <small>
+                      {' '}
+                      {auction.buyToken}/{auction.sellToken}
+                    </small>
+                  </span>
+                )}
+              </Value>
+            </Row>
+            <Row>
+              <Label>Previous closing price</Label>
+              <Value>
+                {auction.closingPrice === undefined ? (
+                  <Loading />
+                ) : (
+                  <span title={getClosingPriceRate(auction)}>
+                    <DecimalValue
+                      value={getCounterCurrencyPrice(auction.closingPrice)}
+                      decimals={DEFAULT_DECIMALS}
+                      hideTitle={true}
+                    />
+                    <small>
+                      {' '}
+                      {auction.buyToken}/{auction.sellToken}
+                    </small>
+                  </span>
+                )}
+              </Value>
+            </Row>
+            <Row>
+              <Label>Volume needed to end</Label>
+              <Value>
+                {auction.sellVolume === undefined || auction.buyVolume === undefined ? (
+                  <Loading />
+                ) : (
+                  <>
+                    <DecimalValue
+                      value={getAvailableVolume(auction).times(auction.currentPrice)}
+                      decimals={DEFAULT_DECIMALS}
+                    />
+                    <small> {auction.buyToken}</small>
+                  </>
+                )}
+              </Value>
+            </Row>
+            <Row helpText='Any auction reaches the last auction price of the previous auction after 6h'>
+              <Label>Estimated time to end</Label>
+              <Value>
+                {auction.auctionStart === undefined ? (
+                  <Loading />
+                ) : (
+                  <TimeTo to={getEstimatedEndTime(auction)} />
+                )}
+              </Value>
+            </Row>
+          </Table>
 
-            <ButtonGroup ref={buttonGroup}>
-              <BidForm auction={auction} />
-              {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
-                <ClaimForm auction={auction} />
-              )}
-            </ButtonGroup>
-          </>
-        )}
+          <ButtonGroup ref={buttonGroup}>
+            <BidForm auction={auction} />
+            {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
+              <ClaimForm auction={auction} />
+            )}
+          </ButtonGroup>
+        </>
+      )}
 
-        {auction.state === 'scheduled' && (
-          <>
-            <Table ref={table}>
-              <Row>
-                <Label>{auction.auctionIndex === '0' ? 'Initial' : 'Previous'} closing price</Label>
-                <Value>
-                  {auction.closingPrice === undefined ? (
-                    <Loading />
-                  ) : (
-                    <span title={getClosingPriceRate(auction)}>
-                      <DecimalValue
-                        value={getCounterCurrencyPrice(auction.closingPrice)}
-                        decimals={DEFAULT_DECIMALS}
-                        hideTitle={true}
-                      />
-                      <small>
-                        {' '}
-                        {auction.buyToken}/{auction.sellToken}
-                      </small>
-                    </span>
-                  )}
-                </Value>
-              </Row>
-              <Row>
-                <Label>Sell volume</Label>
-                <Value>
-                  {auction.sellVolume === undefined ? (
-                    <Loading />
-                  ) : (
-                    <>
-                      <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
-                      <small> {auction.sellToken}</small>
-                    </>
-                  )}
-                </Value>
-              </Row>
-              <Row>
-                <Label>Estimated time to start</Label>
-                <Value>
-                  {auction.auctionStart === undefined ? <Loading /> : <TimeTo to={auction.auctionStart} />}
-                </Value>
-              </Row>
-            </Table>
-          </>
-        )}
+      {auction.state === 'scheduled' && (
+        <>
+          <Table ref={table}>
+            <Row>
+              <Label>{auction.auctionIndex === '0' ? 'Initial' : 'Previous'} closing price</Label>
+              <Value>
+                {auction.closingPrice === undefined ? (
+                  <Loading />
+                ) : (
+                  <span title={getClosingPriceRate(auction)}>
+                    <DecimalValue
+                      value={getCounterCurrencyPrice(auction.closingPrice)}
+                      decimals={DEFAULT_DECIMALS}
+                      hideTitle={true}
+                    />
+                    <small>
+                      {' '}
+                      {auction.buyToken}/{auction.sellToken}
+                    </small>
+                  </span>
+                )}
+              </Value>
+            </Row>
+            <Row>
+              <Label>Sell volume</Label>
+              <Value>
+                {auction.sellVolume === undefined ? (
+                  <Loading />
+                ) : (
+                  <>
+                    <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
+                    <small> {auction.sellToken}</small>
+                  </>
+                )}
+              </Value>
+            </Row>
+            <Row>
+              <Label>Estimated time to start</Label>
+              <Value>
+                {auction.auctionStart === undefined ? <Loading /> : <TimeTo to={auction.auctionStart} />}
+              </Value>
+            </Row>
+          </Table>
+        </>
+      )}
 
-        {auction.state === 'ended' && (
-          <>
-            <Table ref={table}>
-              <Row>
-                <Label>{auction.auctionIndex === '0' ? 'Initial' : 'Closing'} price</Label>
-                <Value>
-                  {auction.closingPrice === undefined ? (
-                    <Loading />
-                  ) : (
-                    <span title={getClosingPriceRate(auction)}>
-                      <DecimalValue
-                        value={getCounterCurrencyPrice(auction.closingPrice)}
-                        decimals={DEFAULT_DECIMALS}
-                        hideTitle={true}
-                      />
-                      <small>
-                        {' '}
-                        {auction.buyToken}/{auction.sellToken}
-                      </small>
-                    </span>
-                  )}
-                </Value>
-              </Row>
-              <Row>
-                <Label>Sell volume</Label>
-                <Value>
-                  {auction.sellVolume === undefined ? (
-                    <Loading />
-                  ) : (
-                    <>
-                      <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
-                      <small> {auction.sellToken}</small>
-                    </>
-                  )}
-                </Value>
-              </Row>
-              <Row>
-                <Label>Buy volume</Label>
-                <Value>
-                  {auction.buyVolume === undefined ? (
-                    <Loading />
-                  ) : (
-                    <>
-                      <DecimalValue value={auction.buyVolume} decimals={DEFAULT_DECIMALS} />
-                      <small> {auction.buyToken}</small>
-                    </>
-                  )}
-                </Value>
-              </Row>
-              <Row>
-                <Label>End time</Label>
-                <Value>
-                  {auction.auctionEnd === undefined ? <Loading /> : <Timestamp value={auction.auctionEnd} />}
-                </Value>
-              </Row>
-            </Table>
+      {auction.state === 'ended' && (
+        <>
+          <Table ref={table}>
+            <Row>
+              <Label>{auction.auctionIndex === '0' ? 'Initial' : 'Closing'} price</Label>
+              <Value>
+                {auction.closingPrice === undefined ? (
+                  <Loading />
+                ) : (
+                  <span title={getClosingPriceRate(auction)}>
+                    <DecimalValue
+                      value={getCounterCurrencyPrice(auction.closingPrice)}
+                      decimals={DEFAULT_DECIMALS}
+                      hideTitle={true}
+                    />
+                    <small>
+                      {' '}
+                      {auction.buyToken}/{auction.sellToken}
+                    </small>
+                  </span>
+                )}
+              </Value>
+            </Row>
+            <Row>
+              <Label>Sell volume</Label>
+              <Value>
+                {auction.sellVolume === undefined ? (
+                  <Loading />
+                ) : (
+                  <>
+                    <DecimalValue value={auction.sellVolume} decimals={DEFAULT_DECIMALS} />
+                    <small> {auction.sellToken}</small>
+                  </>
+                )}
+              </Value>
+            </Row>
+            <Row>
+              <Label>Buy volume</Label>
+              <Value>
+                {auction.buyVolume === undefined ? (
+                  <Loading />
+                ) : (
+                  <>
+                    <DecimalValue value={auction.buyVolume} decimals={DEFAULT_DECIMALS} />
+                    <small> {auction.buyToken}</small>
+                  </>
+                )}
+              </Value>
+            </Row>
+            <Row>
+              <Label>End time</Label>
+              <Value>
+                {auction.auctionEnd === undefined ? <Loading /> : <Timestamp value={auction.auctionEnd} />}
+              </Value>
+            </Row>
+          </Table>
 
-            <ButtonGroup ref={buttonGroup}>
-              {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
-                <ClaimForm auction={auction} />
-              )}
-            </ButtonGroup>
-          </>
-        )}
-      </AuctionCard>
-    </>
+          <ButtonGroup ref={buttonGroup}>
+            {auction.unclaimedFunds && auction.unclaimedFunds.isGreaterThan(ZERO) && (
+              <ClaimForm auction={auction} />
+            )}
+          </ButtonGroup>
+        </>
+      )}
+    </AuctionCard>
   );
 });
 
@@ -404,6 +424,13 @@ const Separator = styled.div`
   padding-top: var(--spacing-title);
   user-select: none;
 `;
+
+function getRandomInt(min: number, max: number) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 function mapDispatchToProps(dispatch: any): DispatchProps {
   return {
