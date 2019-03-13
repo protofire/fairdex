@@ -13,6 +13,7 @@ import {
 } from '../../../contracts/utils/auctions';
 
 import ButtonGroup from '../../../components/ButtonGroup';
+import InfoIcon from '../../../components/InfoIcon';
 import Modal from '../../../components/Modal';
 import { getAuctionDetail } from '../../../store/blockchain';
 import BidForm from './bid/BidForm';
@@ -76,6 +77,8 @@ const Content = ({ auction }: ContentProp) => (
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
+                    &ensp;
+                    <InfoIcon />
                   </small>
                 </span>
               )}
@@ -96,6 +99,8 @@ const Content = ({ auction }: ContentProp) => (
                   <small>
                     {' '}
                     {auction.buyToken}/{auction.sellToken}
+                    &ensp;
+                    <InfoIcon />
                   </small>
                 </span>
               )}

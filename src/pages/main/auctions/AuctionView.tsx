@@ -15,6 +15,7 @@ import Button from '../../../components/Button';
 import ButtonGroup from '../../../components/ButtonGroup';
 import Card from '../../../components/Card';
 import { DecimalValue, Timestamp, TimeTo } from '../../../components/formatters';
+import InfoIcon from '../../../components/InfoIcon';
 import { updateAuction } from '../../../store/blockchain/auctions';
 import { showAuctionDetail } from '../../../store/ui/actions';
 
@@ -138,6 +139,8 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                     <small>
                       {' '}
                       {auction.buyToken}/{auction.sellToken}
+                      &ensp;
+                      <InfoIcon />
                     </small>
                   </span>
                 )}
@@ -158,6 +161,8 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                     <small>
                       {' '}
                       {auction.buyToken}/{auction.sellToken}
+                      &ensp;
+                      <InfoIcon />
                     </small>
                   </span>
                 )}
