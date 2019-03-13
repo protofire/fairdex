@@ -22,7 +22,7 @@ const variables = css`
     --button-height: ${rem('40px')};
     --box-arrow-height: ${rem('10px')};
     --card-height: ${rem('256px')};
-    --card-width: ${rem('280px')};
+    --card-width: ${rem('320px')};
     --header-height: ${rem('72px')};
     --input-height: ${rem('40px')};
     --input-modal-width: ${rem('500px')};
