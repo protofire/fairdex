@@ -131,14 +131,10 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   <Loading />
                 ) : (
                   <span title={getCurrentPriceRate(auction)}>
-                    <DecimalValue
-                      value={getCounterCurrencyPrice(auction.currentPrice)}
-                      decimals={DEFAULT_DECIMALS}
-                      hideTitle={true}
-                    />
+                    <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
                     <small>
                       {' '}
-                      {auction.buyToken}/{auction.sellToken}
+                      {auction.buyToken}
                       &ensp;
                       <InfoIcon />
                     </small>
@@ -153,14 +149,10 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   <Loading />
                 ) : (
                   <span title={getClosingPriceRate(auction)}>
-                    <DecimalValue
-                      value={getCounterCurrencyPrice(auction.closingPrice)}
-                      decimals={DEFAULT_DECIMALS}
-                      hideTitle={true}
-                    />
+                    <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
                     <small>
                       {' '}
-                      {auction.buyToken}/{auction.sellToken}
+                      {auction.buyToken}
                       &ensp;
                       <InfoIcon />
                     </small>
