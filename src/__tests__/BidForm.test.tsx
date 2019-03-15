@@ -113,8 +113,8 @@ describe('in running auctions', () => {
       const proceedButton = await waitForElement(() => getByTestId('cancel-bid-button'));
 
       expect(proceedButton).toBeVisible();
-      expect(getByText('You are bidding above the previous closing price for OMG/DAI')).toBeDefined();
-      expect(getByText('1 OMG')).toBeDefined();
+      expect(getByText('1 DAI')).toBeDefined();
+      expect(getByText('1.2 DAI')).toBeDefined();
     });
 
     test('should display tooltip when user close the auction with its bid', async () => {
