@@ -7,7 +7,6 @@ import { ZERO } from '../../../contracts/utils';
 import {
   getAvailableVolume,
   getClosingPriceRate,
-  getCounterCurrencyPrice,
   getCurrentPriceRate,
   getEstimatedEndTime,
 } from '../../../contracts/utils/auctions';
@@ -190,14 +189,12 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getClosingPriceRate(auction)}>
-                  <DecimalValue
-                    value={getCounterCurrencyPrice(auction.closingPrice)}
-                    decimals={DEFAULT_DECIMALS}
-                    hideTitle={true}
-                  />
+                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
                   <small>
                     {' '}
-                    {auction.buyToken}/{auction.sellToken}
+                    {auction.buyToken}
+                    &ensp;
+                    <InfoIcon />
                   </small>
                 </span>
               )}
@@ -251,14 +248,12 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <span title={getClosingPriceRate(auction)}>
-                  <DecimalValue
-                    value={getCounterCurrencyPrice(auction.closingPrice)}
-                    decimals={DEFAULT_DECIMALS}
-                    hideTitle={true}
-                  />
+                  <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
                   <small>
                     {' '}
-                    {auction.buyToken}/{auction.sellToken}
+                    {auction.buyToken}
+                    &ensp;
+                    <InfoIcon />
                   </small>
                 </span>
               )}
