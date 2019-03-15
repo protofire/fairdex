@@ -380,13 +380,14 @@ const BidForm = React.memo(
           <Popup.Content theme={currentStep === 1 ? 'accent' : 'default'}>
             {currentStep === 1 && (
               <Step1 onSubmit={goToNextStep}>
-                <p>
-                  You are bidding above the previous <br /> closing price for {auction.sellToken}/
-                  {auction.buyToken}
-                </p>
                 <Text>
-                  <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.sellToken} />
+                  <DecimalValue value={auction.currentPrice} decimals={4} postfix={auction.buyToken} />
                 </Text>
+                <p>
+                  You are bidding above the <br />
+                  previous closing price:{' '}
+                  <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.buyToken} />
+                </p>
                 <Button type='submit' autoFocus data-testid={'proceed-bid-button'}>
                   Proceed
                 </Button>
