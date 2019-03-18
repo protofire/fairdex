@@ -370,7 +370,6 @@ const Row = styled.div.attrs((props: RowProps) => ({
   title: props.helpText || '',
 }))`
   display: flex;
-  overflow: hidden;
 
   ${Label}, ${Value} {
     line-height: 1.5rem;
