@@ -2,7 +2,7 @@ import React from 'react';
 import Scrollbar from 'react-custom-scrollbars';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { BrowserRouter as Router, NavLink, Redirect, Route, Switch } from 'react-router-dom';
+import { NavLink, Redirect, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { TimerProvider } from '../../components/formatters';
@@ -68,43 +68,41 @@ class MainPage extends React.Component<Props> {
       return <Redirect to='/network-not-available' />;
     } else {
       return (
-        <Router>
-          <TimerProvider>
-            <Layout>
-              <Sidebar>
-                <Branding>
-                  <NavLink to='/auctions'>
-                    <img src={fairdex} height={40} />
-                  </NavLink>
-                </Branding>
-                <Scrollbar autoHide={true} autoHideTimeout={500}>
-                  <SideContent>
-                    <NavMenu />
-                    <AccountInfo />
-                    <WalletInfo />
-                    <Footer />
-                  </SideContent>
-                </Scrollbar>
-              </Sidebar>
-              <MessageHandler />
-              <Filters />
-              <Content>
-                <ClaimProvider>
-                  <NavBar />
-                  <Section>
-                    <Switch>
-                      <Route path='/auctions/running' component={RunningAuctions} />
-                      <Route path='/auctions/scheduled' component={ScheduledAuctions} />
-                      <Route path='/auctions/ended' component={EndedAuctions} />
-                      <Route path='/wallet' component={WalletOverview} />
-                      <Redirect to='/auctions/running' />
-                    </Switch>
-                  </Section>
-                </ClaimProvider>
-              </Content>
-            </Layout>
-          </TimerProvider>
-        </Router>
+        <TimerProvider>
+          <Layout>
+            <Sidebar>
+              <Branding>
+                <NavLink to='/auctions'>
+                  <img src={fairdex} height={40} />
+                </NavLink>
+              </Branding>
+              <Scrollbar autoHide={true} autoHideTimeout={500}>
+                <SideContent>
+                  <NavMenu />
+                  <AccountInfo />
+                  <WalletInfo />
+                  <Footer />
+                </SideContent>
+              </Scrollbar>
+            </Sidebar>
+            <MessageHandler />
+            <Filters />
+            <Content>
+              <ClaimProvider>
+                <NavBar />
+                <Section>
+                  <Switch>
+                    <Route path='/auctions/running' component={RunningAuctions} />
+                    <Route path='/auctions/scheduled' component={ScheduledAuctions} />
+                    <Route path='/auctions/ended' component={EndedAuctions} />
+                    <Route path='/wallet' component={WalletOverview} />
+                    <Redirect to='/auctions/running' />
+                  </Switch>
+                </Section>
+              </ClaimProvider>
+            </Content>
+          </Layout>
+        </TimerProvider>
       );
     }
   }
