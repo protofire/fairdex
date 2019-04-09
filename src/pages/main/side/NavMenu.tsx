@@ -15,10 +15,20 @@ const NavBar = () => (
       <Icon.Wallet />
       Wallet
     </Item>
+    <Separator />
+    <Link
+      href='https://blog.gnosis.pm/how-to-use-fairdex-a-step-by-step-guide-to-a-dutchx-bidder-interface-643611e7683d'
+      target='_blank'
+      rel='noopener noreferrer'
+    >
+      <Icon.Help />
+      Step-by-Step guide
+    </Link>
     <Link href='https://t.me/dutchXprotocol' target='_blank' rel='noopener noreferrer'>
       <ImageIcon src={images.telegram} />
       Feedback/Questions
     </Link>
+    <Separator />
   </Menu>
 );
 
@@ -57,6 +67,7 @@ const Link = styled.a`
   align-items: center;
   border-radius: 8px;
   display: flex;
+  font-size: 0.9rem;
   font-stretch: normal;
   font-style: normal;
   font-weight: 600;
@@ -81,6 +92,10 @@ const Link = styled.a`
 const ImageIcon = styled.img`
   width: 16px;
   height: 16px;
+`;
+
+const Separator = styled.div`
+  border-top: 1px solid var(--color-border);
 `;
 
 export default withRouter(NavBar);
