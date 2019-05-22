@@ -62,12 +62,6 @@ const whitelist: { [network in Network]?: TokenStatus[] } = {
       address: '0x6810e776880c02933d47db1b9fc05908e5386b96',
     },
     {
-      name: 'Golem',
-      symbol: 'GNT',
-      etherScanLink: 'https://etherscan.io/token/0xa74476443119A942dE498590Fe1f2454d7D4aC0d',
-      address: '0xa74476443119A942dE498590Fe1f2454d7D4aC0d',
-    },
-    {
       name: 'KyberNetwork',
       symbol: 'KNC',
       etherScanLink: 'https://etherscan.io/token/0xdd974d5c2e2928dea5f71b9825b8b646686bd200',
