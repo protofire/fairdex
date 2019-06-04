@@ -100,7 +100,7 @@ const Landing: FunctionComponent<Props> = ({ network, wallet, termsConditionsAcc
           break;
       }
     },
-    [currentStep, stepComponent, hideNext, hidePrev],
+    [currentStep],
   );
 
   const handleStepButtonClick = (step: number) => () => setCurrentStep(step);
@@ -230,7 +230,7 @@ const PrevNextStep = styled.img`
     width: 16.5px;
   }
 
-  ${({ hide }) => {
+  ${({ hide }: { hide: boolean }) => {
     if (hide) {
       return css`
         visibility: hidden;
@@ -271,7 +271,7 @@ const StepButton = styled.div`
   transition: all 0.3s ease-out;
   width: 32px;
 
-  ${({ active }) => {
+  ${({ active }: { active: boolean }) => {
     if (active) {
       return css`
         background: var(--color-accent);

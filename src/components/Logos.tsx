@@ -5,19 +5,28 @@ import * as images from '../images';
 
 const Logos = (props: HTMLAttributes<HTMLDivElement>) => (
   <Wrapper {...props}>
-    <Geco>
-      <img src={images.geco} />
-    </Geco>
-    <Dutchx>
-      <img src={images.dutchx} />
-    </Dutchx>
+    <Row>
+      <Proto>
+        <a href={'https://protofire.io'} target='_blank' rel='noopener noreferrer'>
+          Built by <img src={images.protofire} />
+        </a>
+      </Proto>
+    </Row>
+    <Row>
+      <Geco>
+        <img src={images.geco} />
+      </Geco>
+      <Dutchx>
+        <img src={images.dutchx} />
+      </Dutchx>
+    </Row>
   </Wrapper>
 );
 
 const Wrapper = styled.footer`
   color: #303b3e;
   display: flex;
-  flex-flow: row;
+  flex-direction: column;
   font-size: 9px;
   font-weight: 600;
   justify-content: center;
@@ -41,6 +50,19 @@ const Dutchx = styled.div`
   }
 `;
 
+const Row = styled.div`
+  display: flex;
+  flex-flow: row;
+  justify-content: center;
+`;
+
 const Geco = styled(Dutchx)``;
+const Proto = styled(Dutchx)`
+  margin-bottom: 10px;
+
+  img {
+    vertical-align: middle;
+  }
+`;
 
 export default Logos;
