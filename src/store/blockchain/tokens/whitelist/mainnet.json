@@ -59,7 +59,7 @@
   "address": "0x8f8221afbb33998d8584a2b05749ba73c37a938a",
   "decimals": 18
 }, {
-  "symbol": "OST",
+  "symbol": "ST",
   "name": "Simple Token",
   "address": "0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca",
   "decimals": 18
@@ -73,6 +73,11 @@
   "name": "OceanToken",
   "address": "0x985dd3d42de1e256d09e1c10f112bccb8015ad41",
   "decimals": 18
+}, {
+  "symbol": "FUN",
+  "name": "FunFair",
+  "address": "0x419d0d8bdd9af5e606ae2232ed285aff190e711b",
+  "decimals": 8
 }, {
   "symbol": "BAT",
   "name": "Basic Attention Token",
@@ -108,6 +113,11 @@
   "name": "Numeraire",
   "address": "0x1776e1f26f98b1a5df9cd347953a26dd3cb46671",
   "decimals": 18
+}, {
+  "symbol": "GRID",
+  "name": "GRID Token",
+  "address": "0x12b19d3e2ccc14da04fae33e63652ce469b3f2fd",
+  "decimals": 12
 }, {
   "symbol": "POLY",
   "name": "Polymath",
