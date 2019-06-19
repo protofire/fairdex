@@ -132,6 +132,25 @@ class DutchExchange extends BaseContract<Event> {
     return 0;
   }
 
+  async getEndedAuctionStart(
+    sellToken: Token,
+    buyToken: Token,
+    auctionIndex: string,
+    fromBlock = this.initialBlock,
+  ) {
+    const tokens = await this.contract.methods.getTokenOrder(sellToken.address, buyToken.address).call();
+    const [event] = await this.contract.getPastEvents('AuctionStartScheduled', {
+      fromBlock,
+      filter: { sellToken: tokens[0], buyToken: tokens[1], auctionIndex },
+    });
+
+    if (event) {
+      return parseInt(event.returnValues.auctionStart, 10);
+    }
+
+    return 0;
+  }
+
   async getBalance(token: Token, accountAddress: Address) {
     const balance = await this.contract.methods.balances(token.address, accountAddress).call();
 
