@@ -42,7 +42,7 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
         .isZero();
 
     if (isClosed || isTheoreticalClosed) {
-      const [endedAcutionStart, auctionEnd, bidVolume = ZERO] = await Promise.all([
+      const [endedAuctionStart, auctionEnd, bidVolume = ZERO] = await Promise.all([
         dx.getEndedAuctionStart(sellToken, buyToken, auctionIndex),
         dx.getAuctionEnd(sellToken, buyToken, auctionIndex),
         dx.getBuyVolume(sellToken, buyToken, auctionIndex),
@@ -52,7 +52,7 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
         const auction: EndedAuction = {
           ...data,
           state: 'ended',
-          auctionStart: endedAcutionStart,
+          auctionStart: endedAuctionStart,
           auctionEnd,
           buyVolume: bidVolume,
           closingPrice: closingPrice.value,
