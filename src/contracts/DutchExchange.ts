@@ -145,7 +145,7 @@ class DutchExchange extends BaseContract<Event> {
     });
 
     if (event) {
-      return parseInt(event.returnValues.auctionStart, 10);
+      return parseInt(event.returnValues.auctionStart, 10) * 1_000;
     }
 
     return 0;
