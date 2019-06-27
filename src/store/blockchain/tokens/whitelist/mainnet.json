@@ -132,12 +132,6 @@
     "decimals": 18
   },
   {
-    "symbol": "GRID",
-    "name": "GRID Token",
-    "address": "0x12b19d3e2ccc14da04fae33e63652ce469b3f2fd",
-    "decimals": 12
-  },
-  {
     "symbol": "POLY",
     "name": "Polymath",
     "address": "0x9992ec3cf6a55b00978cddf2b27bc6882d88d1ec",
