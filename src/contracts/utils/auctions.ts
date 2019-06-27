@@ -1,6 +1,6 @@
 import { addHours, isAfter } from 'date-fns';
 
-import { formatNumber, toBigNumber, ZERO } from './decimal';
+import { formatNumber, fromDecimal, toBigNumber, toDecimal, ZERO } from './decimal';
 
 const AUCTION_DURATION = 6; // 6 hours
 const AUCTION_ABOVE_PRIOR_PRICE_THRESHOLD = 1.1; // 10% above prior price
@@ -17,10 +17,12 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
     const data: AuctionData = {
       auctionIndex,
       sellToken: sellToken.symbol,
+      sellTokenDecimals: sellToken.decimals,
       sellTokenAddress: sellToken.address,
       sellVolume,
       extraTokens,
       buyToken: buyToken.symbol,
+      buyTokenDecimals: buyToken.decimals,
       buyTokenAddress: buyToken.address,
       buyVolume,
     };
@@ -104,7 +106,13 @@ export function getAvailableVolume(auction: RunningAuction) {
   if (auction.sellVolume && auction.sellVolume.gt(0)) {
     if (auction.buyVolume && auction.buyVolume.gte(0)) {
       if (auction.currentPrice && auction.currentPrice.gte(0)) {
-        return auction.sellVolume.minus(auction.buyVolume.div(auction.currentPrice));
+        const sellVolumeDec = toBigNumber(fromDecimal(auction.sellVolume, auction.sellTokenDecimals));
+        const buyVolumeDec = toBigNumber(fromDecimal(auction.buyVolume, auction.buyTokenDecimals));
+
+        return toDecimal(
+          sellVolumeDec.times(auction.currentPrice).minus(buyVolumeDec),
+          auction.buyTokenDecimals,
+        );
       }
     }
   }

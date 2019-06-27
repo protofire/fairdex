@@ -94,27 +94,23 @@ const BidForm = React.memo(
       () => {
         if (currentPrice.isPositive()) {
           const liquidityContribution = bidAmount.times(feeRate).div(100);
+          const bidAmountDec = utils.toBigNumber(
+            utils.fromDecimal(bidAmount.minus(liquidityContribution), auction.buyTokenDecimals),
+          );
 
-          return bidAmount.minus(liquidityContribution).div(currentPrice);
+          return utils.toDecimal(bidAmountDec.div(currentPrice), auction.sellTokenDecimals);
         }
 
         return ZERO;
       },
-      [bidAmount, currentAccount, feeRate],
-    );
-
-    const availableSellVolume = useMemo(
-      () => {
-        return utils.auction.getAvailableVolume(auction);
-      },
-      [auction],
+      [auction, bidAmount, currentAccount, feeRate],
     );
 
     const availableBidVolume = useMemo(
       () => {
-        return availableSellVolume.times(currentPrice);
+        return utils.auction.getAvailableVolume(auction);
       },
-      [availableSellVolume, currentPrice],
+      [auction],
     );
 
     const bidTokenBalance = useMemo(

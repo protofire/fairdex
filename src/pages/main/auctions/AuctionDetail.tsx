@@ -145,10 +145,7 @@ const Content = ({ auction }: ContentProp) => (
                 <Loading />
               ) : (
                 <>
-                  <DecimalValue
-                    value={getAvailableVolume(auction).times(auction.currentPrice)}
-                    decimals={DEFAULT_DECIMALS}
-                  />
+                  <DecimalValue value={getAvailableVolume(auction)} decimals={DEFAULT_DECIMALS} />
                   <small> {auction.buyToken}</small>
                 </>
               )}

@@ -4,10 +4,12 @@ interface AuctionData {
   state?: 'running' | 'scheduled' | 'ended';
   auctionIndex: string;
   sellToken: TokenSymbol;
+  sellTokenDecimals: number;
   sellTokenAddress: Address;
   sellVolume: BigNumber;
   extraTokens: BigNumber;
   buyToken: TokenSymbol;
+  buyTokenDecimals: number;
   buyTokenAddress: Address;
   buyVolume: BigNumber;
   unclaimedFunds?: BigNumber;
