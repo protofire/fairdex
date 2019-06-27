@@ -158,7 +158,7 @@ export function updateAuction(auction: Auction) {
           dx.getBuyVolume(sellToken, buyToken),
         ]);
 
-        dispatch(updateAuctionData(auction, currentPrice.value, buyVolume));
+        dispatch(updateAuctionData(auction, currentPrice, buyVolume));
       }
     }
   };
@@ -173,7 +173,7 @@ const setAuctionList: ActionCreator<AnyAction> = (auctions: Auction[]) => {
 
 const updateAuctionData: ActionCreator<AnyAction> = (
   auction: Auction,
-  currentPrice: BigNumber,
+  currentPrice: Fractional,
   buyVolume: BigNumber,
 ) => {
   return {

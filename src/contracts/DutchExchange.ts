@@ -3,7 +3,15 @@ import { DutchExchangeProxy as proxy } from '@gnosis.pm/dx-contracts/networks.js
 
 import BaseContract from './BaseContract';
 import { getErc20Contract, getWethContract } from './index';
-import { Decimal, fromDecimal, toBigNumber, toDecimal, toFractional, ZERO } from './utils';
+import {
+  Decimal,
+  formatPriceWithDecimals,
+  fromDecimal,
+  toBigNumber,
+  toDecimal,
+  toFractional,
+  ZERO,
+} from './utils';
 
 type Event =
   | 'AuctionCleared'
@@ -170,7 +178,21 @@ class DutchExchange extends BaseContract<Event> {
       .getCurrentAuctionPrice(sellToken.address, buyToken.address, auctionIndex)
       .call();
 
-    return toFractional(currentPrice);
+    const formatedWithDecimals = toFractional(
+      formatPriceWithDecimals({
+        price: currentPrice,
+        tokenBDecimals: buyToken.decimals,
+        tokenADecimals: sellToken.decimals,
+      }),
+    );
+
+    const fractional = toFractional(currentPrice);
+
+    // we need to maintain original num and den to be used in getAvailableVolume and sellTokenAmount
+    return {
+      ...fractional,
+      value: formatedWithDecimals.value,
+    };
   }
 
   async getClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
@@ -178,7 +200,13 @@ class DutchExchange extends BaseContract<Event> {
       .closingPrices(sellToken.address, buyToken.address, auctionIndex)
       .call();
 
-    return toFractional(closingPrice);
+    return toFractional(
+      formatPriceWithDecimals({
+        price: closingPrice,
+        tokenBDecimals: buyToken.decimals,
+        tokenADecimals: sellToken.decimals,
+      }),
+    );
   }
 
   async getPreviousClosingPrice(sellToken: Token, buyToken: Token, auctionIndex: string) {
@@ -186,7 +214,13 @@ class DutchExchange extends BaseContract<Event> {
       .getPriceInPastAuction(sellToken.address, buyToken.address, auctionIndex)
       .call();
 
-    return toFractional(closingPrice);
+    return toFractional(
+      formatPriceWithDecimals({
+        price: closingPrice,
+        tokenBDecimals: buyToken.decimals,
+        tokenADecimals: sellToken.decimals,
+      }),
+    );
   }
 
   async getSellVolume(

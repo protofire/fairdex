@@ -56,13 +56,23 @@ describe('in running auctions', () => {
     state: 'running',
     auctionStart: Date.now(),
     sellToken: 'OMG',
+    sellTokenDecimals: 12,
     sellTokenAddress: '0x00df91984582e6e96288307e9c2f20b38c8fece9',
     sellVolume: toBigNumber(100),
     buyToken: 'DAI',
+    buyTokenDecimals: 12,
     buyTokenAddress: '0x62f25065ba60ca3a2044344955a3b2530e355111',
     buyVolume: toBigNumber(0),
-    currentPrice: toBigNumber(0.0123456789),
-    closingPrice: toBigNumber(0.0123456789 * 2),
+    currentPrice: {
+      numerator: toBigNumber(1),
+      denominator: toBigNumber(81.000000737),
+      value: toBigNumber(0.0123456789),
+    },
+    closingPrice: {
+      numerator: toBigNumber(1),
+      denominator: toBigNumber(40.500000369),
+      value: toBigNumber(0.0123456789 * 2),
+    },
     unclaimedFunds: toBigNumber(1234),
   };
 
@@ -99,8 +109,16 @@ describe('in running auctions', () => {
 
     test('should show "above previous closing price" dialog', async () => {
       const aboveAuction = { ...data };
-      aboveAuction.closingPrice = toBigNumber(1);
-      aboveAuction.currentPrice = toBigNumber(1.2);
+      (aboveAuction.closingPrice = {
+        numerator: toBigNumber(1),
+        denominator: toBigNumber(1),
+        value: toBigNumber(1),
+      }),
+        (aboveAuction.currentPrice = {
+          numerator: toBigNumber(1),
+          denominator: toBigNumber(0.833333333),
+          value: toBigNumber(1.2),
+        });
 
       const { getByTestId, getByText } = renderWithRedux(<BidForm auction={aboveAuction} />, {
         blockchain: {
@@ -125,8 +143,7 @@ describe('in running auctions', () => {
         },
       });
 
-      const availableSellVolume = getAvailableVolume(data);
-      const availableBidVolume = availableSellVolume.times(data.currentPrice);
+      const availableBidVolume = getAvailableVolume(data);
 
       const bidAmount = availableBidVolume.plus(1);
 
@@ -148,8 +165,7 @@ describe('in running auctions', () => {
         },
       });
 
-      const availableSellVolume = getAvailableVolume(data);
-      const availableBidVolume = availableSellVolume.times(data.currentPrice);
+      const availableBidVolume = getAvailableVolume(data);
 
       const bidAmount = availableBidVolume.minus(0.01);
 

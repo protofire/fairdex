@@ -48,7 +48,7 @@ const BidForm = React.memo(
       return null;
     }
 
-    const { currentPrice = ZERO } = auction;
+    const currentPrice = auction.currentPrice.value || ZERO;
 
     const [bidAmount, setBidAmount] = useState(ZERO);
     const [bidding, setBidding] = useState(false);
@@ -94,27 +94,26 @@ const BidForm = React.memo(
       () => {
         if (currentPrice.isPositive()) {
           const liquidityContribution = bidAmount.times(feeRate).div(100);
+          const bidAmountDec = utils.toBigNumber(
+            utils.fromDecimal(bidAmount.minus(liquidityContribution), auction.buyTokenDecimals),
+          );
 
-          return bidAmount.minus(liquidityContribution).div(currentPrice);
+          return utils.toDecimal(
+            bidAmountDec.times(auction.currentPrice.denominator).div(auction.currentPrice.numerator),
+            auction.sellTokenDecimals,
+          );
         }
 
         return ZERO;
       },
-      [bidAmount, currentAccount, feeRate],
-    );
-
-    const availableSellVolume = useMemo(
-      () => {
-        return utils.auction.getAvailableVolume(auction);
-      },
-      [auction],
+      [auction, bidAmount, currentAccount, feeRate],
     );
 
     const availableBidVolume = useMemo(
       () => {
-        return availableSellVolume.times(currentPrice);
+        return utils.auction.getAvailableVolume(auction);
       },
-      [availableSellVolume, currentPrice],
+      [auction],
     );
 
     const bidTokenBalance = useMemo(
@@ -381,12 +380,12 @@ const BidForm = React.memo(
             {currentStep === 1 && (
               <Step1 onSubmit={goToNextStep}>
                 <Text>
-                  <DecimalValue value={auction.currentPrice} decimals={4} postfix={auction.buyToken} />
+                  <DecimalValue value={auction.currentPrice.value} decimals={4} postfix={auction.buyToken} />
                 </Text>
                 <p>
                   You are bidding above the <br />
                   previous closing price:{' '}
-                  <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.buyToken} />
+                  <DecimalValue value={auction.closingPrice.value} decimals={4} postfix={auction.buyToken} />
                 </p>
                 <Button type='submit' autoFocus data-testid={'proceed-bid-button'}>
                   Proceed
@@ -435,7 +434,9 @@ const BidForm = React.memo(
 
                 <Button
                   type='submit'
-                  disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
+                  disabled={
+                    !auction.currentPrice || auction.currentPrice.value.lte(ZERO) || bidAmount.lte(ZERO)
+                  }
                   data-testid={'bid-step2-next-button'}
                 >
                   Next
