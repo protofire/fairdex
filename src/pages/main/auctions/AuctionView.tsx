@@ -130,7 +130,11 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   <Loading />
                 ) : (
                   <span title={getCurrentPriceRate(auction)}>
-                    <DecimalValue value={auction.currentPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                    <DecimalValue
+                      value={auction.currentPrice.value}
+                      decimals={DEFAULT_DECIMALS}
+                      hideTitle={true}
+                    />
                     <small>
                       {' '}
                       {auction.buyToken}
@@ -148,7 +152,11 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   <Loading />
                 ) : (
                   <span title={getClosingPriceRate(auction)}>
-                    <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                    <DecimalValue
+                      value={auction.closingPrice.value}
+                      decimals={DEFAULT_DECIMALS}
+                      hideTitle={true}
+                    />
                     <small>
                       {' '}
                       {auction.buyToken}
@@ -203,7 +211,11 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   <Loading />
                 ) : (
                   <span title={getClosingPriceRate(auction)}>
-                    <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                    <DecimalValue
+                      value={auction.closingPrice.value}
+                      decimals={DEFAULT_DECIMALS}
+                      hideTitle={true}
+                    />
                     <small>
                       {' '}
                       {auction.buyToken}
@@ -247,7 +259,11 @@ const AuctionView = React.memo(({ data: auction, onCardClick, dispatch, ...props
                   <Loading />
                 ) : (
                   <span title={getClosingPriceRate(auction)}>
-                    <DecimalValue value={auction.closingPrice} decimals={DEFAULT_DECIMALS} hideTitle={true} />
+                    <DecimalValue
+                      value={auction.closingPrice.value}
+                      decimals={DEFAULT_DECIMALS}
+                      hideTitle={true}
+                    />
                     <small>
                       {' '}
                       {auction.buyToken}

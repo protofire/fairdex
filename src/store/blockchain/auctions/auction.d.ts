@@ -1,5 +1,11 @@
 type Auction = RunningAuction | ScheduledAuction | EndedAuction;
 
+interface Fractional {
+  numerator: BigNumber;
+  denominator: BigNumber;
+  value: BigNumber;
+}
+
 interface AuctionData {
   state?: 'running' | 'scheduled' | 'ended';
   auctionIndex: string;
@@ -19,19 +25,19 @@ interface AuctionData {
 interface RunningAuction extends AuctionData {
   state: 'running';
   auctionStart: number;
-  currentPrice: BigNumber;
-  closingPrice: BigNumber;
+  currentPrice: Fractional;
+  closingPrice: Fractional;
 }
 
 interface ScheduledAuction extends AuctionData {
   state: 'scheduled';
   auctionStart: number;
-  closingPrice: BigNumber;
+  closingPrice: Fractional;
 }
 
 interface EndedAuction extends AuctionData {
   state: 'ended';
   auctionStart: number;
   auctionEnd: number;
-  closingPrice: BigNumber;
+  closingPrice: Fractional;
 }

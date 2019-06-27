@@ -63,8 +63,16 @@ describe('in running auctions', () => {
     buyTokenDecimals: 12,
     buyTokenAddress: '0x62f25065ba60ca3a2044344955a3b2530e355111',
     buyVolume: toBigNumber(0),
-    currentPrice: toBigNumber(0.0123456789),
-    closingPrice: toBigNumber(0.0123456789 * 2),
+    currentPrice: {
+      numerator: toBigNumber(1),
+      denominator: toBigNumber(81.000000737),
+      value: toBigNumber(0.0123456789),
+    },
+    closingPrice: {
+      numerator: toBigNumber(1),
+      denominator: toBigNumber(40.500000369),
+      value: toBigNumber(0.0123456789 * 2),
+    },
     unclaimedFunds: toBigNumber(1234),
   };
 
@@ -101,8 +109,16 @@ describe('in running auctions', () => {
 
     test('should show "above previous closing price" dialog', async () => {
       const aboveAuction = { ...data };
-      aboveAuction.closingPrice = toBigNumber(1);
-      aboveAuction.currentPrice = toBigNumber(1.2);
+      (aboveAuction.closingPrice = {
+        numerator: toBigNumber(1),
+        denominator: toBigNumber(1),
+        value: toBigNumber(1),
+      }),
+        (aboveAuction.currentPrice = {
+          numerator: toBigNumber(1),
+          denominator: toBigNumber(0.833333333),
+          value: toBigNumber(1.2),
+        });
 
       const { getByTestId, getByText } = renderWithRedux(<BidForm auction={aboveAuction} />, {
         blockchain: {

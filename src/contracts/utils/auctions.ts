@@ -57,7 +57,7 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
           auctionStart: endedAuctionStart,
           auctionEnd,
           buyVolume: bidVolume,
-          closingPrice: closingPrice.value,
+          closingPrice,
         };
 
         return auction;
@@ -70,7 +70,7 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
           ...data,
           state: 'scheduled',
           auctionStart,
-          closingPrice: previousClosingPrice.value,
+          closingPrice: previousClosingPrice,
         };
 
         return auction;
@@ -81,8 +81,8 @@ export async function getAuctionInfo(sellToken: Token, buyToken: Token, auctionI
           ...data,
           state: 'running',
           auctionStart,
-          currentPrice: currentPrice.value,
-          closingPrice: previousClosingPrice.value,
+          currentPrice,
+          closingPrice: previousClosingPrice,
         };
 
         return auction;
@@ -105,12 +105,15 @@ export async function getUnclaimedFunds(
 export function getAvailableVolume(auction: RunningAuction) {
   if (auction.sellVolume && auction.sellVolume.gt(0)) {
     if (auction.buyVolume && auction.buyVolume.gte(0)) {
-      if (auction.currentPrice && auction.currentPrice.gte(0)) {
+      if (auction.currentPrice.value && auction.currentPrice.value.gte(0)) {
         const sellVolumeDec = toBigNumber(fromDecimal(auction.sellVolume, auction.sellTokenDecimals));
         const buyVolumeDec = toBigNumber(fromDecimal(auction.buyVolume, auction.buyTokenDecimals));
 
         return toDecimal(
-          sellVolumeDec.times(auction.currentPrice).minus(buyVolumeDec),
+          sellVolumeDec
+            .times(auction.currentPrice.numerator)
+            .div(auction.currentPrice.denominator)
+            .minus(buyVolumeDec),
           auction.buyTokenDecimals,
         );
       }
@@ -131,11 +134,17 @@ export function getEstimatedEndTime(auction: RunningAuction) {
 }
 
 export function isAbovePriorClosingPrice(auction: Auction) {
-  if (auction.state !== 'running' || auction.currentPrice == null || auction.closingPrice == null) {
+  if (
+    auction.state !== 'running' ||
+    auction.currentPrice.value == null ||
+    auction.currentPrice.value == null
+  ) {
     return false;
   }
 
-  return auction.currentPrice.isGreaterThan(auction.closingPrice.times(AUCTION_ABOVE_PRIOR_PRICE_THRESHOLD));
+  return auction.currentPrice.value.isGreaterThan(
+    auction.closingPrice.value.times(AUCTION_ABOVE_PRIOR_PRICE_THRESHOLD),
+  );
 }
 
 export function getSellVolumeInEth(auction: Auction, tokens: Map<Address, Token>) {
@@ -166,11 +175,11 @@ export function getPriceRate(value: BigNumber, sellToken: string, buyToken: stri
 }
 
 export function getCurrentPriceRate(auction: RunningAuction, decimals?: number) {
-  return getPriceRate(auction.currentPrice, auction.sellToken, auction.buyToken, decimals);
+  return getPriceRate(auction.currentPrice.value, auction.sellToken, auction.buyToken, decimals);
 }
 
 export function getClosingPriceRate(auction: Auction, decimals?: number) {
-  return getPriceRate(auction.closingPrice, auction.sellToken, auction.buyToken, decimals);
+  return getPriceRate(auction.closingPrice.value, auction.sellToken, auction.buyToken, decimals);
 }
 
 export function getCounterCurrencyPrice(value: BigNumber) {
@@ -197,5 +206,5 @@ export function getTotalClaimFound(auction: Auction) {
     return ZERO;
   }
 
-  return auction.buyerBalance.dividedBy(auction.closingPrice);
+  return auction.buyerBalance.dividedBy(auction.closingPrice.value);
 }

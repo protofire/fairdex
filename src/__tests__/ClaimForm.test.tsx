@@ -37,8 +37,16 @@ describe('in running auctions', () => {
     buyToken: 'WETH',
     buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
     buyVolume: toBigNumber(0),
-    currentPrice: toBigNumber(0.0123456789),
-    closingPrice: toBigNumber(0.0123456789 * 2),
+    currentPrice: {
+      numerator: toBigNumber(1),
+      denominator: toBigNumber(81.000000737),
+      value: toBigNumber(0.0123456789),
+    },
+    closingPrice: {
+      numerator: toBigNumber(1),
+      denominator: toBigNumber(40.500000369),
+      value: toBigNumber(0.0123456789 * 2),
+    },
     unclaimedFunds: toBigNumber(1234),
   };
 
@@ -153,7 +161,11 @@ describe('in scheduled auctions', () => {
     buyToken: 'WETH',
     buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
     buyVolume: toBigNumber(0),
-    closingPrice: toBigNumber(0.0123456789),
+    closingPrice: {
+      numerator: toBigNumber(1),
+      denominator: toBigNumber(81.000000737),
+      value: toBigNumber(0.0123456789),
+    },
   };
 
   describe('claim button', () => {
@@ -176,7 +188,7 @@ describe('in ended auctions', () => {
     buyToken: 'WETH',
     buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
     buyVolume: toBigNumber(0),
-    closingPrice: toBigNumber(0.5),
+    closingPrice: { numerator: toBigNumber(1), denominator: toBigNumber(2), value: toBigNumber(0.5) },
     unclaimedFunds: toBigNumber(1234),
     buyerBalance: toBigNumber(700),
   };
@@ -191,7 +203,7 @@ describe('in ended auctions', () => {
     buyToken: 'WETH',
     buyTokenAddress: '0xc778417e063141139fce010982780140aa0cd5ab',
     buyVolume: toBigNumber(0),
-    closingPrice: toBigNumber(0.5),
+    closingPrice: { numerator: toBigNumber(1), denominator: toBigNumber(2), value: toBigNumber(0.5) },
     unclaimedFunds: toBigNumber(1400),
     buyerBalance: toBigNumber(700),
   };

@@ -48,7 +48,7 @@ const BidForm = React.memo(
       return null;
     }
 
-    const { currentPrice = ZERO } = auction;
+    const currentPrice = auction.currentPrice.value || ZERO;
 
     const [bidAmount, setBidAmount] = useState(ZERO);
     const [bidding, setBidding] = useState(false);
@@ -98,7 +98,10 @@ const BidForm = React.memo(
             utils.fromDecimal(bidAmount.minus(liquidityContribution), auction.buyTokenDecimals),
           );
 
-          return utils.toDecimal(bidAmountDec.div(currentPrice), auction.sellTokenDecimals);
+          return utils.toDecimal(
+            bidAmountDec.times(auction.currentPrice.denominator).div(auction.currentPrice.numerator),
+            auction.sellTokenDecimals,
+          );
         }
 
         return ZERO;
@@ -377,12 +380,12 @@ const BidForm = React.memo(
             {currentStep === 1 && (
               <Step1 onSubmit={goToNextStep}>
                 <Text>
-                  <DecimalValue value={auction.currentPrice} decimals={4} postfix={auction.buyToken} />
+                  <DecimalValue value={auction.currentPrice.value} decimals={4} postfix={auction.buyToken} />
                 </Text>
                 <p>
                   You are bidding above the <br />
                   previous closing price:{' '}
-                  <DecimalValue value={auction.closingPrice} decimals={4} postfix={auction.buyToken} />
+                  <DecimalValue value={auction.closingPrice.value} decimals={4} postfix={auction.buyToken} />
                 </p>
                 <Button type='submit' autoFocus data-testid={'proceed-bid-button'}>
                   Proceed
@@ -431,7 +434,9 @@ const BidForm = React.memo(
 
                 <Button
                   type='submit'
-                  disabled={!auction.currentPrice || auction.currentPrice.lte(ZERO) || bidAmount.lte(ZERO)}
+                  disabled={
+                    !auction.currentPrice || auction.currentPrice.value.lte(ZERO) || bidAmount.lte(ZERO)
+                  }
                   data-testid={'bid-step2-next-button'}
                 >
                   Next
