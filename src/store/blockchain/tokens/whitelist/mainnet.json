@@ -160,5 +160,11 @@
     "name": "district0x Network Token",
     "address": "0x0abdace70d3790235af448c88547603b945604ea",
     "decimals": 18
+  },
+  {
+    "symbol": "WBTC",
+    "name": "Wrapped BTC",
+    "address": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    "decimals": 8
   }
 ]
